@@ -1,0 +1,11 @@
+# robots.txt for Rasi Foundation
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Allow: /
+
+# Disallow admin/api routes
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://rasifoundation.com/sitemap.xml
