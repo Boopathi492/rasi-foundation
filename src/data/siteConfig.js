@@ -52,18 +52,6 @@ export const HERO_SLIDES = [
     cta: { label: "இப்போதே ஆலோசனை பெறுங்கள்", href: "/book-counselling", box: { left: 4.1, top: 78.67, width: 29.25, height: 10.93 } },
   },
   {
-    id: "college-admissions",
-    src: "/images/banners/hero-2-right-guidance.png",
-    alt: "Right Guidance for a Brighter Future. Explore the best colleges, get expert counselling and find the right course for your career. College admissions, career guidance, scholarship support and personalised counselling.",
-    cta: { label: "Start Your Admission Journey", href: "/colleges", box: { left: 4.95, top: 70.67, width: 25.45, height: 10.8 } },
-  },
-  {
-    id: "courses",
-    src: "/images/banners/hero-3-explore-perfect-course.png",
-    alt: "Explore Your Perfect Course. Wide range of colleges, expert guidance and secure admissions across Engineering, Medical, Arts and Science, Law, Nursing and Pharmacy. Personalised counselling, right college recommendation, admission assistance, scholarship support and career guidance.",
-    cta: { label: "Explore Courses & Colleges", href: "/courses", box: { left: 4.5, top: 72.13, width: 24.75, height: 11.07 } },
-  },
-  {
     id: "brighter-future",
     src: "/images/banners/hero-4-step-into-brighter-future.png",
     alt: "Step Into Your Brighter Future. Right guidance, right college, right career. Personalised career counselling, top college recommendations, scholarship support for eligible students and a wide range of courses.",

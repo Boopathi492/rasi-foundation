@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  FaGraduationCap, FaUserGraduate, FaStethoscope, FaCog, FaBalanceScale, FaChartLine,
-  FaArrowRight, FaChalkboardTeacher, FaFlask, FaSeedling, FaBullhorn, FaCalendarCheck,
-  FaRegCommentDots, FaShieldAlt, FaCompass, FaRoute, FaAward, FaUniversity,
-  FaHandHoldingHeart, FaComments, FaCheckCircle,
+  FaUserGraduate, FaStethoscope, FaCog, FaBalanceScale, FaArrowRight, FaFlask,
+  FaBullhorn, FaCalendarCheck, FaRegCommentDots, FaHandHoldingHeart, FaCheckCircle,
 } from 'react-icons/fa';
 import Layout from '@/frontend/components/Layout';
 import HeroCarousel from '@/frontend/components/home/HeroCarousel';
@@ -14,31 +12,21 @@ import Testimonials from '@/frontend/components/home/Testimonials';
 import DistrictExplorer from '@/frontend/components/home/DistrictExplorer';
 import FeatureCollage from '@/frontend/components/home/FeatureCollage';
 import VisionMission from '@/frontend/components/home/VisionMission';
+import AdmissionJourney from '@/frontend/components/home/AdmissionJourney';
+import BannerCrop from '@/frontend/components/home/BannerCrop';
 import Reveal from '@/frontend/components/home/Reveal';
 import { ROUTES, TESTIMONIALS } from '@/data/siteConfig';
 
 const eyebrow = 'rf-eyebrow';
 
-// PENDING VERIFICATION: "5000+" and "100+" are the site's existing default figures and are not verified.
-// If /api/achievements returns "stat" records, those replace this whole list.
-const DEFAULT_TRUST = [
-  { icon: FaUserGraduate, number: '5000+', label: 'Students Guided' },
-  { icon: FaUniversity, number: '100+', label: 'Partner Colleges' },
-  { icon: FaShieldAlt, number: 'Admission', label: 'Support' },
-  { icon: FaCompass, number: 'Career', label: 'Guidance' },
-];
-const TRUST_ICONS = [FaUserGraduate, FaUniversity, FaShieldAlt, FaCompass];
 
 // The categories offered on /courses (src/pages/courses.js). Example courses are real entries from that
 // page's course list. /courses has no URL filter, so every card links to the course page.
 const COURSE_CATEGORIES = [
-  { icon: FaStethoscope, name: 'Medical', courses: ['MBBS', 'BDS', 'B.Sc Nursing', 'B.Pharm'] },
-  { icon: FaCog, name: 'Engineering', courses: ['B.E. CSE', 'B.E. ECE', 'B.E. Mechanical', 'B.E. Civil'] },
-  { icon: FaChartLine, name: 'Management', courses: ['MBA', 'BBA', 'MCA', 'B.Com'] },
-  { icon: FaBalanceScale, name: 'Law', courses: ['BA LLB', 'BBA LLB', 'LLB', 'LLM'] },
-  { icon: FaChalkboardTeacher, name: 'Education', courses: ['B.Ed', 'M.Ed', 'D.T.Ed', 'D.El.Ed'] },
-  { icon: FaFlask, name: 'Arts & Science', courses: ['B.Sc', 'B.A.', 'M.Sc', 'M.A.'] },
-  { icon: FaSeedling, name: 'Agriculture', courses: ['B.Sc Agriculture', 'B.Sc Horticulture', 'B.Sc Forestry', 'B.V.Sc'] },
+  { icon: FaCog, name: 'Engineering', courses: ['B.E. CSE', 'B.E. Mechanical', 'B.E. Civil'], src: '/images/banners/hero-4-step-into-brighter-future.png', region: { x: 1250, y: 220, w: 500, h: 360 }, color: 'gold' },
+  { icon: FaStethoscope, name: 'Medical', courses: ['MBBS', 'BDS', 'B.Sc Nursing'], src: '/images/banners/hero-1-tamil-campus-admissions.png', region: { x: 720, y: 20, w: 540, h: 700 }, color: 'red' },
+  { icon: FaFlask, name: 'Arts & Science', courses: ['B.Sc', 'B.A.', 'M.Sc'], src: '/images/banners/hero-5-students-today-leaders-tomorrow.png', region: { x: 730, y: 70, w: 650, h: 620 }, color: 'green' },
+  { icon: FaBalanceScale, name: 'Law', courses: ['BA LLB', 'BBA LLB', 'LLB'], src: '/images/banners/hero-4-step-into-brighter-future.png', region: { x: 1480, y: 45, w: 320, h: 180 }, color: 'rose' },
 ];
 
 const BENEFITS = {
@@ -140,111 +128,56 @@ function LatestAnnouncements() {
 }
 
 export default function Home() {
-  const [trust, setTrust] = useState(DEFAULT_TRUST);
   const hasTestimonials = [...TESTIMONIALS.students, ...TESTIMONIALS.colleges].length > 0;
-
-  // Existing data source: GET /api/achievements. "stat" records, when present, replace the defaults.
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch('/api/achievements');
-        if (!res.ok) return;
-        const result = await res.json();
-        if (!cancelled && result?.stats?.length > 0) {
-          setTrust(result.stats.map((s, idx) => ({
-            icon: TRUST_ICONS[idx] || FaAward,
-            number: s.value,
-            label: s.title,
-          })));
-        }
-      } catch (error) {
-        console.error('Error fetching home data:', error);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
 
   return (
     <Layout
       title="Home"
-      description="Rasi Foundation - Premier career guidance & education consultancy in Tamil Nadu. Expert counseling for MBBS, Engineering, MBA, Law admissions. 5000+ students guided, 100+ partner colleges."
+      description="Rasi Foundation - career guidance and education consultancy in Tamil Nadu. Expert counselling for college admissions, career choices and scholarships."
       keywords="NEET counseling, medical college admission Tamil Nadu, engineering admission guidance, MBA admission consultant, career counselor Rasipuram, Namakkal education consultancy"
     >
       <h1 className="sr-only">Rasi Foundation: career guidance and college admission support in Tamil Nadu</h1>
 
-      {/* 1. Hero carousel */}
+      {/* Homepage sequence follows the supplied reference. */}
       <HeroCarousel />
-
-      {/* 2. Trust and key highlights */}
-      <section aria-label="Rasi Foundation at a glance" className="container mx-auto px-4 py-8">
-        <Reveal>
-          <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-brand-100 bg-brand-100 shadow-card lg:grid-cols-4">
-            {trust.map((item, i) => (
-              <div key={`${item.label}-${i}`} className="flex items-center gap-4 bg-white p-5 md:p-6">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xl text-brand-700">
-                  <item.icon aria-hidden="true" />
-                </span>
-                <div className="flex flex-col-reverse">
-                  <dt className="text-sm text-gray-600">{item.label}</dt>
-                  <dd className="font-heading text-xl font-bold leading-tight text-gray-900 md:text-2xl">{item.number}</dd>
-                </div>
-              </div>
-            ))}
-          </dl>
-        </Reveal>
-      </section>
-
-      {/* 2b. Tamil Nadu districts ticker and feature collage */}
       <DistrictExplorer />
+      <AdmissionJourney />
+      <CollegeShowcase />
       <FeatureCollage />
 
-      {/* 3. Explore colleges, then courses */}
-      <CollegeShowcase />
-
-      {/* Explore courses */}
-      <section aria-labelledby="courses-heading" className="bg-white py-16">
+      <section aria-labelledby="courses-heading" className="relative overflow-hidden bg-[#fffdfa] py-14 md:py-16">
         <div className="container mx-auto px-4">
-          <Reveal>
-            <SectionHeading id="courses-heading" label="Courses" title="Explore courses">
-              The course categories we guide students towards, including Nursing and Pharmacy under Medical.
-            </SectionHeading>
+          <Reveal className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className={eyebrow}>Courses</p>
+              <h2 id="courses-heading" className="mt-1 font-heading text-3xl font-bold text-gray-900 md:text-4xl">Explore Popular Courses</h2>
+              <p className="mt-2 max-w-xl text-sm text-gray-600">Choose from a wide range of undergraduate and postgraduate programs.</p>
+            </div>
+            <Link href="/courses" className="rf-btn-outline self-start whitespace-nowrap px-4 py-2.5 text-xs sm:self-auto">View All Courses <FaArrowRight aria-hidden="true" /></Link>
           </Reveal>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {COURSE_CATEGORIES.map((course, i) => (
-              <Reveal key={course.name} delay={(i % 4) * 0.07}>
-                <Link
-                  href="/courses"
-                  className="rf-card group block h-full p-6 transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-card-hover motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2"
-                >
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-700 transition-colors group-hover:bg-brand-700 group-hover:text-white">
-                    <course.icon className="text-xl" aria-hidden="true" />
-                  </div>
-                  <h3 className="font-sans text-lg font-semibold text-gray-900">{course.name}</h3>
-                  <p className="mt-2 text-sm text-gray-600">{course.courses.join(' · ')}</p>
-                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-700">
-                    View courses <FaArrowRight className="text-xs" aria-hidden="true" />
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {COURSE_CATEGORIES.map(({ icon: Icon, name, courses, src, region, color }, i) => (
+              <Reveal key={name} delay={i * 0.06}>
+                <Link href="/courses" className={`course-card course-${color} group relative flex min-h-[220px] overflow-hidden rounded-2xl border border-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-card-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2`}>
+                  <span className="absolute inset-y-0 right-0 w-[48%] overflow-hidden" style={{ clipPath: 'polygon(22% 0,100% 0,100% 100%,0 100%)' }}>
+                    <BannerCrop src={src} alt="" region={region} fill sizes="(min-width: 1280px) 14vw, (min-width: 640px) 40vw, 60vw" className="h-full w-full transition-transform duration-500 group-hover:scale-105" />
+                  </span>
+                  <span className="relative z-10 flex w-[64%] flex-col items-start justify-center p-5 pr-3">
+                    <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 text-xl shadow-sm"><Icon aria-hidden="true" /></span>
+                    <span className="font-heading text-lg font-bold text-gray-900">{name}</span>
+                    <span className="mt-2 text-xs leading-relaxed text-gray-700">{courses.join(' · ')}</span>
+                    <span className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-rasi-700">Explore <FaArrowRight aria-hidden="true" /></span>
                   </span>
                 </Link>
               </Reveal>
             ))}
-            <Reveal delay={0.21}>
-              <Link
-                href="/courses"
-                className="flex h-full min-h-[10rem] flex-col items-start justify-center rounded-2xl bg-brand-800 p-6 text-white transition-colors hover:bg-brand-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2"
-              >
-                <FaGraduationCap className="mb-3 text-2xl text-gold-300" aria-hidden="true" />
-                <h3 className="font-sans text-lg font-semibold">View all courses</h3>
-                <span className="mt-3 inline-flex items-center gap-2 text-sm font-semibold">
-                  Open course list <FaArrowRight aria-hidden="true" />
-                </span>
-              </Link>
-            </Reveal>
           </div>
         </div>
+        <style jsx>{`
+          .course-gold{background:#fff7e9}.course-red{background:#fff0f2}.course-green{background:#eef8f3}.course-rose{background:#fff2f3}
+          .course-gold .rounded-xl{color:#ab6900}.course-red .rounded-xl,.course-rose .rounded-xl{color:#a20d28}.course-green .rounded-xl{color:#075544}
+        `}</style>
       </section>
-      <VisionMission />
-
       {/* 6. Scholarship support: image is a crop of the supplied student banner artwork */}
       <section aria-labelledby="scholarship-heading" className="bg-brand-50/60 py-16">
         <div className="container mx-auto grid items-center gap-10 px-4 lg:grid-cols-2">
@@ -275,6 +208,8 @@ export default function Home() {
           </Reveal>
         </div>
       </section>
+
+      <VisionMission />
 
       {/* 7. Student success: verified testimonials when configured, otherwise a service-benefits section */}
       {hasTestimonials ? (

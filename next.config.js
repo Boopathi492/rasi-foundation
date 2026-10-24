@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Optional override so a verification build can run without touching the dev server's .next folder
-  distDir: process.env.NEXT_DIST_DIR || '.next',
+  // Keep dev and production artifacts apart. A build must not replace chunks the
+  // running dev server is using (and the dev server must not mutate production output).
+  distDir: process.env.NEXT_DIST_DIR || (process.env.NODE_ENV === 'development' ? '.next-dev' : '.next'),
   reactStrictMode: true,
   
   // Enable compression

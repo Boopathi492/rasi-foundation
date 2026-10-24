@@ -22,13 +22,19 @@ export default function Marquee({ children, label, speed = 0.5, className = '', 
   const scrollerRef = useRef(null);
   const pausedRef = useRef(false);
   const posRef = useRef(0);
+  const nudgeTimerRef = useRef(null);
   const reduced = usePrefersReducedMotion();
   const [overflowing, setOverflowing] = useState(false);
 
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return undefined;
-    const measure = () => setOverflowing(el.scrollWidth / 2 > el.clientWidth + 1);
+    // Measure the original item set. Before the clone is rendered, scrollWidth is
+    // only one set wide, so dividing it by two incorrectly disables many tickers.
+    const measure = () => {
+      const items = el.firstElementChild;
+      setOverflowing(Boolean(items && items.scrollWidth > el.clientWidth + 1));
+    };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
@@ -39,20 +45,26 @@ export default function Marquee({ children, label, speed = 0.5, className = '', 
     const el = scrollerRef.current;
     if (!el || reduced || !overflowing) return undefined;
     let frame;
+    let lastTimestamp = 0;
     posRef.current = el.scrollLeft;
-    const tick = () => {
+    const tick = (timestamp) => {
       if (!pausedRef.current) {
         const loop = el.scrollWidth / 2;
-        posRef.current += speed;
+        const elapsed = lastTimestamp ? Math.min(timestamp - lastTimestamp, 40) : 16.67;
+        posRef.current += speed * (elapsed / 16.67);
         if (posRef.current >= loop) posRef.current -= loop;
         el.scrollLeft = posRef.current;
       } else {
         posRef.current = el.scrollLeft; // keep in sync with manual scrolling
       }
+      lastTimestamp = timestamp;
       frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(nudgeTimerRef.current);
+    };
   }, [reduced, overflowing, speed, children]);
 
   // Keep manual scrolling inside the seamless loop
@@ -62,6 +74,7 @@ export default function Marquee({ children, label, speed = 0.5, className = '', 
     const loop = el.scrollWidth / 2;
     if (el.scrollLeft >= loop) el.scrollLeft -= loop;
     else if (el.scrollLeft <= 0 && pausedRef.current) el.scrollLeft += loop;
+    posRef.current = el.scrollLeft;
   };
 
   // Mouse drag-to-scroll (touch and trackpad already scroll natively)
@@ -78,7 +91,13 @@ export default function Marquee({ children, label, speed = 0.5, className = '', 
   const nudge = (dir) => {
     const el = scrollerRef.current;
     if (!el) return;
+    pausedRef.current = true;
+    window.clearTimeout(nudgeTimerRef.current);
     el.scrollBy({ left: dir * Math.max(240, el.clientWidth * 0.6), behavior: reduced ? 'auto' : 'smooth' });
+    nudgeTimerRef.current = window.setTimeout(() => {
+      posRef.current = el.scrollLeft;
+      pausedRef.current = false;
+    }, reduced ? 0 : 450);
   };
 
   const pause = () => { pausedRef.current = true; };

@@ -4,8 +4,8 @@ import BannerCrop from './BannerCrop';
 import Reveal from './Reveal';
 import { ROUTES } from '@/data/siteConfig';
 
-const B2 = '/images/banners/hero-2-right-guidance.png';
-const B4 = '/images/banners/hero-4-step-into-brighter-future.png';
+const MAIN_IMAGE = '/images/banners/hero-1-tamil-campus-admissions.png';
+const SUPPORT_IMAGES = '/images/banners/hero-4-step-into-brighter-future.png';
 
 const POINTS = [
   { icon: FaUserGraduate, title: 'Personalised Career Counselling', text: 'One-to-one sessions to understand your marks, interests and goals.' },
@@ -21,37 +21,30 @@ export default function FeatureCollage() {
       <span aria-hidden="true" className="pointer-events-none absolute -left-24 top-10 h-64 w-64 rounded-full bg-brand-100/70" />
       <span aria-hidden="true" className="pointer-events-none absolute -right-20 bottom-0 h-56 w-56 rounded-full border-2 border-gold-300/50" />
       <div className="container relative mx-auto grid items-center gap-12 px-4 lg:grid-cols-2">
-        {/* Layered collage: one primary image, three overlapping rounded, square and circular images */}
-        <Reveal className="relative mx-auto w-full max-w-lg pb-10 pr-8 sm:pr-12">
-          <span aria-hidden="true" className="absolute -left-4 -top-4 h-24 w-24 rounded-full bg-gold-300/60" />
-          <span aria-hidden="true" className="absolute bottom-2 left-6 h-16 w-16 rounded-full border-4 border-brand-200" />
+        {/* Three separate existing photos: student, counselling and campus peers. */}
+        <Reveal className="relative mx-auto aspect-[1.05/1] w-full max-w-lg">
+          <span aria-hidden="true" className="absolute -left-4 top-4 h-24 w-24 rounded-full bg-gold-300/60" />
+          <span aria-hidden="true" className="absolute bottom-2 left-8 h-16 w-16 rounded-full border-4 border-brand-200" />
           <BannerCrop
-            src={B2}
-            alt="A smiling student holding books and a tablet"
-            region={{ x: 700, y: 20, w: 640, h: 720 }}
-            sizes="(min-width: 1024px) 30vw, 70vw"
-            className="relative rounded-[2.5rem] shadow-card-hover ring-8 ring-white"
+            src={MAIN_IMAGE}
+            alt="A student holding books on a college campus"
+            region={{ x: 730, y: 18, w: 520, h: 700 }}
+            sizes="(min-width: 1024px) 29vw, 68vw"
+            className="absolute bottom-0 left-4 top-0 w-[66%] rounded-[2.5rem] shadow-card-hover ring-8 ring-white"
           />
           <BannerCrop
-            src={B4}
-            alt="A student talking with a counsellor"
-            region={{ x: 1490, y: 60, w: 250, h: 135 }}
-            sizes="220px"
-            className="absolute right-0 top-6 w-36 rounded-2xl shadow-card-hover ring-4 ring-white sm:w-44"
+            src={SUPPORT_IMAGES}
+            alt="A student speaking with a counsellor"
+            region={{ x: 1510, y: 55, w: 300, h: 180 }}
+            sizes="(min-width: 640px) 220px, 40vw"
+            className="absolute right-0 top-[8%] w-[38%] rounded-2xl shadow-card-hover ring-4 ring-white"
           />
           <BannerCrop
-            src={B4}
-            alt="Students discussing options around a laptop"
-            region={{ x: 1490, y: 210, w: 250, h: 135 }}
-            sizes="220px"
-            className="absolute right-0 top-1/2 w-36 rounded-lg shadow-card-hover ring-4 ring-white sm:w-44"
-          />
-          <BannerCrop
-            src={B4}
-            alt="A graduation cap on books beside a jar of coins"
-            region={{ x: 1490, y: 360, w: 250, h: 130 }}
-            sizes="220px"
-            className="absolute -left-2 bottom-0 w-36 rounded-full shadow-card-hover ring-4 ring-white sm:w-44"
+            src={SUPPORT_IMAGES}
+            alt="Students discussing their college choices"
+            region={{ x: 1320, y: 215, w: 430, h: 260 }}
+            sizes="(min-width: 640px) 250px, 42vw"
+            className="absolute bottom-[7%] right-0 w-[42%] rounded-[2rem] shadow-card-hover ring-4 ring-white"
           />
         </Reveal>
 

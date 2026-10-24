@@ -52,6 +52,24 @@ h1, h2, h3, h4, h5, h6 {
 
 
 @layer components {
+  /*
+   * Site layout: the header, hero and footer backgrounds span the full viewport,
+   * while their inner content (and all page sections) share one centered,
+   * responsive container. Overrides Tailwind's default breakpoint-bound container,
+   * while explicit max-width utilities still take precedence.
+   */
+  .container {
+    width: 90%;
+    max-width: 1440px;
+    margin-inline: auto;
+  }
+
+  @media (max-width: 639px) {
+    .container {
+      width: 93%;
+    }
+  }
+
   /* Rasi design tokens: buttons (green primary, outline, gold highlight) and cards */
   .rf-btn {
     @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors duration-200

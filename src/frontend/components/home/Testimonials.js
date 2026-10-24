@@ -39,7 +39,7 @@ export default function Testimonials({ data = TESTIMONIALS }) {
       onFocus={() => setPaused(true)}
       onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setPaused(false); }}
     >
-      <div className="container mx-auto max-w-3xl px-4 text-center">
+      <div className="container mx-auto px-4 text-center">
         <p className="rf-eyebrow">Testimonials</p>
         <h2 id="testimonials-heading" className="mb-6 font-heading text-3xl font-bold text-gray-900">
           What they say about Rasi Foundation

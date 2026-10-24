@@ -1,375 +1,264 @@
-# Rasi Foundation – Complete Premium Website Redesign & Implementation
-
-Act as a senior UI/UX designer and full-stack developer. Upgrade my existing Rasi Foundation website into a premium, modern, visually rich educational consultancy platform. Do not just suggest designs or generate sample code—inspect the existing codebase and implement the improvements directly in the project.
-
-## 1. First: Inspect the Existing Project
+# Rasi Foundation – Match the Provided Homepage Reference Precisely
 
 Project path: `D:\Boopathi\rasi-foundation`
 
-Reference website: `https://mothereducationtrust.com/`
+I have provided a reference screenshot showing the exact homepage style and section arrangement I want. Use that screenshot as the primary visual reference and update my existing website to match it as closely as possible.
 
-Before editing:
-- Inspect the complete project structure, existing routes, components, assets, styling system, APIs, database models, authentication and payment integration.
-- Inspect all existing pages, especially Home, About Us, Colleges, Courses, Scholarships, Contact, Secure Your Seat/payment and registration/enquiry forms.
-- Inspect the `images_for_website_build` folder and reuse relevant original assets and logos.
-- Identify existing reusable components and current functionality before making changes.
-- Use the reference website for inspiration only. Create a distinctive Rasi Foundation design rather than copying its exact layout.
+**Do not just create a similar concept. Implement the actual layout, styling, animations and responsive behaviour in the existing project.** Inspect the current code before changing anything, and preserve all existing business logic.
 
-## 2. Global Design System – Most Important
+## 1. Header – Match My Approved Header Reference
 
-Create a centralized global design system so that changing a color in one place updates the entire website consistently.
-
-Brand colors:
-- Use the actual Rasi Foundation logo colors as the primary brand palette.
-- Use green and red as the initial primary colors, with white/off-white backgrounds and dark readable text.
-- Add complementary colors only where visually necessary for education-related cards, highlights, icons and CTAs.
-- Do not hardcode brand colors independently throughout components.
-
-Create or update centralized CSS variables/design tokens for:
-- Primary, secondary and accent colors
-- Background and surface colors
-- Text and muted text
-- Borders, shadows and gradients
-- Button variants
-- Card styles
-- Border radius and spacing
-- Typography and responsive breakpoints
-
-If the logo colors change later, I should be able to update the global variables and apply the new palette across the whole project.
-
-## 3. Header – Premium, Layered and Modern
-
-Completely improve the header while preserving existing navigation and functionality.
+The current header still does not match the approved design. Rework it to closely follow the header in the provided reference image.
 
 Requirements:
-- A slim top contact bar with verified phone, WhatsApp, email and social links.
-- Original Rasi Foundation logo and tagline.
-- Elegant navigation with Home, About Us, Courses, Colleges, Scholarships, Achievements and Contact.
-- Professional Enquiry and Book Counselling buttons.
-- A prominent Secure Your Seat CTA.
-- Subtle depth, layered surfaces, refined shadows, tasteful 3D effects and hover animations.
-- Sticky header with a polished scrolling transition.
-- Well-designed dropdown menus for Courses and Colleges, if appropriate.
-- Mobile navigation with a proper responsive menu.
-- Clear active-page indicators, proper spacing and alignment.
+- Full-width, two-row header.
+- Top contact strip with the existing verified phone, WhatsApp, email and useful information links.
+- Main navigation with the original Rasi Foundation logo, including the graduation cap above the letter R.
+- Use the approved layered maroon, deep green, white and subtle gold decorative styling.
+- Keep the logo on the left and navigation/action buttons aligned in one clean row.
+- Include Home, About Us, Courses, Colleges, Scholarships, Achievements, Announcements and Contact as appropriate to existing routes.
+- Include search, Enquiry, Book Counselling and Secure Your Seat.
+- Use polished hover states, subtle shadows, clean spacing and professional typography.
+- Make sure labels do not wrap awkwardly. In the current header, the About Us and action buttons wrap onto multiple lines; fix this.
+- Use responsive navigation on smaller screens.
 
-Avoid excessive 3D effects, oversized navigation and distracting animations. The header should look premium, trustworthy and suitable for an established educational organisation.
+Do not use the reference screenshot as a flat image. Rebuild the header with HTML/CSS and the real logo/assets.
 
-## 4. Homepage – Complete Premium Redesign
+## 2. Hero Banner – Full Width
 
-The homepage currently feels incomplete and lacks enough visual content. Redesign the entire page so it feels like a complete, professional educational website.
+- Keep the hero slider edge-to-edge at 100% viewport width.
+- Place previous and next arrows directly on the left and right sides of the banner.
+- Remove the old control row beneath the banner, including its dots and play/pause controls.
+- Remove the statistics strip beneath the banner completely, including the `5000+`, `100+`, Trusted and Expert figures.
+- Remove the statistics ribbon baked into the bottom of the hero design if it appears in the rendered slide.
+- Do not leave unnecessary blank spacing after the hero.
+- Preserve autoplay, slide transitions and existing CTA navigation.
+- Ensure banner text and faces remain visible at desktop and mobile sizes.
 
-### Section A: Hero Carousel
-- Create a visually rich, full-width educational hero section.
-- Use genuine project assets or suitable educational images.
-- Support multiple slides with distinct themes: college admissions, career guidance, scholarships, course selection and student success.
-- Add a clear headline, short supporting content and meaningful CTA buttons.
-- Keep the text readable over images using overlays, gradients or suitable contrast.
-- Add previous/next controls, dots and automatic slide transitions.
-- Autoplay approximately every 5 seconds, with pause-on-hover/focus and reduced-motion support.
-- Avoid stretching images, unnecessary blank areas and oversized hero content.
+## 3. Tamil Nadu Districts Ticker – Directly Above Admission Journey
 
-### Section B: Tamil Nadu Districts Automatic Scrolling Strip
-I specifically need an automatically scrolling Tamil Nadu districts section.
+The reference clearly places the district ticker between the hero banner and the Admission Journey section.
 
-- Display all 38 Tamil Nadu districts accurately.
-- Use a smooth horizontal marquee/ticker animation.
-- Make the content responsive and seamless without sudden jumps.
-- Avoid duplicated visual glitches, overflow and broken mobile layouts.
-- Allow users to select a district where the existing business requirements support it.
-- If district selection filters colleges or counselling locations, connect it to existing supported data rather than inventing records.
+Move the existing Tamil Nadu districts ticker to this position.
 
-### Section C: Unique Feature Section Between Districts and Colleges
-Between the district ticker and the colleges ticker, create an attractive two-column section.
+Requirements:
+- Show all 38 Tamil Nadu districts accurately.
+- Use a premium horizontal ticker with a maroon location label, clean district chips and suitable location icons.
+- Automatically scroll continuously from right to left.
+- Loop seamlessly without jumps, empty gaps or visible resets.
+- Keep the ticker directly below the hero, with a small, balanced gap.
+- Add functional arrows only if appropriate to the existing design.
+- Support touch interaction and reduced-motion preferences.
+- Avoid duplicated content glitches, horizontal overflow and layout shifts.
+- Do not turn it into a static row of district buttons.
 
-Left side:
-- A large educational image collage.
-- Use layered image composition: one primary image with smaller overlapping square or rounded images.
-- Add tasteful circular shapes, geometric layers and decorative accents.
-- Keep the composition balanced and responsive.
+**Automatic scrolling is mandatory.** Inspect and fix the existing implementation so the ticker actually moves in the browser.
 
-Right side:
-- A strong heading explaining why students choose Rasi Foundation.
-- Five clear points:
-  1. Personalised Career Counselling
-  2. Right College Selection
-  3. Admission Application Support
-  4. Scholarship Guidance
-  5. Continued Student Support
-- Each point needs a suitable icon, a short explanation and consistent spacing.
-- Add a meaningful CTA linking to the existing About Us or counselling route.
+## 4. Admission Journey – Match the Reference Layout
 
-This section must look visually distinctive rather than like five ordinary text rows.
+Place the Admission Journey immediately after the district ticker.
 
-### Section D: Automatic College Carousel
-Immediately below the above section, create a premium college carousel.
+Use a two-column layout:
 
-- Reframe the existing college cards and their complete layout.
-- Use actual available college logos, names, locations and images from existing data.
-- Automatic horizontal scrolling with smooth transitions.
-- Add navigation arrows and optional drag/swipe support.
-- Keep logos aligned, properly sized and uncropped.
-- Each card should have a consistent design, balanced whitespace and clear text.
-- Link to the relevant existing college detail page where available.
-- Include a View All Colleges CTA.
-- Do not create fake college names, logos, partnerships or statistics.
+### Left column
+- Small Rasi Foundation label.
+- Large heading: “Your Admission Journey”.
+- Subtitle: “From Enquiry to a Brighter Future”.
+- Short, clear supporting paragraph.
+- Three small benefit indicators: Expert Guidance, Trusted Colleges and End-to-End Support.
+- A clear Start Your Admission Journey CTA.
 
-### Section E: Courses
-- Redesign the courses section using attractive image cards.
-- Include relevant existing course categories such as Engineering, Medical, Arts & Science, Law, Nursing, Pharmacy and Management only where supported by the existing website data.
-- Add course imagery, clear category labels and subtle hover animations.
-- Include a View All Courses CTA.
-- Preserve existing course routes, filters and functionality.
+### Right column
+Build a visually balanced winding-road timeline containing six numbered steps:
 
-### Section F: Scholarships
-The existing Scholarships module must retain its functionality but receive a substantial visual upgrade.
+1. Explore Programs
+2. Fill the Form
+3. Attend Counselling
+4. Make the Payment
+5. Upload Documents
+6. Admission Guidance
 
-- Preserve existing scholarship information, application flows and routes.
-- Improve the hero/banner, layout, scholarship cards, eligibility information and CTA hierarchy.
-- Add relevant educational imagery and decorative layered compositions.
-- Clearly organise available scholarship details, eligibility, benefits, application guidance and deadlines when actual data exists.
-- Add extra helpful content sections only when supported by actual project data or clearly marked static informational content.
-- Never invent scholarship amounts, guarantees or eligibility claims.
-
-### Section G: Vision & Mission
-Redesign the existing Vision & Mission section.
-
-- Keep the genuine Vision and Mission content.
-- Use attractive side cards with green/red brand accents and clear icons.
-- Place a central image carousel between them.
-- Automatically transition between suitable existing images.
-- Include smooth fades or slides, responsive dimensions and proper image cropping.
-- Add subtle background patterns, geometric layers and refined shadows.
-- Avoid excessive card height or empty space.
-- Preserve the original content unless a copy improvement is necessary.
-
-### Section H: Student Testimonials and Feedback
-- Create an attractive testimonial carousel using existing genuine student feedback.
-- Automatically rotate testimonials every few seconds.
-- Include actual student names, feedback and profile images only when available and approved for display.
-- Provide navigation controls and readable testimonial cards.
-- Use subtle animations, star ratings only where supported by genuine data, and responsive layouts.
-- Never generate fake reviews, student identities or ratings.
-
-### Section I: Latest Updates and Achievements
-- Display existing announcements, admission updates, events and achievements.
-- Use existing APIs or data sources where available.
-- Add clear cards, dates, relevant imagery and links.
-- If no data is available, show a well-designed empty state instead of fabricated news.
-
-### Section J: Final CTA and Footer
-- Create a premium final banner encouraging students to enquire or book counselling.
-- Include Enquiry, Book Counselling and Secure Your Seat buttons.
-- Redesign the footer with the original logo, a short organisation description, useful navigation, services, verified contact details and social links.
-- Preserve existing privacy policy, terms and other important links.
-
-## 5. About Us – Expand and Upgrade
-
-The current About Us page must be redesigned at a higher visual and content quality level.
-
-Build a complete organisation profile with suitable sections:
-- Premium About Us hero banner.
-- Introduction to Rasi Foundation.
-- Organisation story and purpose, using verified existing content.
-- Vision and Mission.
-- Core values and educational commitment.
-- Why Choose Rasi Foundation.
-- Student counselling and admission support process.
-- Genuine achievements and verified statistics, if available.
-- Genuine partner college information.
-- Team or leadership section only if real information and images exist.
-- Student success stories only where genuine content is available.
-- Final enquiry/counselling CTA.
-- Relevant testimonials and feedback carousel near the bottom.
+Each step must have:
+- A circular numbered badge.
+- A suitable education-related icon.
+- A compact white or softly tinted content card.
+- A clear heading and short description.
+- Consistent spacing and typography.
 
 Design requirements:
-- Mix square image cards, rounded image cards and circular image compositions.
-- Use overlapping images, layered shapes, refined gradients and subtle depth.
-- Add scroll-reveal animations without harming performance.
-- Keep the content detailed, readable, well structured and professional.
-- Avoid repeating the same paragraphs across multiple sections.
-- Do not invent the organisation's history, team members, achievements or claims.
+- Use a curved dark-green road with a subtle dashed centre line.
+- Alternate the milestone cards naturally along the road.
+- Ensure the road connects the steps without passing through text.
+- Prevent cards, badges and icons from overlapping incorrectly.
+- Use maroon, green, gold and white consistently.
+- Keep the composition balanced and visually appealing, like the provided reference.
 
-## 6. Colleges Module – Complete Visual Rework
+The current roadmap has a major alignment problem: the road crosses the cards and text, the cards overlap, and the layout feels cramped. Fix the actual component layout, not just its colours.
 
-Completely rework the existing Colleges page while preserving its functionality.
+On mobile, replace the winding-road composition with a clean vertical timeline. Do not shrink the desktop layout until everything becomes unreadable.
 
-Include:
-- Premium college listing hero/banner.
-- College search and existing filters.
-- District, location, institution category or course filters only if supported by the current data model.
-- Attractive college cards with proper logo/image ratios.
-- College details, location and available courses.
-- A clean college detail page layout if one already exists.
-- Relevant related colleges or courses using actual records.
-- Pagination or existing load-more behaviour.
-- Responsive card grids, useful empty states and loading states.
+The payment step must remain informational and use the existing Secure Your Seat/payment route only when applicable. Never claim that a payment or admission is completed merely because a visitor sees this section.
 
-Ensure the cards look consistent and the listing page feels like a professional college discovery platform.
+## 5. Colleges – Automatic Carousel With Genuine College Logos
 
-## 7. Courses Module – Complete Visual Rework
+Immediately after Admission Journey, create the college section shown in the reference.
 
-Redesign the existing Courses module.
+Section heading:
+**Our Partner Colleges**
 
-Include:
-- A visually rich course banner.
-- A short, clear introduction to course and career selection.
-- Existing course categories and filters.
-- Attractive square or rounded image cards.
-- Clear course descriptions and relevant information.
-- Course detail links using existing routes.
-- Related college recommendations only when supported by current data.
-- Counselling CTA.
-- A genuine student testimonial/feedback section near the bottom.
+Supporting text:
+“Explore top colleges across Tamil Nadu with expert admission support.”
 
-Preserve all current data, routes and business rules. Do not invent course records.
+Requirements:
+- Automatically scrolling horizontal college carousel.
+- Smooth, continuous movement.
+- Functional previous/next controls.
+- Properly aligned cards with consistent dimensions.
+- Display each available college's genuine logo, name and location.
+- Keep the logo prominent and correctly proportioned.
+- Add subtle borders, shadows and hover effects.
+- Include a View All Colleges CTA.
+- Ensure cards stay inside the shared content container.
+- Support mobile swipe and prevent overflow.
 
-## 8. Contact Module – Premium Form and Information Layout
+Important:
+- Inspect existing college data and project assets first.
+- Use actual logos only when available and verified.
+- Do not invent partner relationships, college logos or college records.
+- If a college logo is unavailable, use a clean institution icon placeholder rather than a fabricated logo.
+- If the existing API cannot load data locally because of missing environment configuration, do not add fake database records. Preserve the real integration.
 
-Redesign the Contact page with a proper banner section at the top.
+Verify that automatic scrolling really works, including after React rerenders. Fix the root cause of any ticker or carousel that fails to start.
 
-Create a responsive two-column layout.
+## 6. Courses – Completely Reframe the Current Design
 
-Left side:
-- A clean, professional enquiry/contact form.
-- Appropriate fields based on existing functionality, such as full name, phone number, email, district/location, course interest, enquiry type and message.
-- Required-field validation and helpful error messages.
-- Accessible labels, clear input spacing and consistent styling.
-- A professional submit button and proper loading/success/error states.
+The current Courses section needs a fresh layout. Do not simply recolour the existing cards.
 
-Right side:
-- Verified contact information.
-- Phone and WhatsApp links.
-- Email link.
-- Office address.
-- Working hours, if verified.
-- Map or directions only if a genuine address and appropriate map integration are already available.
+Use the reference's **Explore Popular Courses** style as inspiration, while creating a polished and maintainable implementation.
 
-At the bottom:
-- Relevant student testimonials and feedback carousel.
-- A clear final CTA.
+Section heading:
+**Explore Popular Courses**
 
-Preserve existing API submission, validation, notification and data-storage behaviour. Do not make the form look functional while leaving submission disconnected.
+Supporting text:
+“Choose from a wide range of undergraduate and postgraduate programs.”
 
-## 9. Secure Your Seat – Payment and Registration Form
+Requirements:
+- Use a responsive grid of attractive image-led course cards.
+- Each card should have a category icon, course category, concise description or existing course examples, a suitable genuine image and an Explore link.
+- Create distinct but consistent cards for relevant existing categories such as Engineering, Medical, Arts & Science and Law.
+- Include other categories such as Nursing, Pharmacy or Management only where supported by the actual project data.
+- Use asymmetric image compositions or diagonal/curved image edges sparingly, with clean text alignment.
+- Use subtle hover elevation, image transitions and scroll-reveal animation.
+- Keep the card heights and content spacing consistent.
+- Include a View All Courses CTA.
+- Preserve existing course data, links and functionality.
 
-Keep the existing Secure Your Seat entry point and payment module.
+Do not use the same banner crop repeatedly as a substitute for genuine course photography if better existing assets are available. Inspect the asset folder first.
 
-Improve the form design significantly:
-- Organised sections and clear visual hierarchy.
-- Better field grouping, spacing, typography and input styling.
-- Responsive multi-column layouts where appropriate.
-- Clear required/optional indicators and inline validation.
-- Helpful loading, error and success states.
-- Proper confirmation and payment-status messaging.
-- A professional, trustworthy payment interface.
+## 7. Vision & Mission – Completely Redesign
 
-Inspect the existing form fields and payment flow before making changes. Add only genuinely useful fields that the existing backend and business process can support.
+The current Vision & Mission design is not acceptable. Replace its layout with a much stronger design inspired by the provided reference.
 
-CRITICAL:
-- Preserve the current Razorpay integration and payment verification.
-- Preserve payment amounts, order creation, callbacks, webhooks and server-side verification.
-- Do not bypass payment verification or expose secrets.
-- Do not change payment business logic merely to improve the UI.
-- Do not create a second payment system.
-- Keep existing API routes and database structure compatible.
+Create a single cohesive section with:
+- A small section label: “OUR PURPOSE”.
+- A clear heading: “Vision and Mission”.
+- A short, readable introduction.
+- A visually balanced composition containing:
+  - A green Vision card.
+  - A central circular or organically shaped student/campus image.
+  - A maroon Mission card.
+- Layered shapes, tasteful borders and subtle shadows.
+- Clear icons and comfortable text spacing.
+- Responsive alignment without excessive blank space.
 
-## 10. Global Automatic Scrolling and Animations
+Keep the genuine existing Vision and Mission text. Do not invent organisational promises or claims.
 
-The following should animate automatically where applicable:
-- Hero banners.
-- Tamil Nadu districts ticker.
-- College carousel.
-- Central Vision & Mission image carousel.
-- Genuine student testimonials and feedback.
-- Any existing image gallery or announcement carousel.
+### Central Image Carousel
+- Use suitable existing student/campus images.
+- Automatically rotate the central image.
+- Add subtle transitions and optional unobtrusive navigation controls.
+- Ensure the image remains centred between the two cards.
+- Respect reduced-motion preferences.
 
-Use polished, consistent motion:
-- Smooth transitions.
-- Subtle scroll-reveal effects.
-- Refined hover states.
-- Lightweight layered parallax only where appropriate.
-- Consistent timing and easing.
-- Pause controls or pause-on-hover where useful.
-- Respect `prefers-reduced-motion`.
+The previous layout was too plain and widely spaced. Create a polished composition that visually connects the three elements without making the text cards too large.
 
-Do not make every element move simultaneously. Animation must improve the experience, not distract users.
+## 8. Improve the Feature Section's Images
 
-## 11. Image Quality and Visual Composition
+In the existing “Why Students Choose Us” / guidance section:
+- Remove the current large side image collage if it causes the image to be cropped or looks repetitive.
+- Replace it with a clean, purposeful three-image composition.
+- Use one main square or rounded image with two smaller supporting images layered beside or below it.
+- Use different relevant existing images where available.
+- Keep the five guidance points on the opposite side, with clear icons, headings and short descriptions.
+- Ensure the images are balanced, well cropped and responsive.
+- Do not use arbitrary crops of the same banner if better images exist in the assets folder.
 
-- Inspect and use the project's existing image assets first.
-- Use genuine logos and preserve their aspect ratios.
-- Prefer high-quality education, campus, counselling and student imagery.
-- Use square image compositions, circular decorative layers, overlapping images and controlled geometric accents where appropriate.
-- Use `object-fit: cover` or `contain` correctly based on the image type.
-- Do not stretch, pixelate or crop important parts of logos.
-- Use consistent image aspect ratios within repeated cards.
-- Optimise image loading and use the project's existing image-handling conventions.
-- Do not use one generic image repeatedly across every section.
-- Do not embed a fake Rasi Foundation logo into generated banner imagery.
-- Avoid excessive decorative shapes, oversized text and unnecessarily tall sections.
+## 9. Global Visual Consistency
 
-## 12. Content Quality
+Use the approved Rasi Foundation palette:
+- Deep green.
+- Maroon/red.
+- White/off-white.
+- Subtle gold accents.
 
-All website content must be crystal clear, professional, student-friendly and relevant to education.
+Keep global colours centralised in the existing design tokens so a palette change can update the whole site.
 
-- Use concise headings and useful supporting paragraphs.
-- Use English consistently unless the existing website already supports Tamil or bilingual content.
-- If bilingual content exists, preserve it and ensure correct Tamil rendering.
-- Avoid placeholder text, duplicated paragraphs, vague marketing language and unsupported promises.
-- Make every section answer a clear user question.
-- Use genuine organisational information and existing data wherever available.
-- Maintain consistent tone across Home, About, Colleges, Courses, Scholarships and Contact.
+Use consistent typography, spacing, border radii, shadows, button styles and container widths.
 
-## 13. Technical and Functional Safety
+Layout rules:
+- Header: full width.
+- Hero: full width.
+- District ticker: full width background with a centred inner container where appropriate.
+- Main content: approximately 90% width and centred on desktop.
+- Footer: full width with a centred inner container.
+- On mobile, use comfortable side padding and prevent horizontal overflow.
 
-This is an existing production-oriented project. Make targeted, compatible improvements.
+## 10. Animations and Interaction
 
-- Preserve the existing Next.js architecture, routing and conventions.
-- Preserve API routes, MongoDB/Mongoose models, authentication and existing integrations.
-- Do not migrate the database or create new collections for purely visual features.
-- Do not delete existing functionality just to simplify the redesign.
-- Do not overwrite `.env.local` or print secret values.
-- Do not connect tests to the production database.
-- Do not introduce fake records into any database.
-- Reuse existing dependencies where possible; avoid unnecessary packages.
-- Ensure mobile, tablet and desktop responsiveness.
-- Add accessible keyboard navigation, focus indicators, semantic headings, alt text and sufficient colour contrast.
-- Check for layout shifts, horizontal overflow, broken links, console errors and failed requests.
+Implement and verify:
+- Hero autoplay and banner arrows.
+- Continuous district ticker.
+- Continuous college carousel.
+- Vision & Mission image carousel.
+- Scroll-reveal animations for major sections.
+- Refined hover states for cards and buttons.
 
-## 14. Implementation Workflow
+Animations must be smooth and restrained. Avoid making every element move simultaneously.
 
-Work in this order:
+Use appropriate cleanup for timers and event listeners, avoid duplicate intervals, and respect reduced-motion settings.
 
-1. Inspect the project, pages, data, assets and existing integrations.
-2. Identify the global styles and establish the centralized brand design system.
-3. Implement the shared header, navigation, buttons, cards, forms and footer.
-4. Redesign the homepage and implement the districts ticker, unique two-column feature section and automatic college carousel.
-5. Upgrade About Us, Colleges, Courses, Scholarships, Contact and Secure Your Seat.
-6. Implement the Vision & Mission carousel and genuine testimonials/feedback carousel.
-7. Verify all existing forms, navigation, API integrations and payment behaviour.
-8. Run available linting, tests and production build.
-9. Fix any errors introduced by the changes.
-10. Review the actual rendered pages at desktop, tablet and mobile sizes.
+## 11. Preserve Existing Functionality
 
-Do not stop after writing a plan or completing only the homepage. Continue implementing the agreed scope across all requested modules. If a specific feature depends on unavailable real data or an existing integration that cannot be safely modified, explain the limitation rather than faking the result.
+This is an existing working project. Do not break it.
 
-## 15. Final Restrictions
+- Preserve Next.js architecture and current routing.
+- Preserve APIs, database models, authentication and existing integrations.
+- Preserve Razorpay and server-side payment verification.
+- Do not modify payment amounts or payment business logic.
+- Do not overwrite `.env.local`.
+- Do not add fake testimonials, statistics, college records or scholarship claims.
+- Do not remove other existing homepage sections unless explicitly requested.
+- Do not commit, push or deploy.
 
-- Do not commit, push or deploy anything.
-- Work locally only.
-- Do not delete or overwrite existing user work without checking it first.
-- Do not replace real content with mock data.
-- Do not silently remove existing routes or functionality.
-- Keep the design cohesive across the entire website.
-- Prioritise quality, consistency, performance, accessibility and maintainability.
+## 12. Required Implementation and Verification
 
-At the end, provide a concise implementation report containing:
-- Files created and modified.
-- Pages and modules completed.
-- New animations and carousels implemented.
-- Existing integrations preserved.
-- Lint/test/build results.
-- Any remaining issues or manual testing still required.
+Before editing, inspect the actual components and identify the causes of the current layout issues.
 
-Begin by inspecting the codebase, then implement the redesign directly.
+Then implement the changes directly in the existing project.
+
+After implementation:
+1. Run lint and the production build.
+2. Test at 375px, 768px, 1024px, 1280px and 1440px if browser tools are available.
+3. Verify the header has no awkward text wrapping.
+4. Verify the hero arrows are on the banner and the old controls/statistics strip are gone.
+5. Verify the district ticker is directly above Admission Journey and scrolls automatically.
+6. Verify the road connects all six roadmap steps without overlapping cards or text.
+7. Verify the college carousel scrolls automatically and displays available genuine logos.
+8. Verify the courses cards have the new layout.
+9. Verify the Vision & Mission composition and central image carousel.
+10. Verify the three-image guidance composition.
+11. Check for horizontal overflow, broken images, console errors and failed API requests.
+
+If browser automation is unavailable, clearly state that browser testing has not been performed. Do not claim a visual issue is fixed unless the rendered result has been checked.
+
+At the end, report the files changed, the issues corrected, lint/build results and any remaining manual verification required.

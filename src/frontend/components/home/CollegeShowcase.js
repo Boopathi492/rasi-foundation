@@ -40,18 +40,19 @@ export default function CollegeShowcase() {
   }, []);
 
   return (
-    <section aria-labelledby="colleges-heading" className="bg-gray-50 py-14">
+    <section aria-labelledby="colleges-heading" className="bg-white py-12 md:py-14">
       <div className="container mx-auto px-4">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="rf-eyebrow">Colleges</p>
-            <h2 id="colleges-heading" className="font-heading text-3xl font-bold text-gray-900">
-              Tamil Nadu colleges in our directory
+            <p className="rf-eyebrow">Rasi Colleges</p>
+            <h2 id="colleges-heading" className="font-heading text-3xl font-bold text-gray-900 md:text-4xl">
+              Our Partner Colleges
             </h2>
+            <p className="mt-1 text-sm text-gray-600">Explore top colleges across Tamil Nadu with expert admission support.</p>
           </div>
           <Link
             href="/colleges"
-            className="inline-flex items-center gap-2 self-start rounded-lg bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 sm:self-auto"
+            className="rf-btn-outline self-start whitespace-nowrap px-4 py-2.5 text-xs sm:self-auto"
           >
             View All Colleges <FaArrowRight aria-hidden="true" />
           </Link>
@@ -60,7 +61,7 @@ export default function CollegeShowcase() {
         {state.status === 'loading' && (
           <div className="flex gap-4 overflow-hidden" aria-busy="true" aria-label="Loading colleges">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="h-28 w-64 shrink-0 animate-pulse rounded-xl border border-gray-200 bg-white" />
+              <div key={i} className="h-32 w-44 shrink-0 animate-pulse rounded-xl border border-gray-200 bg-white sm:w-48" />
             ))}
           </div>
         )}
@@ -81,23 +82,25 @@ export default function CollegeShowcase() {
         {state.status === 'ready' && state.colleges.length > 0 && (
           <Marquee label="Colleges in our directory" speed={0.5} arrows>
             {state.colleges.map((c) => (
-              <article
+              <Link
                 key={c.id || c.name}
-                className="flex h-28 w-64 shrink-0 gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:w-72"
+                href="/colleges"
+                aria-label={`View ${c.name} in the college directory`}
+                className="group flex h-32 w-44 shrink-0 flex-col items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-3 text-center shadow-sm transition-all hover:-translate-y-1 hover:border-brand-200 hover:shadow-card-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 sm:w-48"
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-brand-600">
-                  <FaUniversity className="text-xl" aria-hidden="true" />
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-brand-100 bg-brand-50 text-brand-700 transition-colors group-hover:bg-brand-700 group-hover:text-white">
+                  <FaUniversity className="text-2xl" aria-hidden="true" />
                 </div>
-                <div className="min-w-0">
-                  <h3 className="line-clamp-2 font-sans text-sm font-semibold leading-snug text-gray-900">{c.name}</h3>
+                <div className="min-w-0 w-full">
+                  <h3 className="line-clamp-2 font-sans text-xs font-semibold leading-snug text-gray-900">{c.name}</h3>
                   {c.location && (
-                    <p className="mt-1 flex items-center gap-1.5 truncate text-xs text-gray-600">
+                    <p className="mt-1 flex items-center justify-center gap-1.5 truncate text-[11px] text-gray-600">
                       <FaMapMarkerAlt className="shrink-0 text-gray-400" aria-hidden="true" />
                       <span className="truncate">{c.location}</span>
                     </p>
                   )}
                 </div>
-              </article>
+              </Link>
             ))}
           </Marquee>
         )}

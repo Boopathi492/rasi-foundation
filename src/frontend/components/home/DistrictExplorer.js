@@ -2,33 +2,24 @@ import { FaMapMarkerAlt } from 'react-icons/fa';
 import { TN_DISTRICTS } from '@/data/siteConfig';
 import Marquee from './Marquee';
 
-// Display-only strip: /colleges has no district filter (no query handling in src/pages/colleges.js),
-// so district chips are deliberately not links.
+// Display-only: the college directory has no district filter, so these stay non-clickable.
 export default function DistrictExplorer() {
   return (
-    <section aria-labelledby="district-heading" className="border-y border-gray-200 bg-white py-8">
-      <div className="container mx-auto px-4">
-        <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 id="district-heading" className="font-heading text-2xl font-bold text-gray-900">
-              Tamil Nadu District Explorer
-            </h2>
-            <p className="text-sm text-gray-600">
-              The {TN_DISTRICTS.length} districts of Tamil Nadu. Scroll or swipe to browse.
-            </p>
-          </div>
+    <section aria-label="Tamil Nadu districts" className="border-y border-rose-100 bg-[#fff7f6] py-3 md:py-4">
+      <div className="container mx-auto flex flex-col gap-3 px-4 sm:flex-row sm:items-center">
+        <div className="flex shrink-0 items-center gap-3 rounded-full bg-rasi-700 px-4 py-2.5 text-white shadow-sm sm:max-w-[205px]">
+          <FaMapMarkerAlt className="shrink-0 text-xl" aria-hidden="true" />
+          <span className="text-xs font-bold leading-tight">Explore Tamil Nadu Districts</span>
         </div>
-        <Marquee label="Tamil Nadu districts" speed={0.4}>
-          {TN_DISTRICTS.map((name) => (
-            <span
-              key={name}
-              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-gray-200 bg-brand-50/50 px-4 py-2 text-sm font-medium text-gray-800"
-            >
-              <FaMapMarkerAlt className="text-brand-600" aria-hidden="true" />
-              {name}
-            </span>
-          ))}
-        </Marquee>
+        <div className="min-w-0 flex-1">
+          <Marquee label={`All ${TN_DISTRICTS.length} districts of Tamil Nadu`} speed={0.8} arrows className="w-full">
+            {TN_DISTRICTS.map((name) => (
+              <span key={name} className="inline-flex shrink-0 items-center gap-2 rounded-full border border-gray-100 bg-white px-3.5 py-2 text-xs font-semibold text-gray-800 shadow-sm">
+                <FaMapMarkerAlt className="text-rasi-700" aria-hidden="true" />{name}
+              </span>
+            ))}
+          </Marquee>
+        </div>
       </div>
     </section>
   );

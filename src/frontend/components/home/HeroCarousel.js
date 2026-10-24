@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaChevronLeft, FaChevronRight, FaPause, FaPlay } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { HERO_SLIDES } from '@/data/siteConfig';
 import { usePrefersReducedMotion } from './Marquee';
 
@@ -17,7 +17,6 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
   const [seen, setSeen] = useState(() => new Set([0, 1]));
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
-  const [userPaused, setUserPaused] = useState(false);
   const reduced = usePrefersReducedMotion();
   const touchStartX = useRef(null);
   const count = slides.length;
@@ -32,7 +31,7 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
     [count]
   );
 
-  const autoPlay = !reduced && !userPaused && !hovered && !focused && count > 1;
+  const autoPlay = !reduced && !hovered && !focused && count > 1;
 
   useEffect(() => {
     if (!autoPlay) return undefined;
@@ -48,14 +47,14 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
   };
 
   const btn =
-    'flex h-10 w-10 items-center justify-center rounded-full border border-brand-200 bg-white text-brand-800 shadow-sm transition-colors hover:bg-brand-50 ' +
+    'flex h-11 w-11 items-center justify-center rounded-full border border-white/80 bg-white/90 text-brand-900 shadow-lg backdrop-blur transition-colors hover:bg-white md:h-12 md:w-12 ' +
     focusRing;
 
   return (
     <section
       aria-roledescription="carousel"
       aria-label="Rasi Foundation highlights"
-      className="container mx-auto px-4 pt-4"
+      className="w-full"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)}
@@ -63,7 +62,7 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
       onKeyDown={onKeyDown}
     >
       <div
-        className="relative aspect-[5/4] w-full overflow-hidden rounded-2xl bg-brand-50 shadow-lg ring-1 ring-black/5 md:aspect-[2048/768] md:rounded-3xl"
+        className="relative aspect-[5/4] w-full overflow-hidden bg-brand-50 md:aspect-[2048/768]"
         onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
         onTouchEnd={(e) => {
           if (touchStartX.current == null) return;
@@ -72,6 +71,10 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
           touchStartX.current = null;
         }}
       >
+        {count > 1 && <>
+          <button type="button" onClick={() => go(index - 1)} aria-label="Previous slide" className={`${btn} absolute left-1 top-1/2 z-20 -translate-y-1/2 md:left-3`}><FaChevronLeft aria-hidden="true" /></button>
+          <button type="button" onClick={() => go(index + 1)} aria-label="Next slide" className={`${btn} absolute right-1 top-1/2 z-20 -translate-y-1/2 md:right-3`}><FaChevronRight aria-hidden="true" /></button>
+        </>}
         <div aria-live={autoPlay ? 'off' : 'polite'}>
           {slides.map((slide, i) => {
             const active = i === index;
@@ -92,7 +95,7 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
                       alt={slide.alt}
                       fill
                       priority={i === 0}
-                      sizes="(max-width: 767px) 215vw, 1200px"
+                      sizes="(max-width: 767px) 215vw, 100vw"
                       className="object-cover"
                     />
                   )}
@@ -118,38 +121,6 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
         </div>
       </div>
 
-      {count > 1 && (
-        <div className="mt-3 flex items-center justify-center gap-3">
-          <button type="button" onClick={() => go(index - 1)} aria-label="Previous slide" className={btn}>
-            <FaChevronLeft aria-hidden="true" />
-          </button>
-          <div className="flex items-center gap-2" role="group" aria-label="Choose slide">
-            {slides.map((s, i) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => go(i)}
-                aria-label={`Go to slide ${i + 1} of ${count}`}
-                aria-current={i === index}
-                className={`h-2.5 rounded-full transition-all ${i === index ? 'w-8 bg-brand-700' : 'w-2.5 bg-brand-200 hover:bg-brand-400'} ${focusRing}`}
-              />
-            ))}
-          </div>
-          <button type="button" onClick={() => go(index + 1)} aria-label="Next slide" className={btn}>
-            <FaChevronRight aria-hidden="true" />
-          </button>
-          {!reduced && (
-            <button
-              type="button"
-              onClick={() => setUserPaused((v) => !v)}
-              aria-label={userPaused ? 'Play automatic slide rotation' : 'Pause automatic slide rotation'}
-              className={btn}
-            >
-              {userPaused ? <FaPlay aria-hidden="true" /> : <FaPause aria-hidden="true" />}
-            </button>
-          )}
-        </div>
-      )}
     </section>
   );
 }

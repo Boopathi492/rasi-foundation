@@ -4,23 +4,17 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import {
   FaPhoneAlt, FaEnvelope, FaWhatsapp, FaMapMarkerAlt, FaBars, FaTimes,
-  FaCalendarCheck, FaRegCommentDots, FaFacebookF, FaInstagram, FaYoutube, FaArrowRight,
+  FaCalendarCheck, FaRegCommentDots, FaArrowRight, FaSearch,
 } from 'react-icons/fa';
-import { CONTACT, NAV_LINKS, ROUTES, LABELS, SOCIAL, SERVICE_AREA } from '@/data/siteConfig';
+import { CONTACT, NAV_LINKS, ROUTES, LABELS } from '@/data/siteConfig';
 
 const focusRing =
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2';
 const barFocus =
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1 focus-visible:ring-offset-brand-900 rounded';
 
-const SOCIAL_ITEMS = [
-  { key: 'facebook', label: 'Facebook', Icon: FaFacebookF },
-  { key: 'instagram', label: 'Instagram', Icon: FaInstagram },
-  { key: 'youtube', label: 'YouTube', Icon: FaYoutube },
-].filter((s) => SOCIAL[s.key]);
-
 function CtaButtons({ onNavigate, stacked = false }) {
-  const size = 'text-[13px] px-4';
+  const size = 'whitespace-nowrap text-[12px] px-2.5';
   return (
     <div className={stacked ? 'grid gap-3 sm:grid-cols-3' : 'flex items-center gap-2'}>
       <Link href={ROUTES.enquiry} onClick={onNavigate} className={`rf-btn-outline ${size}`}>
@@ -61,6 +55,8 @@ function Brand({ compact = false }) {
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
   const menuButtonRef = useRef(null);
@@ -113,19 +109,11 @@ const Navbar = () => {
         Skip to main content
       </a>
 
-      {/* Top information bar (scrolls away) */}
-      <div className="bg-brand-800 text-white/90">
-        <div className="container mx-auto flex items-center justify-between gap-4 px-4 py-2 text-xs">
-          <p className="hidden items-center gap-2 lg:flex">
-            <FaMapMarkerAlt aria-hidden="true" className="text-gold-300" />
-            {SERVICE_AREA.map((a, i) => (
-              <span key={a} className="flex items-center gap-2">
-                {i > 0 && <span className="text-white/30" aria-hidden="true">|</span>}
-                {a}
-              </span>
-            ))}
-          </p>
-          <div className="flex w-full flex-wrap items-center justify-between gap-x-5 gap-y-1 lg:w-auto lg:justify-end">
+      <div className="rasi-header-shell relative z-50 mx-auto w-full overflow-visible">
+      {/* Contact ribbon */}
+      <div className="rasi-contact-bar bg-brand-900 text-white/90">
+        <div className="container mx-auto flex min-h-10 flex-wrap items-center justify-between gap-x-5 gap-y-1 px-4 py-2 text-xs">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
             <a href={`tel:${CONTACT.phoneTel}`} className={`flex items-center gap-2 hover:text-white ${barFocus}`}>
               <FaPhoneAlt className="text-[11px]" aria-hidden="true" />
               <span>{CONTACT.phoneDisplay}</span>
@@ -137,49 +125,30 @@ const Navbar = () => {
               className={`flex items-center gap-2 hover:text-white ${barFocus}`}
             >
               <FaWhatsapp aria-hidden="true" />
-              <span>Chat on WhatsApp<span className="sr-only"> (opens in a new tab)</span></span>
+              <span>{CONTACT.phoneDisplay}<span className="sr-only"> WhatsApp (opens in a new tab)</span></span>
             </a>
-            <a href={`mailto:${CONTACT.email}`} className={`hidden items-center gap-2 hover:text-white md:flex ${barFocus}`}>
+            <a href={`mailto:${CONTACT.email}`} className={`hidden items-center gap-2 hover:text-white sm:flex ${barFocus}`}>
               <FaEnvelope className="text-[11px]" aria-hidden="true" />
               <span>{CONTACT.email}</span>
             </a>
-            {SOCIAL_ITEMS.length > 0 && (
-              <ul className="flex items-center gap-3 lg:border-l lg:border-white/20 lg:pl-5" aria-label="Social media">
-                {SOCIAL_ITEMS.map(({ key, label, Icon }) => (
-                  <li key={key}>
-                    <a href={SOCIAL[key]} target="_blank" rel="noopener noreferrer" aria-label={`${label} (opens in a new tab)`} className={`block hover:text-white ${barFocus}`}>
-                      <Icon aria-hidden="true" />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
+          <p className="hidden items-center gap-2 font-medium text-white/90 lg:flex"><FaMapMarkerAlt className="text-gold-300" aria-hidden="true" /> College Admissions <span className="text-white/40">|</span> Career Guidance <span className="text-white/40">|</span> Scholarship Support</p>
         </div>
       </div>
 
-      {/* Branding area, large screens only (scrolls away) */}
-      <div className="hidden border-b border-brand-100 bg-white xl:block">
-        <div className="container mx-auto flex items-center justify-between gap-6 px-4 py-3">
-          <Brand />
-          <p className="font-heading text-sm italic text-gray-500">Empowering minds! Igniting future!</p>
-        </div>
-      </div>
-
-      {/* Sticky navigation bar */}
-      <header className={`sticky top-0 z-50 border-b border-brand-100 bg-white/95 backdrop-blur transition-shadow duration-300 ${scrolled ? 'shadow-md' : ''}`}>
-        <nav aria-label="Main" className="container mx-auto flex items-center justify-between gap-4 px-4 py-2">
-          <div className="xl:hidden"><Brand compact /></div>
+      <header className={`rasi-nav relative border-b border-brand-100 bg-white transition-shadow duration-300 ${scrolled ? 'shadow-lg' : 'shadow-md'}`}>
+        <nav aria-label="Main" className="container mx-auto flex min-h-[76px] items-center justify-between gap-4 px-4 py-2 lg:min-h-[88px]">
+          <div className="shrink-0"><Brand compact /></div>
 
           <ul className="hidden items-center gap-0.5 xl:flex">
-            {NAV_LINKS.map((link) => {
+            {NAV_LINKS.filter((link) => link.path !== '/announcements').map((link) => {
               const active = isActive(link.path);
               return (
                 <li key={link.path}>
                   <Link
                     href={link.path}
                     aria-current={active ? 'page' : undefined}
-                    className={`relative block rounded-md px-3 py-2.5 text-[13px] font-semibold transition-colors ${focusRing} ${
+                    className={`relative block whitespace-nowrap rounded-md px-2 py-2.5 text-xs font-semibold transition-colors ${focusRing} ${
                       active ? 'text-brand-700' : 'text-gray-700 hover:bg-brand-50 hover:text-brand-700'
                     }`}
                   >
@@ -191,10 +160,14 @@ const Navbar = () => {
             })}
           </ul>
 
-          <div className="hidden xl:block"><CtaButtons /></div>
+          <div className="hidden items-center gap-1 xl:flex">
+            <button type="button" aria-label={searchOpen ? 'Close site search' : 'Open site search'} onClick={() => setSearchOpen((v) => !v)} className={`flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-brand-900 hover:bg-brand-50 ${focusRing}`}><FaSearch aria-hidden="true" /></button>
+            <CtaButtons />
+          </div>
 
           <div className="flex items-center gap-2 xl:hidden">
-            <Link
+            <button type="button" aria-label={searchOpen ? 'Close site search' : 'Open site search'} onClick={() => setSearchOpen((v) => !v)} className={`flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-brand-900 hover:bg-brand-50 ${focusRing}`}><FaSearch aria-hidden="true" /></button>
+              <Link
               href={ROUTES.counselling}
               className={`hidden items-center gap-2 rounded-lg bg-brand-700 px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-brand-800 sm:inline-flex ${focusRing}`}
             >
@@ -213,6 +186,12 @@ const Navbar = () => {
             </button>
           </div>
         </nav>
+
+        {searchOpen && <div className="container mx-auto px-4 pb-3">
+          <label className="sr-only" htmlFor="site-search">Search pages</label>
+          <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2"><FaSearch className="text-brand-700" aria-hidden="true" /><input id="site-search" autoFocus value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder="Search courses, colleges, scholarships…" className="w-full bg-transparent py-1 text-sm outline-none" /></div>
+          {searchText.trim() && <ul className="mt-2 grid gap-1 sm:grid-cols-2 lg:grid-cols-4">{NAV_LINKS.filter((item) => item.name.toLowerCase().includes(searchText.trim().toLowerCase()) || (item.name === 'About' && 'about us'.includes(searchText.trim().toLowerCase()))).map((item) => <li key={item.path}><Link href={item.path} onClick={() => { setSearchOpen(false); setSearchText(''); }} className="block rounded-lg px-3 py-2 text-sm font-medium text-brand-800 hover:bg-brand-50">{item.name === 'About' ? 'About Us' : item.name}</Link></li>)}</ul>}
+        </div>}
 
         {/* Mobile / tablet menu */}
         {isOpen && (
@@ -255,6 +234,14 @@ const Navbar = () => {
           </>
         )}
       </header>
+      </div>
+      <style jsx>{`
+        .rasi-contact-bar{background-image:linear-gradient(90deg,#9f0c29 0 1.2%,#075544 1.2% 98.8%,#9f0c29 98.8%)}
+        .rasi-nav:before,.rasi-nav:after{content:'';position:absolute;bottom:0;height:6px;pointer-events:none}
+        .rasi-nav:before{left:0;width:24%;background:#075544;clip-path:polygon(0 0,100% 0,96% 100%,0 100%)}
+        .rasi-nav:after{right:0;width:16%;background:#9f0c29;clip-path:polygon(4% 0,100% 0,100% 100%,0 100%)}
+        .rasi-nav nav{position:relative;z-index:1}
+      `}</style>
     </>
   );
 };
