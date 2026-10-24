@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Optional override so a verification build can run without touching the dev server's .next folder
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   reactStrictMode: true,
   
   // Enable compression
@@ -18,7 +20,8 @@ const nextConfig = {
       },
     ],
     // Reduce image quality slightly for faster loading
-    deviceSizes: [640, 750, 828, 1080, 1200],
+    // 1920/2048 added so the full-width hero banners (2048px wide artwork) stay sharp on large screens
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
     formats: ['image/webp'],
     minimumCacheTTL: 60,

@@ -28,7 +28,7 @@ const Layout = ({
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <NotificationBar />
-        <main className="flex-grow">{children}</main>
+        <main id="main-content" className="flex-grow">{children}</main>
         <Footer />
         <FloatingButtons />
       </div>

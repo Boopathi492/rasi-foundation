@@ -1,447 +1,263 @@
-import Layout from '@/frontend/components/Layout';
 import { useState } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
-  FaPhone,
-  FaEnvelope,
-  FaMapMarkerAlt,
-  FaClock,
-  FaPaperPlane,
-  FaCheckCircle,
-  FaSpinner,
-  FaWhatsapp,
-  FaFacebook,
-  FaInstagram,
-  FaYoutube,
-  FaUser,
-  FaGraduationCap,
-  FaArrowRight,
-  FaHeadset
+  FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaClock, FaPaperPlane, FaCheckCircle,
+  FaSpinner, FaWhatsapp, FaExclamationCircle, FaCalendarCheck,
 } from 'react-icons/fa';
+import Layout from '@/frontend/components/Layout';
+import PageHero from '@/frontend/components/PageHero';
+import Testimonials from '@/frontend/components/home/Testimonials';
+import Reveal from '@/frontend/components/home/Reveal';
+import { CONTACT, ROUTES, TN_DISTRICTS, LABELS } from '@/data/siteConfig';
+
+// The WhatsApp number used on this page before the redesign. It differs from CONTACT.whatsappNumber
+// (header/floating buttons): the owner needs to confirm which is official.
+const CONTACT_PAGE_WHATSAPP = '918073774591';
+
+const ENQUIRY_TYPES = ['General enquiry', 'Admission guidance', 'Course selection', 'College selection', 'Scholarship information', 'Counselling'];
+const COURSE_INTERESTS = ['Medical', 'Engineering', 'Management', 'Law', 'Education', 'Arts & Science', 'Agriculture', 'Not sure yet'];
+
+const OFFICE_MAP_URL =
+  'https://www.google.com/maps/place/11%C2%B024\'06.6%22N+78%C2%B009\'34.6%22E/@11.4018417,78.1570241,17z/data=!3m1!4b1!4m4!3m3!8m2!3d11.4018417!4d78.159599';
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: 'Rasi Foundation',
+  description: 'Career guidance and education consultancy',
+  telephone: '+91-9789446100',
+  email: CONTACT.email,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: '11°24\'06.6"N 78°09\'34.6"E',
+    addressLocality: 'Rasipuram',
+    addressRegion: 'Tamil Nadu',
+    postalCode: '637408',
+    addressCountry: 'IN',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: '11.4018417', longitude: '78.159599' },
+  openingHours: 'Mo-Sa 09:00-18:00',
+};
+
+const EMPTY = { name: '', email: '', phone: '', district: '', course: '', type: ENQUIRY_TYPES[0], message: '' };
+
+function validate(v) {
+  const e = {};
+  if (!v.name.trim()) e.name = 'Please enter your full name.';
+  if (!/^\S+@\S+\.\S+$/.test(v.email.trim())) e.email = 'Please enter a valid email address.';
+  if (v.phone.replace(/\D/g, '').length < 10) e.phone = 'Please enter a phone number with at least 10 digits.';
+  if (!v.message.trim()) e.message = 'Please tell us how we can help.';
+  return e;
+}
+
+const fieldClass = (bad) =>
+  `w-full rounded-lg border bg-white px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-600 ${bad ? 'border-red-500' : 'border-gray-300'}`;
+
+function Field({ id, label, required, error, children }) {
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1.5 block text-sm font-semibold text-gray-800">
+        {label} {required ? <span className="text-red-600" aria-hidden="true">*</span> : <span className="font-normal text-gray-500">(optional)</span>}
+      </label>
+      {children}
+      {error && (
+        <p id={`${id}-error`} className="mt-1.5 flex items-center gap-1.5 text-sm text-red-700">
+          <FaExclamationCircle aria-hidden="true" /> {error}
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default function Contact() {
-  const fadeInUp = {
-    initial: { opacity: 0, y: 30 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6, ease: "easeOut" }
-  };
+  const [values, setValues] = useState(EMPTY);
+  const [errors, setErrors] = useState({});
+  const [status, setStatus] = useState('idle'); // idle | submitting | success | error
 
-  const staggerContainer = {
-    animate: {
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-  // Page SEO structured data for local business
-  const contactStructuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    name: 'Rasi Foundation',
-    description: 'Elite Career Guidance & Education Consultancy',
-    telephone: '+91-9789446100',
-    email: 'rasipuramrasifoundation@gmail.com',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: '11°24\'06.6"N 78°09\'34.6"E',
-      addressLocality: 'Rasipuram',
-      addressRegion: 'Tamil Nadu',
-      postalCode: '637408',
-      addressCountry: 'IN'
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: '11.4018417',
-      longitude: '78.159599'
-    },
-    openingHours: 'Mo-Sa 09:00-18:00'
-  };
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
-
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: ''
-  });
-
-  const contactInfo = [
-    {
-      icon: FaUser,
-      title: 'Strategic Advisor',
-      name: 'Prof. P. Gunasekaran',
-      credentials: 'M.Sc., M.Phil.',
-      role: 'Career Guidance Advisor & Analyst',
-      phone: '+91 97 89 44 61 00',
-      color: 'red'
-    },
-    {
-      icon: FaUser,
-      title: 'Administrative Director',
-      name: 'P. Yuvaraj Kumar',
-      credentials: 'MBA',
-      role: 'Career Guidance Advisor',
-      phone: '+91 92 94 96 91 96',
-      color: 'green'
-    }
-  ];
-
-  const handleInputChange = (e) => {
+  const onChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setValues((p) => ({ ...p, [name]: value }));
+    if (errors[name]) setErrors((p) => ({ ...p, [name]: undefined }));
   };
 
-  const handleSubmit = async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus(null);
-
+    const found = validate(values);
+    setErrors(found);
+    if (Object.keys(found).length) {
+      document.getElementById(Object.keys(found)[0])?.focus();
+      return;
+    }
+    setStatus('submitting');
+    // POST /api/contact only stores name, email, phone, subject and message. District and course interest are
+    // added to the message text so staff see them, without changing the API or the database model.
+    const extra = [values.district && `District: ${values.district}`, values.course && `Course interest: ${values.course}`].filter(Boolean);
+    const message = [values.message.trim(), extra.length ? `\n\n${extra.join(' | ')}` : ''].join('').slice(0, 2000);
     try {
-      const response = await fetch('/api/contact', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: values.name.trim(),
+          email: values.email.trim(),
+          phone: values.phone.trim(),
+          subject: values.type,
+          message,
+        }),
       });
-
-      if (response.ok) {
-        setSubmitStatus('success');
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          subject: '',
-          message: ''
-        });
+      const json = await res.json().catch(() => ({}));
+      if (res.ok && json.success) {
+        setStatus('success');
+        setValues(EMPTY);
       } else {
-        setSubmitStatus('error');
+        setStatus('error');
       }
-    } catch (error) {
-      setSubmitStatus('error');
-    } finally {
-      setIsSubmitting(false);
+    } catch (err) {
+      console.error('Contact submit failed', err);
+      setStatus('error');
     }
   };
+
+  const describe = (n) => (errors[n] ? `${n}-error` : undefined);
+  const submitting = status === 'submitting';
+
+  const details = [
+    { Icon: FaPhoneAlt, label: 'Phone', node: <a href={`tel:${CONTACT.phoneTel}`} className="font-semibold text-gray-900 hover:text-brand-700">{CONTACT.phoneDisplay}</a> },
+    { Icon: FaWhatsapp, label: 'WhatsApp', node: <a href={`https://wa.me/${CONTACT_PAGE_WHATSAPP}`} target="_blank" rel="noopener noreferrer" className="font-semibold text-gray-900 hover:text-brand-700">Chat on WhatsApp<span className="sr-only"> (opens in a new tab)</span></a> },
+    { Icon: FaEnvelope, label: 'Email', node: <a href={`mailto:${CONTACT.email}`} className="break-all font-semibold text-gray-900 hover:text-brand-700">{CONTACT.email}</a> },
+    { Icon: FaMapMarkerAlt, label: 'Office', node: (<><p className="font-semibold text-gray-900">Rasipuram, Tamil Nadu 637408</p><a href={OFFICE_MAP_URL} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-brand-700 underline">Get directions<span className="sr-only"> (opens in a new tab)</span></a></>) },
+    { Icon: FaClock, label: 'Working hours', node: <p className="font-semibold text-gray-900">Monday to Saturday, 9:00 am to 6:00 pm</p> },
+  ];
 
   return (
     <Layout
       title="Contact Us"
-      description="Connect with Rasi Foundation for career guidance. Our experts provide counseling for MBBS, Engineering, and Admissions."
-      keywords="career guidance, education consultancy, medical admission, engineering career advisor"
-      structuredData={contactStructuredData}
+      description="Contact Rasi Foundation for career guidance, course and college selection, and admission support."
+      keywords="career guidance, education consultancy, admission support, Rasipuram"
+      structuredData={structuredData}
     >
-      {/* Hero Section */}
-      <section className="relative pt-40 pb-24 bg-gray-50 overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-red-500/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-green-500/5 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2"></div>
+      <PageHero eyebrow="Get in touch" title="Contact Rasi Foundation">
+        Questions about admissions, courses or scholarships? Send us a message and a counsellor will get back to you.
+      </PageHero>
 
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial="initial"
-            animate="animate"
-            variants={staggerContainer}
-            className="text-center max-w-4xl mx-auto"
-          >
-            <motion.span
-              variants={fadeInUp}
-              className="inline-flex items-center gap-2 bg-red-100 text-red-700 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.25em] mb-10 border border-red-200"
-            >
-              <FaEnvelope className="text-[10px]" />
-              <span>Get In Touch</span>
-            </motion.span>
-            <motion.h1
-              variants={fadeInUp}
-              className="text-5xl md:text-6xl lg:text-8xl font-black text-gray-900 mb-10 tracking-tighter leading-none"
-            >
-              Contact <span className="text-green-600 italic">Us</span>
-            </motion.h1>
-            <motion.p
-              variants={fadeInUp}
-              className="text-2xl text-gray-600 leading-relaxed font-medium max-w-2xl mx-auto"
-            >
-              Have questions about admissions or need career guidance? Reach out to us
-              and take the first step towards your dream career.
-            </motion.p>
-          </motion.div>
+      <section className="bg-brand-50/50 py-14">
+        <div className="container mx-auto grid gap-8 px-4 lg:grid-cols-12">
+          <Reveal className="lg:col-span-7">
+            <div className="rf-card p-6 md:p-8">
+              <h2 className="font-heading text-2xl font-bold text-gray-900">Send an enquiry</h2>
+              <p className="mt-1 text-gray-600">Fields marked * are required.</p>
+
+              {status === 'success' && (
+                <div role="status" className="mt-6 flex gap-4 rounded-xl border border-brand-200 bg-brand-50 p-5">
+                  <FaCheckCircle className="mt-1 shrink-0 text-2xl text-brand-700" aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold text-brand-900">Thank you. Your enquiry has been received.</p>
+                    <p className="mt-1 text-sm text-gray-700">Our team will contact you on the phone number or email you gave us.</p>
+                    <a href={`https://wa.me/${CONTACT_PAGE_WHATSAPP}`} target="_blank" rel="noopener noreferrer" className="rf-btn-primary mt-3 px-4 py-2">
+                      <FaWhatsapp aria-hidden="true" /> Chat on WhatsApp<span className="sr-only"> (opens in a new tab)</span>
+                    </a>
+                  </div>
+                </div>
+              )}
+              {status === 'error' && (
+                <div role="alert" className="mt-6 flex gap-4 rounded-xl border border-red-200 bg-red-50 p-5">
+                  <FaExclamationCircle className="mt-1 shrink-0 text-2xl text-red-700" aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold text-red-900">We could not send your enquiry.</p>
+                    <p className="mt-1 text-sm text-gray-700">Please check your details and try again, or call us on {CONTACT.phoneDisplay}.</p>
+                  </div>
+                </div>
+              )}
+
+              <form onSubmit={onSubmit} noValidate className="mt-6 grid gap-5 sm:grid-cols-2">
+                <Field id="name" label="Full name" required error={errors.name}>
+                  <input id="name" name="name" type="text" autoComplete="name" value={values.name} onChange={onChange}
+                    aria-invalid={!!errors.name} aria-describedby={describe('name')} className={fieldClass(errors.name)} placeholder="Your full name" />
+                </Field>
+                <Field id="phone" label="Phone number" required error={errors.phone}>
+                  <input id="phone" name="phone" type="tel" autoComplete="tel" value={values.phone} onChange={onChange}
+                    aria-invalid={!!errors.phone} aria-describedby={describe('phone')} className={fieldClass(errors.phone)} placeholder="10-digit mobile number" />
+                </Field>
+                <div className="sm:col-span-2">
+                  <Field id="email" label="Email address" required error={errors.email}>
+                    <input id="email" name="email" type="email" autoComplete="email" value={values.email} onChange={onChange}
+                      aria-invalid={!!errors.email} aria-describedby={describe('email')} className={fieldClass(errors.email)} placeholder="you@example.com" />
+                  </Field>
+                </div>
+                <Field id="district" label="District">
+                  <select id="district" name="district" value={values.district} onChange={onChange} className={fieldClass(false)}>
+                    <option value="">Select your district</option>
+                    {TN_DISTRICTS.map((d) => <option key={d} value={d}>{d}</option>)}
+                    <option value="Outside Tamil Nadu">Outside Tamil Nadu</option>
+                  </select>
+                </Field>
+                <Field id="course" label="Course interest">
+                  <select id="course" name="course" value={values.course} onChange={onChange} className={fieldClass(false)}>
+                    <option value="">Select a course area</option>
+                    {COURSE_INTERESTS.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </Field>
+                <div className="sm:col-span-2">
+                  <Field id="type" label="Enquiry type" required>
+                    <select id="type" name="type" value={values.type} onChange={onChange} className={fieldClass(false)}>
+                      {ENQUIRY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </Field>
+                </div>
+                <div className="sm:col-span-2">
+                  <Field id="message" label="Message" required error={errors.message}>
+                    <textarea id="message" name="message" rows={5} maxLength={1800} value={values.message} onChange={onChange}
+                      aria-invalid={!!errors.message} aria-describedby={describe('message')} className={`${fieldClass(errors.message)} resize-y`} placeholder="Tell us about your marks, interests or questions" />
+                  </Field>
+                </div>
+                <div className="sm:col-span-2">
+                  <button type="submit" disabled={submitting} className="rf-btn-primary w-full px-6 py-3.5 text-base sm:w-auto">
+                    {submitting ? <><FaSpinner className="animate-spin" aria-hidden="true" /> Sending...</> : <><FaPaperPlane aria-hidden="true" /> Send enquiry</>}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.08} className="space-y-6 lg:col-span-5">
+            <div className="rf-card p-6 md:p-8">
+              <h2 className="font-heading text-2xl font-bold text-gray-900">Contact details</h2>
+              <ul className="mt-5 space-y-5">
+                {details.map(({ Icon, label, node }) => (
+                  <li key={label} className="flex items-start gap-4">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700"><Icon aria-hidden="true" /></span>
+                    <div><p className="text-xs font-semibold uppercase tracking-wider text-gray-500">{label}</p>{node}</div>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-5 text-xs text-gray-500">
+                The office location and working hours are carried over from the previous contact page and still need confirming.
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-brand-800 p-6 text-white md:p-8">
+              <h2 className="font-heading text-xl font-bold">Prefer to talk it through?</h2>
+              <p className="mt-2 text-white/80">Book a one-to-one counselling session for course and college guidance.</p>
+              <Link href={ROUTES.counselling} className="rf-btn-gold mt-4 px-5 py-2.5"><FaCalendarCheck aria-hidden="true" /> Book Counselling</Link>
+            </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* Main Content Area */}
-      <section className="py-32 bg-white relative overflow-hidden">
+      <Testimonials />
+
+      <section aria-labelledby="contact-cta" className="bg-white py-14">
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-12 gap-20">
-
-            {/* Left Column: Form Container */}
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="lg:col-span-7"
-            >
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-red-600/10 to-green-600/10 rounded-[3rem] blur-xl opacity-25 group-hover:opacity-50 transition duration-1000"></div>
-
-                <div className="relative bg-white border border-gray-100 rounded-[3rem] p-10 md:p-16 shadow-2xl">
-                  <h2 className="text-4xl font-black text-gray-900 mb-3 tracking-tighter">Send a Message</h2>
-                  <p className="text-lg text-gray-500 mb-12 font-medium">Fill out the form below and we&apos;ll get back to you shortly.</p>
-
-                  <form onSubmit={handleSubmit} className="space-y-10">
-                    <div className="grid md:grid-cols-2 gap-10">
-                      <div className="space-y-3">
-                        <label className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] ml-2">Your Name</label>
-                        <input
-                          type="text"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full bg-gray-50 border border-gray-200 text-gray-900 px-8 py-6 rounded-2xl focus:ring-4 focus:ring-red-500/10 focus:border-red-500/50 outline-none transition-all placeholder:text-gray-300 font-bold text-lg"
-                          placeholder="Your full name"
-                        />
-                      </div>
-                      <div className="space-y-3">
-                        <label className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] ml-2">Email Address</label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full bg-gray-50 border border-gray-200 text-gray-900 px-8 py-6 rounded-2xl focus:ring-4 focus:ring-red-500/10 focus:border-red-500/50 outline-none transition-all placeholder:text-gray-300 font-bold text-lg"
-                          placeholder="your@email.com"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-10">
-                      <div className="space-y-3">
-                        <label className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] ml-2">Phone Number</label>
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full bg-gray-50 border border-gray-200 text-gray-900 px-8 py-6 rounded-2xl focus:ring-4 focus:ring-red-500/10 focus:border-red-500/50 outline-none transition-all placeholder:text-gray-300 font-bold text-lg"
-                          placeholder="+91 000 000 0000"
-                        />
-                      </div>
-                      <div className="space-y-3">
-                        <label className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] ml-2">Subject</label>
-                        <input
-                          type="text"
-                          name="subject"
-                          value={formData.subject}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full bg-gray-50 border border-gray-200 text-gray-900 px-8 py-6 rounded-2xl focus:ring-4 focus:ring-red-500/10 focus:border-red-500/50 outline-none transition-all placeholder:text-gray-300 font-bold text-lg"
-                          placeholder="How can we help?"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <label className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] ml-2">Your Message</label>
-                      <textarea
-                        name="message"
-                        value={formData.message}
-                        onChange={handleInputChange}
-                        required
-                        rows={6}
-                        className="w-full bg-gray-50 border border-gray-200 text-gray-900 px-8 py-6 rounded-2xl focus:ring-4 focus:ring-red-500/10 focus:border-red-500/50 outline-none transition-all placeholder:text-gray-300 font-bold text-lg resize-none"
-                        placeholder="Tell us about your requirements"
-                      ></textarea>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full relative group/btn overflow-hidden rounded-2xl p-[2px] disabled:opacity-50"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-red-600 via-red-500 to-green-600 bg-[length:200%_100%] animate-gradient"></div>
-                      <div className="relative bg-[#020617] py-6 rounded-2xl flex items-center justify-center gap-4 font-black text-white uppercase tracking-[0.25em] text-sm group-hover/btn:bg-transparent transition-colors">
-                        {isSubmitting ? (
-                          <>
-                            <FaSpinner className="animate-spin text-lg" />
-                            Sending...
-                          </>
-                        ) : (
-                          <>
-                            <FaPaperPlane className="text-sm" /> Send Message
-                          </>
-                        )}
-                      </div>
-                    </button>
-                  </form>
-
-                  <AnimatePresence>
-                    {submitStatus === 'success' && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="mt-10 p-8 bg-green-50 border border-green-200 rounded-3xl flex items-center gap-6"
-                      >
-                        <div className="w-14 h-14 bg-green-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-green-200">
-                          <FaCheckCircle className="text-white text-2xl" />
-                        </div>
-                        <div>
-                          <p className="font-black text-green-900 text-sm uppercase tracking-widest">Message Sent!</p>
-                          <p className="text-green-700 text-sm font-bold mt-1 mb-4">We&apos;ll contact you shortly.</p>
-                          <a
-                            href={`https://wa.me/918073774591?text=${encodeURIComponent(
-                              `*NEW ENQUIRY*\n\n` +
-                              `*Name:* ${formData.name}\n` +
-                              `*Subject:* ${formData.subject}\n` +
-                              `*Phone:* ${formData.phone}\n` +
-                              `*Email:* ${formData.email}\n` +
-                              `*Message:* ${formData.message}`
-                            )}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-green-700 transition-colors shadow-lg shadow-green-200"
-                          >
-                            <FaWhatsapp /> Chat on WhatsApp
-                          </a>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {submitStatus === 'error' && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="mt-10 p-8 bg-red-50 border border-red-200 rounded-3xl flex items-center gap-6"
-                      >
-                        <div className="w-14 h-14 bg-red-500 rounded-2xl flex items-center justify-center flex-shrink-0 text-white font-black text-xl shadow-lg shadow-red-200">!</div>
-                        <div>
-                          <p className="font-black text-red-900 text-sm uppercase tracking-widest">Submission Error</p>
-                          <p className="text-red-700 text-sm font-bold mt-1">Please try again or call us directly.</p>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Right Column: Contact Cards */}
-            <div className="lg:col-span-5 space-y-12">
-              <motion.div
-                initial="initial"
-                whileInView="animate"
-                viewport={{ once: true }}
-                variants={staggerContainer}
-                className="grid gap-8"
-              >
-                {contactInfo.map((contact, index) => (
-                  <motion.div
-                    key={index}
-                    variants={fadeInUp}
-                    className="bg-white border border-gray-100 rounded-[2.5rem] p-8 hover:shadow-2xl transition-all duration-500 group shadow-lg"
-                  >
-                    <div className="flex items-center gap-8">
-                      <div className={`w-24 h-24 rounded-3xl flex items-center justify-center text-white text-3xl font-black shadow-xl group-hover:scale-110 transition-transform duration-500 ${contact.color === 'red' ? 'bg-gradient-to-br from-red-600 to-red-700 shadow-red-100' : 'bg-gradient-to-br from-green-600 to-green-700 shadow-green-100'
-                        }`}>
-                        {contact.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
-                      </div>
-                      <div className="flex-1">
-                        <span className={`text-[10px] font-black uppercase tracking-[0.25em] block mb-2 ${contact.color === 'red' ? 'text-red-600' : 'text-green-600'
-                          }`}>{contact.title}</span>
-                        <h3 className="text-2xl font-black text-gray-900 tracking-tight">{contact.name}</h3>
-                        <p className="text-xs text-gray-500 font-black mb-5 uppercase tracking-widest">{contact.role}</p>
-                        <a
-                          href={`tel:${contact.phone.replace(/\s/g, '')}`}
-                          className="inline-flex items-center gap-3 text-gray-900 font-black hover:text-red-600 transition-colors text-lg"
-                        >
-                          <FaPhone className="text-sm" /> {contact.phone}
-                        </a>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-
-              {/* Quick Info */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="bg-gray-50 border border-gray-100 rounded-[3rem] p-12 shadow-inner"
-              >
-                <h3 className="text-3xl font-black text-gray-900 mb-10 tracking-tighter">Information</h3>
-
-                <div className="space-y-12">
-                  <div className="flex items-start gap-6">
-                    <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center border border-gray-200 shadow-sm">
-                      <FaMapMarkerAlt className="text-red-600 text-xl" />
-                    </div>
-                    <div>
-                      <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] mb-2">Location</h4>
-                      <a
-                        href="https://www.google.com/maps/place/11%C2%B024'06.6%22N+78%C2%B009'34.6%22E/@11.4018417,78.1570241,17z/data=!3m1!4b1!4m4!3m3!8m2!3d11.4018417!4d78.159599"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-gray-900 font-black hover:text-red-600 transition-colors text-lg"
-                      >
-                        Rasipuram, Tamil Nadu<br />
-                        <span className="text-sm font-bold text-red-500">View on Google Maps</span>
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-6">
-                    <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center border border-gray-200 shadow-sm">
-                      <FaEnvelope className="text-red-600 text-xl" />
-                    </div>
-                    <div>
-                      <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] mb-2">Email</h4>
-                      <a href="mailto:rasipuramrasifoundation@gmail.com" className="text-gray-900 font-black hover:text-red-600 transition-colors break-all text-lg">
-                        rasipuramrasifoundation@gmail.com
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-6">
-                    <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center border border-gray-200 shadow-sm">
-                      <FaClock className="text-green-600 text-xl" />
-                    </div>
-                    <div>
-                      <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] mb-2">Availability</h4>
-                      <p className="text-gray-900 font-black text-lg">MON — SAT / 09:00 — 18:00</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-6 pt-6">
-                    <Link href="https://wa.me/918073774591" className="flex items-center gap-4 w-full bg-green-600 text-white p-6 rounded-2xl font-black uppercase tracking-[0.2em] text-sm justify-center hover:bg-green-700 transition-all shadow-xl shadow-green-100 hover:scale-[1.02]">
-                      <FaWhatsapp className="text-2xl" /> WhatsApp Chat
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
+          <div className="relative overflow-hidden rounded-3xl bg-brand-900 px-8 py-10 text-center text-white">
+            <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-gold-400" />
+            <h2 id="contact-cta" className="font-heading text-3xl font-bold">Ready to secure your admission?</h2>
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link href={ROUTES.counselling} className="rf-btn-gold px-6 py-3">Book Counselling</Link>
+              <Link href={ROUTES.secureSeat} className="rf-btn-light px-6 py-3">{LABELS.secureSeat}</Link>
             </div>
           </div>
         </div>
       </section>
-
-      <style jsx>{`
-        @keyframes gradient {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .animate-gradient {
-          animation: gradient 3s linear infinite;
-        }
-      `}</style>
     </Layout>
   );
 }

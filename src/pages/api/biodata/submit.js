@@ -21,7 +21,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const record = new BioData(req.body);
+    // Whitelist: visitors must not be able to set `status` or `adminNotes`.
+    const allowed = [...required, 'subCaste', 'documents'];
+    const record = new BioData(Object.fromEntries(allowed.filter((k) => k in req.body).map((k) => [k, req.body[k]])));
     await record.save();
 
     // Sync to Google Sheets — fire and forget, never block the response
@@ -31,6 +33,10 @@ export default async function handler(req, res) {
 
     return res.status(201).json({ success: true, id: record._id });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ message: err.message });
+    }
+    console.error('Biodata submit error:', err);
+    return res.status(500).json({ message: 'Failed to submit. Please try again.' });
   }
 }

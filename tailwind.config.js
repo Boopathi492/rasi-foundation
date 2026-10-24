@@ -33,6 +33,42 @@ module.exports = {
           800: '#166534',
           900: '#14532d',
         },
+        // Primary: refined deep green (evolved from the site's existing green)
+        brand: {
+          50: '#f1f8f3',
+          100: '#dcefe1',
+          200: '#b8dfc4',
+          300: '#8cc9a1',
+          400: '#55a974',
+          500: '#2f8a53',
+          600: '#1f7142',
+          700: '#185c36',
+          800: '#144a2c',
+          900: '#0f3a23',
+        },
+        // Secondary accent: warm gold, used sparingly for highlights
+        gold: {
+          50: '#fdf8e8',
+          100: '#faefc7',
+          200: '#f4dd92',
+          300: '#ecc65c',
+          400: '#dfaa32',
+          500: '#c8921f',
+          600: '#a37316',
+        },
+        // Logo accent: maroon sampled from the official Rasi Foundation seal
+        rasi: {
+          50: '#fbf3f2',
+          100: '#f5e3e1',
+          200: '#e9c3bf',
+          300: '#d99a94',
+          400: '#c4655d',
+          500: '#aa3a33',
+          600: '#8f2a25',
+          700: '#7a2420',
+          800: '#611d1a',
+          900: '#4a1715',
+        },
         accent: {
           50: '#fffbeb',
           100: '#fef3c7',
@@ -46,8 +82,12 @@ module.exports = {
           900: '#78350f',
         },
       },
+      boxShadow: {
+        card: '0 1px 2px rgba(15, 58, 35, 0.06), 0 4px 14px rgba(15, 58, 35, 0.06)',
+        'card-hover': '0 2px 4px rgba(15, 58, 35, 0.08), 0 12px 28px rgba(15, 58, 35, 0.12)',
+      },
       fontFamily: {
-        heading: ['Georgia', 'serif'],
+        heading: ['"Playfair Display"', 'Georgia', 'serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
       },
     },

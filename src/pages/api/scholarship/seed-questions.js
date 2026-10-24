@@ -1,5 +1,6 @@
 import dbConnect from '@/lib/mongodb';
 import ScholarshipQuestion from '@/models/ScholarshipQuestion';
+import { withAuth } from '@/backend/lib/auth';
 
 // Curriculum-accurate questions for Tamil Nadu State Board (Class 12)
 const sampleQuestions = {
@@ -512,22 +513,14 @@ const sampleQuestions = {
     ],
 };
 
-export default async function handler(req, res) {
+// Admin JWT required (replaces the former admin key hardcoded in this file).
+async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, message: 'Method not allowed' });
     }
 
     try {
         await dbConnect();
-
-        // Check for admin authorization
-        const { adminKey } = req.body;
-        if (adminKey !== 'rasi-admin-seed-2024') {
-            return res.status(401).json({
-                success: false,
-                message: 'Unauthorized. Invalid admin key.',
-            });
-        }
 
         // Clear existing questions to ensure fresh start with TN syllabus
         await ScholarshipQuestion.deleteMany({});
@@ -584,3 +577,5 @@ export default async function handler(req, res) {
         });
     }
 }
+
+export default withAuth(handler);

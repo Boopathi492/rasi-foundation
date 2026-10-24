@@ -1,6 +1,6 @@
 import dbConnect from '@/backend/lib/mongodb';
 import College from '@/backend/models/College';
-import jwt from 'jsonwebtoken';
+import { verifyToken } from '@/backend/lib/auth';
 
 // Comprehensive college data with departments from official websites
 const collegesDepartments = {
@@ -493,16 +493,9 @@ export default async function handler(req, res) {
         return res.status(405).json({ message: 'Method not allowed' });
     }
 
-    // Verify admin token
-    const token = req.headers.authorization?.replace('Bearer ', '');
-    if (!token) {
+    // Verify admin token (shared verifier; the previous inline check used a different fallback secret)
+    if (!verifyToken(req)) {
         return res.status(401).json({ message: 'Unauthorized' });
-    }
-
-    try {
-        jwt.verify(token, process.env.JWT_SECRET || 'rasi-secret-key');
-    } catch {
-        return res.status(401).json({ message: 'Invalid token' });
     }
 
     try {
@@ -536,6 +529,6 @@ export default async function handler(req, res) {
         });
     } catch (error) {
         console.error('Error updating college departments:', error);
-        res.status(500).json({ message: 'Failed to update departments', error: error.message });
+        res.status(500).json({ message: 'Failed to update departments' });
     }
 }

@@ -1,160 +1,260 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { FaPhone, FaEnvelope, FaBars, FaTimes, FaGraduationCap, FaChevronRight } from 'react-icons/fa';
+import {
+  FaPhoneAlt, FaEnvelope, FaWhatsapp, FaMapMarkerAlt, FaBars, FaTimes,
+  FaCalendarCheck, FaRegCommentDots, FaFacebookF, FaInstagram, FaYoutube, FaArrowRight,
+} from 'react-icons/fa';
+import { CONTACT, NAV_LINKS, ROUTES, LABELS, SOCIAL, SERVICE_AREA } from '@/data/siteConfig';
+
+const focusRing =
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2';
+const barFocus =
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1 focus-visible:ring-offset-brand-900 rounded';
+
+const SOCIAL_ITEMS = [
+  { key: 'facebook', label: 'Facebook', Icon: FaFacebookF },
+  { key: 'instagram', label: 'Instagram', Icon: FaInstagram },
+  { key: 'youtube', label: 'YouTube', Icon: FaYoutube },
+].filter((s) => SOCIAL[s.key]);
+
+function CtaButtons({ onNavigate, stacked = false }) {
+  const size = 'text-[13px] px-4';
+  return (
+    <div className={stacked ? 'grid gap-3 sm:grid-cols-3' : 'flex items-center gap-2'}>
+      <Link href={ROUTES.enquiry} onClick={onNavigate} className={`rf-btn-outline ${size}`}>
+        <FaRegCommentDots aria-hidden="true" /> Enquiry
+      </Link>
+      <Link href={ROUTES.counselling} onClick={onNavigate} className={`rf-btn-primary ${size}`}>
+        <FaCalendarCheck aria-hidden="true" /> Book Counselling
+      </Link>
+      <Link href={ROUTES.secureSeat} onClick={onNavigate} className={`rf-btn-gold ${size}`}>
+        {LABELS.secureSeat} <FaArrowRight className="text-xs" aria-hidden="true" />
+      </Link>
+    </div>
+  );
+}
+
+function Brand({ compact = false }) {
+  return (
+    <Link href="/" className={`flex items-center gap-3 rounded-lg ${focusRing}`} aria-label="Rasi Foundation home">
+      <Image
+        src="/rasi-logo.png"
+        alt="Rasi Foundation logo"
+        width={72}
+        height={72}
+        priority
+        className={compact ? 'h-11 w-11 object-contain' : 'h-14 w-14 object-contain lg:h-16 lg:w-16'}
+      />
+      <span className="leading-tight">
+        <span className={`block font-heading font-bold tracking-[0.08em] text-rasi-700 ${compact ? 'text-lg' : 'text-xl lg:text-2xl'}`}>
+          RASI FOUNDATION
+        </span>
+        <span className={`block text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-500 ${compact ? 'hidden sm:block' : ''}`}>
+          Think Admission! Think RASI!!
+        </span>
+      </span>
+    </Link>
+  );
+}
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
+  const menuButtonRef = useRef(null);
+  const menuRef = useRef(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'About', path: '/about' },
-    { name: 'Courses', path: '/courses' },
-    { name: 'Colleges', path: '/colleges' },
-    { name: 'Scholarship', path: '/scholarship-test' },
-    { name: 'Achievements', path: '/achievements' },
-    { name: 'Announcements', path: '/announcements' },
-    { name: 'Payment', path: '/payment' },
-  ];
+  // Close the mobile menu after navigation
+  useEffect(() => {
+    const close = () => setIsOpen(false);
+    router.events.on('routeChangeComplete', close);
+    return () => router.events.off('routeChangeComplete', close);
+  }, [router.events]);
 
-  const isActive = (path) => router.pathname === path;
+  // Escape closes the menu; body scroll is locked while open
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    menuRef.current?.querySelector('a')?.focus();
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
+  const isActive = (path) =>
+    path === '/' ? router.pathname === '/' : router.pathname === path || router.pathname.startsWith(`${path}/`);
+
+  const closeMenu = () => setIsOpen(false);
 
   return (
     <>
-      {/* Restored Original Color Theme Top Bar */}
-      <div className="bg-gradient-to-r from-red-700 via-red-600 to-green-700 text-white py-2 text-[10px] md:text-xs font-bold uppercase tracking-[0.15em] relative z-[60]">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center gap-4 md:gap-8">
-            <a href="tel:+919789446100" className="flex items-center gap-2 hover:text-amber-300 transition-colors group">
-              <FaPhone className="text-white group-hover:scale-110 transition-transform" />
-              <span className="hidden sm:inline">+91 97 89 44 61 00</span>
-              <span className="sm:hidden">9789446100</span>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-2 focus:z-[70] focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-brand-800"
+      >
+        Skip to main content
+      </a>
+
+      {/* Top information bar (scrolls away) */}
+      <div className="bg-brand-800 text-white/90">
+        <div className="container mx-auto flex items-center justify-between gap-4 px-4 py-2 text-xs">
+          <p className="hidden items-center gap-2 lg:flex">
+            <FaMapMarkerAlt aria-hidden="true" className="text-gold-300" />
+            {SERVICE_AREA.map((a, i) => (
+              <span key={a} className="flex items-center gap-2">
+                {i > 0 && <span className="text-white/30" aria-hidden="true">|</span>}
+                {a}
+              </span>
+            ))}
+          </p>
+          <div className="flex w-full flex-wrap items-center justify-between gap-x-5 gap-y-1 lg:w-auto lg:justify-end">
+            <a href={`tel:${CONTACT.phoneTel}`} className={`flex items-center gap-2 hover:text-white ${barFocus}`}>
+              <FaPhoneAlt className="text-[11px]" aria-hidden="true" />
+              <span>{CONTACT.phoneDisplay}</span>
             </a>
-            <a href="mailto:rasipuramrasifoundation@gmail.com" className="hidden lg:flex items-center gap-2 hover:text-amber-300 transition-colors group">
-              <FaEnvelope className="text-white group-hover:scale-110 transition-transform" />
-              <span>RASIFOUNDATION@GMAIL.COM</span>
+            <a
+              href={`https://wa.me/${CONTACT.whatsappNumber}?text=${encodeURIComponent(CONTACT.whatsappMessage)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center gap-2 hover:text-white ${barFocus}`}
+            >
+              <FaWhatsapp aria-hidden="true" />
+              <span>Chat on WhatsApp<span className="sr-only"> (opens in a new tab)</span></span>
             </a>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="hidden xl:inline text-white/90 italic font-medium tracking-normal normal-case">&quot;Empowering minds! Igniting future!&quot;</span>
-            <Link href="/contact" className="hover:text-amber-300 transition-colors border-l border-white/20 pl-4 ml-2">Contact Us</Link>
+            <a href={`mailto:${CONTACT.email}`} className={`hidden items-center gap-2 hover:text-white md:flex ${barFocus}`}>
+              <FaEnvelope className="text-[11px]" aria-hidden="true" />
+              <span>{CONTACT.email}</span>
+            </a>
+            {SOCIAL_ITEMS.length > 0 && (
+              <ul className="flex items-center gap-3 lg:border-l lg:border-white/20 lg:pl-5" aria-label="Social media">
+                {SOCIAL_ITEMS.map(({ key, label, Icon }) => (
+                  <li key={key}>
+                    <a href={SOCIAL[key]} target="_blank" rel="noopener noreferrer" aria-label={`${label} (opens in a new tab)`} className={`block hover:text-white ${barFocus}`}>
+                      <Icon aria-hidden="true" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Main Navbar */}
-      <nav className={`sticky top-0 z-50 transition-all duration-500 ${scrolled
-        ? 'bg-white/95 backdrop-blur-md shadow-lg py-2'
-        : 'bg-white shadow-sm py-4'
-        }`}>
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between gap-4 lg:gap-8">
-            {/* Logo */}
-            <Link href="/" className="flex items-center group relative z-[60]">
-              <div className="relative h-12 md:h-16 lg:h-20 w-auto">
-                <Image
-                  src="/logo.png"
-                  alt="RASI FOUNDATION"
-                  width={400}
-                  height={100}
-                  className="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-102"
-                  priority
-                  unoptimized
-                />
-              </div>
+      {/* Branding area, large screens only (scrolls away) */}
+      <div className="hidden border-b border-brand-100 bg-white xl:block">
+        <div className="container mx-auto flex items-center justify-between gap-6 px-4 py-3">
+          <Brand />
+          <p className="font-heading text-sm italic text-gray-500">Empowering minds! Igniting future!</p>
+        </div>
+      </div>
+
+      {/* Sticky navigation bar */}
+      <header className={`sticky top-0 z-50 border-b border-brand-100 bg-white/95 backdrop-blur transition-shadow duration-300 ${scrolled ? 'shadow-md' : ''}`}>
+        <nav aria-label="Main" className="container mx-auto flex items-center justify-between gap-4 px-4 py-2">
+          <div className="xl:hidden"><Brand compact /></div>
+
+          <ul className="hidden items-center gap-0.5 xl:flex">
+            {NAV_LINKS.map((link) => {
+              const active = isActive(link.path);
+              return (
+                <li key={link.path}>
+                  <Link
+                    href={link.path}
+                    aria-current={active ? 'page' : undefined}
+                    className={`relative block rounded-md px-3 py-2.5 text-[13px] font-semibold transition-colors ${focusRing} ${
+                      active ? 'text-brand-700' : 'text-gray-700 hover:bg-brand-50 hover:text-brand-700'
+                    }`}
+                  >
+                    {link.name === 'About' ? 'About Us' : link.name}
+                    {active && <span className="absolute inset-x-3 bottom-0.5 h-0.5 rounded-full bg-brand-700" aria-hidden="true" />}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="hidden xl:block"><CtaButtons /></div>
+
+          <div className="flex items-center gap-2 xl:hidden">
+            <Link
+              href={ROUTES.counselling}
+              className={`hidden items-center gap-2 rounded-lg bg-brand-700 px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-brand-800 sm:inline-flex ${focusRing}`}
+            >
+              <FaCalendarCheck aria-hidden="true" /> Book Counselling
             </Link>
-
-            {/* Desktop Navigation - Original Color Theme Integration */}
-            <div className="hidden md:flex items-center justify-center flex-1 gap-0">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  href={link.path}
-                  className={`relative px-1 lg:px-2 xl:px-3 py-2 text-[10px] lg:text-[11px] xl:text-[12px] font-bold uppercase tracking-wider transition-all duration-300 rounded-lg group whitespace-nowrap ${isActive(link.path)
-                    ? 'bg-green-600 text-white shadow-md'
-                    : 'text-gray-700 hover:text-green-600 hover:bg-green-50'
-                    }`}
-                >
-                  {link.name}
-                </Link>
-              ))}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2 lg:gap-3 relative z-[60] ml-2 flex-shrink-0">
-              <Link
-                href="/contact"
-                className="hidden lg:flex items-center gap-2 bg-green-600 text-white px-3 lg:px-6 py-2.5 lg:py-3 rounded-xl text-[9px] lg:text-xs font-bold uppercase tracking-wider shadow-lg shadow-green-600/20 hover:bg-green-700 hover:-translate-y-0.5 transition-all whitespace-nowrap"
-              >
-                <FaGraduationCap className="text-sm" />
-                Find Your Course
-              </Link>
-
-              {/* Mobile Menu Icon */}
-              <button
-                className="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 transition-all"
-                onClick={() => setIsOpen(!isOpen)}
-                aria-label="Toggle menu"
-              >
-                <span className={`w-6 h-0.5 bg-gray-800 rounded-full transition-all duration-300 ${isOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
-                <span className={`w-6 h-0.5 bg-gray-800 rounded-full transition-all duration-300 ${isOpen ? 'opacity-0' : ''}`}></span>
-                <span className={`w-6 h-0.5 bg-gray-800 rounded-full transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
-              </button>
-            </div>
+            <button
+              ref={menuButtonRef}
+              type="button"
+              className={`inline-flex h-11 w-11 items-center justify-center rounded-lg border border-gray-300 text-gray-800 ${focusRing}`}
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isOpen}
+              aria-controls="mobile-menu"
+              onClick={() => setIsOpen((v) => !v)}
+            >
+              {isOpen ? <FaTimes aria-hidden="true" /> : <FaBars aria-hidden="true" />}
+            </button>
           </div>
-        </div>
+        </nav>
 
-        {/* Mobile menu overlay */}
-        <div
-          className={`fixed inset-0 z-[-1] bg-black/40 backdrop-blur-sm transition-opacity duration-500 md:hidden ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-            }`}
-          onClick={() => setIsOpen(false)}
-        ></div>
-
-        <div className={`absolute top-full left-0 w-full bg-white md:hidden border-t border-gray-100 transition-all duration-500 ease-in-out origin-top shadow-2xl ${isOpen ? 'scale-y-100 opacity-100 pointer-events-auto' : 'scale-y-0 opacity-0 pointer-events-none'
-          }`}>
-          <div className="container mx-auto px-6 py-8">
-            <div className="space-y-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  href={link.path}
-                  className={`flex items-center justify-between py-4 px-6 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${isActive(link.path)
-                    ? 'bg-green-600 text-white'
-                    : 'text-gray-700 hover:bg-gray-50'
-                    }`}
-                  onClick={() => setIsOpen(false)}
-                >
-                  {link.name}
-                  <FaChevronRight className={`text-[10px] ${isActive(link.path) ? 'text-white/60' : 'text-gray-300'}`} />
-                </Link>
-              ))}
+        {/* Mobile / tablet menu */}
+        {isOpen && (
+          <>
+            <button
+              type="button"
+              tabIndex={-1}
+              aria-hidden="true"
+              className="fixed inset-0 -z-10 h-screen w-full cursor-default bg-black/40 xl:hidden"
+              onClick={closeMenu}
+            />
+            <div
+              id="mobile-menu"
+              ref={menuRef}
+              className="absolute inset-x-0 top-full max-h-[calc(100vh-4.5rem)] overflow-y-auto border-t border-gray-200 bg-white shadow-xl xl:hidden"
+            >
+              <ul className="container mx-auto grid gap-1 px-4 py-4 sm:grid-cols-2">
+                {NAV_LINKS.map((link) => {
+                  const active = isActive(link.path);
+                  return (
+                    <li key={link.path}>
+                      <Link
+                        href={link.path}
+                        onClick={closeMenu}
+                        aria-current={active ? 'page' : undefined}
+                        className={`flex items-center rounded-lg border-l-4 px-4 py-3 text-base font-semibold ${focusRing} ${
+                          active ? 'border-brand-700 bg-brand-50 text-brand-800' : 'border-transparent text-gray-800 hover:bg-gray-50'
+                        }`}
+                      >
+                        {link.name === 'About' ? 'About Us' : link.name}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="container mx-auto border-t border-gray-100 px-4 py-4">
+                <CtaButtons onNavigate={closeMenu} stacked />
+              </div>
             </div>
-
-            <div className="mt-6 pt-6 border-t border-gray-100">
-              <Link
-                href="/contact"
-                className="flex items-center justify-center gap-3 w-full bg-red-600 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg shadow-red-600/20"
-                onClick={() => setIsOpen(false)}
-              >
-                <FaGraduationCap className="text-lg" />
-                Contact Us Now
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav >
+          </>
+        )}
+      </header>
     </>
   );
 };

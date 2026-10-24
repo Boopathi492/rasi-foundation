@@ -1,397 +1,218 @@
-import Layout from '@/frontend/components/Layout';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import {
-  FaGraduationCap,
-  FaUserTie,
-  FaLightbulb,
-  FaHandshake,
-  FaPhone,
-  FaEnvelope,
-  FaStar,
-  FaAward,
-  FaUsers,
-  FaCheckCircle,
-  FaArrowRight,
-  FaQuoteLeft,
-  FaHeart,
-  FaEye,
-  FaBullseye
+  FaHeart, FaLightbulb, FaHandshake, FaAward, FaPhoneAlt, FaArrowRight, FaCalendarCheck,
+  FaBullseye, FaEye, FaUniversity, FaUserGraduate, FaFileSignature, FaHandsHelping, FaRoute,
 } from 'react-icons/fa';
+import Layout from '@/frontend/components/Layout';
+import PageHero from '@/frontend/components/PageHero';
+import Reveal from '@/frontend/components/home/Reveal';
+import BannerCrop from '@/frontend/components/home/BannerCrop';
+import Testimonials from '@/frontend/components/home/Testimonials';
+import { ROUTES, LABELS } from '@/data/siteConfig';
+
+const VALUES = [
+  { icon: FaHeart, title: 'Student-centric', text: "Every decision is centred on what is best for the student's future." },
+  { icon: FaLightbulb, title: 'Expert guidance', text: 'Informed, personalised advice from our counsellors.' },
+  { icon: FaHandshake, title: 'Trust and integrity', text: 'Honesty and transparency in all our dealings.' },
+  { icon: FaAward, title: 'Excellence', text: 'High standards in every service for students and parents.' },
+];
+
+// Informational outline of the services Rasi Foundation lists on its site; not a claim about timelines or outcomes.
+const PROCESS = [
+  { icon: FaUserGraduate, title: 'Counselling', text: 'We learn about your marks, interests and goals.' },
+  { icon: FaRoute, title: 'Course and college choice', text: 'We help you compare options that suit you.' },
+  { icon: FaFileSignature, title: 'Admission support', text: 'Guidance with applications and documents.' },
+  { icon: FaAward, title: 'Scholarship information', text: 'Information on scholarships you may qualify for.' },
+  { icon: FaHandsHelping, title: 'Continued support', text: 'We stay in touch after admission.' },
+];
+
+const LEADERS = [
+  {
+    initials: 'PG', name: 'Prof. P. Gunasekaran', role: 'Founder', credentials: 'M.Sc., M.Phil.',
+    bio: 'Career Guidance Advisor and Analyst with experience in the education sector.',
+    phone: '+91 97894 46100', tel: '+919789446100', tone: 'bg-brand-700',
+  },
+  {
+    initials: 'YK', name: 'P. Yuvaraj Kumar', role: 'Administrative Director', credentials: 'MBA',
+    bio: 'Career Guidance Advisor responsible for administration and day-to-day service to students.',
+    phone: '+91 92949 69196', tel: '+919294969196', tone: 'bg-rasi-700',
+  },
+];
+
+// PENDING VERIFICATION: these two figures are the site's existing defaults and have not been confirmed.
+const STATS = [
+  { number: '5000+', label: 'Students guided' },
+  { number: '100+', label: 'Partner colleges' },
+];
+
+function Heading({ id, label, title, center, light }) {
+  return (
+    <div className={`mb-10 max-w-2xl ${center ? 'mx-auto text-center' : ''}`}>
+      <p className={`text-sm font-semibold uppercase tracking-[0.16em] ${light ? 'text-gold-300' : 'text-rasi-700'}`}>{label}</p>
+      <h2 id={id} className={`mt-1 font-heading text-3xl font-bold md:text-4xl ${light ? 'text-white' : 'text-gray-900'}`}>{title}</h2>
+    </div>
+  );
+}
 
 export default function About() {
-  const fadeInUp = {
-    initial: { opacity: 0, y: 30 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6, ease: "easeOut" }
-  };
-
-  const staggerContainer = {
-    animate: {
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-  const values = [
-    {
-      icon: FaHeart,
-      title: 'Student-Centric',
-      description: 'Every decision we make is centered around what\'s best for our students and their future.'
-    },
-    {
-      icon: FaLightbulb,
-      title: 'Expert Guidance',
-      description: 'Our team of experienced counselors provides informed and personalized advice.'
-    },
-    {
-      icon: FaHandshake,
-      title: 'Trust & Integrity',
-      description: 'We maintain the highest standards of honesty and transparency in all our dealings.'
-    },
-    {
-      icon: FaAward,
-      title: 'Excellence',
-      description: 'We strive for excellence in every service we provide to our students and parents.'
-    }
-  ];
-
-  const timeline = [
-    { year: 'Foundation', event: 'Rasi Foundation was established with a vision to guide students towards successful careers' },
-    { year: 'Growth', event: 'Expanded services to cover Medical, Engineering, and Management courses' },
-    { year: 'Network', event: 'Built partnerships with 100+ prestigious colleges across India' },
-    { year: 'Today', event: 'Successfully guided 5000+ students in achieving their educational dreams' }
-  ];
-
   return (
     <Layout
       title="About Us"
-      description="Learn about Rasi Foundation - 15+ years of excellence in career guidance. Founded by Prof. P. Gunasekaran, we've helped 5000+ students achieve their educational dreams in Medical, Engineering, MBA & Law."
-      keywords="about Rasi Foundation, career guidance Rasipuram, education consultant history, Prof Gunasekaran, career counselor Tamil Nadu"
+      description="About Rasi Foundation: a career guidance and education consultancy in Rasipuram, Tamil Nadu, founded by Prof. P. Gunasekaran."
+      keywords="about Rasi Foundation, career guidance Rasipuram, education consultant, Prof Gunasekaran, career counsellor Tamil Nadu"
     >
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-red-50 via-white to-green-50 py-20 overflow-hidden">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial="initial"
-            animate="animate"
-            variants={staggerContainer}
-            className="text-center max-w-4xl mx-auto"
-          >
-            <motion.span
-              variants={fadeInUp}
-              className="inline-flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-full text-sm font-semibold mb-6"
-            >
-              <FaGraduationCap />
-              <span>About Rasi Foundation</span>
-            </motion.span>
-            <motion.h1
-              variants={fadeInUp}
-              className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-800 mb-6 tracking-tight"
-            >
-              Shaping <span className="text-red-600">Futures</span>, Building <span className="text-green-600">Dreams</span>
-            </motion.h1>
-            <motion.p
-              variants={fadeInUp}
-              className="text-xl text-gray-600 leading-relaxed font-medium"
-            >
-              Rasi Foundation is a premier career guidance and education consultancy dedicated to
-              helping students navigate their educational journey and achieve their professional dreams.
-            </motion.p>
-          </motion.div>
-        </div>
-      </section>
+      <PageHero eyebrow="About Rasi Foundation" title="Shaping futures through guidance">
+        Think Admission! Think RASI!! We help students choose the right course and college, and support them through admission.
+      </PageHero>
 
-      {/* Mission & Vision */}
-      <section className="py-20 bg-white overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12">
-            {/* Mission */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="bg-gradient-to-br from-red-600 to-red-700 rounded-[2.5rem] p-10 text-white relative overflow-hidden shadow-2xl"
-            >
-              <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20"></div>
-              <div className="relative z-10">
-                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-sm">
-                  <FaBullseye className="text-3xl" />
-                </div>
-                <h2 className="text-3xl font-black mb-4 uppercase tracking-tight">Our Mission</h2>
-                <p className="text-white/90 text-lg leading-relaxed font-medium">
-                  To empower students with the knowledge, guidance, and support they need to make
-                  informed career decisions and secure admissions in prestigious institutions that
-                  align with their aspirations and potential.
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Vision */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="bg-gradient-to-br from-green-600 to-green-700 rounded-[2.5rem] p-10 text-white relative overflow-hidden shadow-2xl"
-            >
-              <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20"></div>
-              <div className="relative z-10">
-                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-sm">
-                  <FaEye className="text-3xl" />
-                </div>
-                <h2 className="text-3xl font-black mb-4 uppercase tracking-tight">Our Vision</h2>
-                <p className="text-white/90 text-lg leading-relaxed font-medium">
-                  To be the most trusted and preferred education consultancy, recognized for
-                  transforming lives through quality guidance and creating successful professionals
-                  who contribute to society.
-                </p>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Leadership Section */}
-      <section className="py-20 bg-gray-50 overflow-hidden">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <span className="text-red-600 font-black uppercase tracking-[0.2em] text-xs">Our Team</span>
-            <h2 className="text-4xl md:text-5xl font-black text-gray-800 mt-4 mb-4 tracking-tighter">
-              Meet Our <span className="text-green-600">Leaders</span>
-            </h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto font-medium">
-              Our foundation is led by experienced professionals dedicated to student success.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto"
-          >
-            {/* Founder */}
-            <motion.div variants={fadeInUp} className="card p-10 text-center group hover:border-red-500/30 transition-all duration-500">
-              <div className="w-32 h-32 mx-auto mb-8 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center text-white text-4xl font-black shadow-2xl group-hover:scale-110 transition-transform duration-500">
-                PG
-              </div>
-              <h3 className="text-2xl font-black text-gray-800 mb-2">Prof. P. Gunasekaran</h3>
-              <p className="text-red-600 font-bold mb-2 uppercase tracking-widest text-xs">Founder</p>
-              <p className="text-gray-500 mb-4 font-bold">M.Sc., M.Phil.</p>
-              <p className="text-gray-600 mb-8 leading-relaxed font-medium">
-                Career Guidance Advisor & Analyst with extensive experience in the education sector.
-                Prof. Gunasekaran has dedicated his career to helping students find their path to success.
+      {/* Introduction */}
+      <section aria-labelledby="intro-heading" className="bg-white py-16">
+        <div className="container mx-auto grid items-center gap-12 px-4 lg:grid-cols-2">
+          <Reveal>
+            <p className="rf-eyebrow">Who we are</p>
+            <h2 id="intro-heading" className="mt-1 font-heading text-3xl font-bold text-gray-900 md:text-4xl">A career guidance and education consultancy</h2>
+            <div className="mt-5 space-y-4 text-gray-700">
+              <p>
+                Rasi Foundation is a career guidance and education consultancy based in Rasipuram, Tamil Nadu. It was founded by
+                Prof. P. Gunasekaran and is led day to day by Administrative Director P. Yuvaraj Kumar.
               </p>
-              <div className="flex items-center justify-center gap-3">
-                <a href="tel:+919789446100" className="inline-flex items-center gap-2 bg-gray-50 text-gray-800 px-6 py-3 rounded-xl font-bold hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                  <FaPhone className="text-sm" /> +91 97894 46100
-                </a>
-              </div>
-            </motion.div>
-
-            {/* Administrative Director */}
-            <motion.div variants={fadeInUp} className="card p-10 text-center group hover:border-green-500/30 transition-all duration-500">
-              <div className="w-32 h-32 mx-auto mb-8 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center text-white text-4xl font-black shadow-2xl group-hover:scale-110 transition-transform duration-500">
-                YK
-              </div>
-              <h3 className="text-2xl font-black text-gray-800 mb-2">P. Yuvaraj Kumar</h3>
-              <p className="text-green-600 font-bold mb-2 uppercase tracking-widest text-xs">Administrative Director</p>
-              <p className="text-gray-500 mb-4 font-bold">MBA</p>
-              <p className="text-gray-600 mb-8 leading-relaxed font-medium">
-                Career Guidance Advisor with strong administrative and management skills.
-                Yuvaraj Kumar ensures smooth operations and excellent service delivery to all students.
+              <p>
+                We guide students and parents on course selection, college selection, admissions and scholarship information, so that
+                important decisions are made with clear information.
               </p>
-              <div className="flex items-center justify-center gap-3">
-                <a href="tel:+919294969196" className="inline-flex items-center gap-2 bg-gray-50 text-gray-800 px-6 py-3 rounded-xl font-bold hover:bg-green-600 hover:text-white transition-all shadow-sm">
-                  <FaPhone className="text-sm" /> +91 92949 69196
-                </a>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Our Story */}
-      <section className="py-20 bg-white overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <span className="text-red-600 font-black uppercase tracking-[0.2em] text-xs">Our Story</span>
-              <h2 className="text-4xl md:text-5xl font-black text-gray-800 mt-4 mb-6 tracking-tighter">
-                The Journey of <span className="text-green-600">Rasi Foundation</span>
-              </h2>
-              <div className="space-y-6 text-gray-600 text-lg leading-relaxed font-medium">
-                <p>
-                  Rasi Foundation was born out of a deep passion for education and a sincere desire
-                  to help students navigate the complex world of higher education and career choices.
-                </p>
-                <p>
-                  Founded by Prof. P. Gunasekaran, a seasoned career guidance expert, the foundation
-                  has grown from a small consultancy to a trusted name in education guidance across
-                  Tamil Nadu and beyond.
-                </p>
-                <p>
-                  Today, with a team of dedicated professionals and a network of prestigious
-                  institutional partners, we continue to fulfill our mission of empowering minds
-                  and igniting futures.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6 mt-12">
-                <div className="p-6 bg-red-50 rounded-[2rem] border border-red-100">
-                  <h4 className="text-4xl font-black text-red-600 mb-1">5000+</h4>
-                  <p className="text-gray-500 font-bold text-xs uppercase tracking-widest">Students Guided</p>
-                </div>
-                <div className="p-6 bg-green-50 rounded-[2rem] border border-green-100">
-                  <h4 className="text-4xl font-black text-green-600 mb-1">100+</h4>
-                  <p className="text-gray-500 font-bold text-xs uppercase tracking-widest">Partner Colleges</p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Timeline */}
-            <div className="relative">
-              <div className="absolute left-8 top-0 bottom-0 w-1 bg-gradient-to-b from-red-500 via-amber-500 to-green-500 rounded-full opacity-20"></div>
-
-              <div className="space-y-12">
-                {timeline.map((item, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: 30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="relative pl-20 group"
-                  >
-                    <div className={`absolute left-4 w-10 h-10 rounded-2xl flex items-center justify-center text-white text-sm font-black shadow-lg group-hover:scale-110 transition-transform duration-300 z-10 ${index === 0 ? 'bg-red-500 shadow-red-200' :
-                      index === 1 ? 'bg-orange-500 shadow-orange-200' :
-                        index === 2 ? 'bg-amber-500 shadow-amber-200' :
-                          'bg-green-500 shadow-green-200'
-                      }`}>
-                      {index + 1}
-                    </div>
-                    <div className="card p-8 group-hover:border-red-500/20 transition-all duration-300">
-                      <h4 className="text-xl font-black text-gray-800 mb-2 uppercase tracking-tight">{item.year}</h4>
-                      <p className="text-gray-600 font-medium">{item.event}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
             </div>
-          </div>
+            <dl className="mt-8 grid max-w-md grid-cols-2 gap-4">
+              {STATS.map((s) => (
+                <div key={s.label} className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
+                  <dd className="font-heading text-3xl font-bold text-brand-800">{s.number}</dd>
+                  <dt className="text-sm text-gray-600">{s.label}</dt>
+                </div>
+              ))}
+            </dl>
+            <p className="mt-2 text-xs text-gray-500">Figures pending verification by Rasi Foundation.</p>
+          </Reveal>
+
+          <Reveal delay={0.08} className="relative mx-auto w-full max-w-lg pb-8 pl-8">
+            <span aria-hidden="true" className="absolute -right-3 -top-3 h-24 w-24 rounded-full bg-gold-300/60" />
+            <BannerCrop
+              src="/images/banners/hero-1-tamil-campus-admissions.png"
+              alt="A smiling student holding books in front of a college building"
+              region={{ x: 920, y: 20, w: 640, h: 720 }}
+              sizes="(min-width: 1024px) 30vw, 80vw"
+              className="relative rounded-[2.5rem] shadow-card-hover ring-8 ring-brand-50"
+            />
+            <BannerCrop
+              src="/images/banners/hero-5-students-today-leaders-tomorrow.png"
+              alt="Students walking together on a campus"
+              region={{ x: 1000, y: 380, w: 520, h: 330 }}
+              sizes="240px"
+              className="absolute bottom-0 left-0 w-44 rounded-2xl shadow-card-hover ring-4 ring-white sm:w-52"
+            />
+          </Reveal>
         </div>
       </section>
 
-      {/* Core Values */}
-      <section className="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
+      {/* Vision and mission */}
+      <section aria-labelledby="vm-about-heading" className="relative overflow-hidden bg-brand-50/60 py-16">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <span className="text-amber-400 font-black uppercase tracking-[0.2em] text-xs">Our Values</span>
-            <h2 className="text-4xl md:text-5xl font-black mt-4 mb-4 tracking-tighter">
-              What We Stand For
-            </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto font-medium">
-              Our core values guide everything we do at Rasi Foundation.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
-          >
-            {values.map((value, index) => (
-              <motion.div
-                key={index}
-                variants={fadeInUp}
-                className="text-center p-10 bg-white/5 backdrop-blur-md rounded-[2.5rem] border border-white/10 hover:bg-white/10 transition-all duration-500 group"
-              >
-                <div className="w-20 h-20 mx-auto mb-8 bg-gradient-to-br from-red-500 to-green-500 rounded-3xl flex items-center justify-center shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-                  <value.icon className="text-3xl text-white" />
-                </div>
-                <h3 className="text-xl font-black mb-4 uppercase tracking-tight">{value.title}</h3>
-                <p className="text-gray-400 font-medium leading-relaxed">{value.description}</p>
-              </motion.div>
+          <Heading id="vm-about-heading" label="Our purpose" title="Vision and mission" center />
+          <div className="grid gap-6 md:grid-cols-2">
+            {[
+              { icon: FaBullseye, title: 'Our Mission', tone: 'bg-brand-800', text: 'To empower students with the knowledge, guidance and support they need to make informed career decisions and secure admissions in institutions that align with their aspirations and potential.' },
+              { icon: FaEye, title: 'Our Vision', tone: 'bg-rasi-700', text: 'To be the most trusted and preferred education consultancy, recognised for transforming lives through quality guidance and creating successful professionals who contribute to society.' },
+            ].map((c, i) => (
+              <Reveal key={c.title} delay={i * 0.08} className={`relative overflow-hidden rounded-3xl p-8 text-white shadow-card-hover ${c.tone}`}>
+                <span aria-hidden="true" className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-white/10" />
+                <span className="relative mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-2xl"><c.icon aria-hidden="true" /></span>
+                <h3 className="relative font-heading text-2xl font-bold">{c.title}</h3>
+                <p className="relative mt-3 text-lg leading-relaxed text-white/90">{c.text}</p>
+              </Reveal>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Quote Section */}
-      <section className="py-24 bg-gradient-to-r from-red-600 to-green-600 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-white rounded-full blur-[100px]"></div>
-          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-black rounded-full blur-[100px]"></div>
-        </div>
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="max-w-4xl mx-auto text-center text-white"
-          >
-            <FaQuoteLeft className="text-6xl mx-auto mb-10 opacity-30" />
-            <blockquote className="text-2xl md:text-4xl font-black italic leading-tight mb-12 tracking-tight">
-              &quot;Every student has potential. Our job is to help them discover it and guide them
-              towards the right path that will help them shine.&quot;
-            </blockquote>
-            <div className="flex items-center justify-center gap-6">
-              <div className="w-20 h-20 bg-white rounded-[1.5rem] flex items-center justify-center shadow-2xl">
-                <span className="text-3xl font-black text-red-600">PG</span>
-              </div>
-              <div className="text-left">
-                <p className="font-black text-2xl tracking-tighter">Prof. P. Gunasekaran</p>
-                <p className="text-white/80 font-bold uppercase tracking-widest text-xs">Founder, Rasi Foundation</p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24 bg-white">
+      {/* Values */}
+      <section aria-labelledby="values-heading" className="bg-white py-16">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="max-w-5xl mx-auto text-center"
-          >
-            <h2 className="text-5xl md:text-6xl font-black text-gray-800 mb-8 tracking-tighter">
-              Ready to Start Your <span className="text-red-600 italic">Journey?</span>
-            </h2>
-            <p className="text-xl text-gray-500 mb-12 font-medium max-w-2xl mx-auto">
-              Let us help you make the right career decisions. Contact us for a free counseling session.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <Link href="/contact" className="btn-primary flex items-center justify-center gap-3 px-10 py-5 rounded-2xl text-lg group">
-                Contact Us <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link href="/courses" className="btn-outline flex items-center justify-center gap-3 px-10 py-5 rounded-2xl text-lg group">
-                View Our Courses <FaGraduationCap className="group-hover:scale-110 transition-transform" />
-              </Link>
+          <Heading id="values-heading" label="Our values" title="What we stand for" center />
+          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {VALUES.map((v, i) => (
+              <Reveal as="li" key={v.title} delay={i * 0.06} className="rf-card p-6 text-center transition-shadow hover:shadow-card-hover">
+                <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 text-2xl text-brand-700"><v.icon aria-hidden="true" /></span>
+                <h3 className="font-sans text-lg font-semibold text-gray-900">{v.title}</h3>
+                <p className="mt-2 text-sm text-gray-600">{v.text}</p>
+              </Reveal>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Counselling and admission support */}
+      <section aria-labelledby="process-heading" className="bg-brand-900 py-16 text-white">
+        <div className="container mx-auto px-4">
+          <Heading id="process-heading" label="How we support you" title="Counselling and admission support" center light />
+          <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+            {PROCESS.map((s, i) => (
+              <Reveal as="li" key={s.title} delay={i * 0.06} className="relative rounded-2xl border border-white/10 bg-white/5 p-6">
+                <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gold-400 text-lg text-brand-900"><s.icon aria-hidden="true" /></span>
+                <p className="text-xs font-semibold uppercase tracking-wider text-gold-300">Step {i + 1}</p>
+                <h3 className="mt-1 font-sans text-base font-semibold">{s.title}</h3>
+                <p className="mt-2 text-sm text-white/75">{s.text}</p>
+              </Reveal>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* Leadership (names and credentials from the existing site; no photographs are available) */}
+      <section aria-labelledby="leaders-heading" className="bg-white py-16">
+        <div className="container mx-auto px-4">
+          <Heading id="leaders-heading" label="Our team" title="Leadership" center />
+          <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
+            {LEADERS.map((l, i) => (
+              <Reveal key={l.name} delay={i * 0.08} className="rf-card p-8 text-center">
+                <div className={`mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-full text-3xl font-bold text-white ring-4 ring-brand-50 ${l.tone}`} aria-hidden="true">{l.initials}</div>
+                <h3 className="font-heading text-2xl font-bold text-gray-900">{l.name}</h3>
+                <p className="mt-1 text-sm font-semibold uppercase tracking-wider text-rasi-700">{l.role}</p>
+                <p className="mt-1 font-semibold text-gray-600">{l.credentials}</p>
+                <p className="mt-4 text-gray-600">{l.bio}</p>
+                <a href={`tel:${l.tel}`} className="rf-btn-outline mt-5 px-5 py-2.5"><FaPhoneAlt aria-hidden="true" /> {l.phone}</a>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Partner colleges */}
+      <section aria-labelledby="partners-heading" className="bg-brand-50/60 py-14">
+        <div className="container mx-auto flex flex-col items-start justify-between gap-5 px-4 md:flex-row md:items-center">
+          <div className="flex items-start gap-4">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-700 text-2xl text-white"><FaUniversity aria-hidden="true" /></span>
+            <div>
+              <h2 id="partners-heading" className="font-heading text-2xl font-bold text-gray-900">Colleges in our directory</h2>
+              <p className="mt-1 max-w-xl text-gray-600">Browse the colleges we guide students towards, grouped by zone.</p>
             </div>
-          </motion.div>
+          </div>
+          <Link href="/colleges" className="rf-btn-primary px-6 py-3">View All Colleges <FaArrowRight aria-hidden="true" /></Link>
+        </div>
+      </section>
+
+      <Testimonials />
+
+      {/* Final CTA */}
+      <section aria-labelledby="about-cta" className="bg-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="relative overflow-hidden rounded-3xl bg-brand-900 px-8 py-12 text-center text-white">
+            <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-gold-400" />
+            <h2 id="about-cta" className="font-heading text-3xl font-bold md:text-4xl">Ready to plan your next step?</h2>
+            <p className="mx-auto mt-3 max-w-xl text-white/80">Talk to a counsellor about courses, colleges and admission.</p>
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link href={ROUTES.counselling} className="rf-btn-gold px-6 py-3"><FaCalendarCheck aria-hidden="true" /> Book Counselling</Link>
+              <Link href={ROUTES.enquiry} className="rf-btn border border-white/40 px-6 py-3 text-white hover:bg-white/10">Enquiry</Link>
+              <Link href={ROUTES.secureSeat} className="rf-btn-light px-6 py-3">{LABELS.secureSeat}</Link>
+            </div>
+          </div>
         </div>
       </section>
     </Layout>

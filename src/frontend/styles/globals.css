@@ -5,9 +5,9 @@
 @tailwind utilities;
 
 :root {
-  --primary-red: #dc2626;
-  --primary-green: #16a34a;
-  --accent-gold: #f59e0b;
+  --primary-red: #7a2420;
+  --primary-green: #185c36;
+  --accent-gold: #dfaa32;
   --dark: #1f2937;
   --light: #f9fafb;
 }
@@ -40,7 +40,7 @@ body {
   overflow-x: hidden;
   scroll-behavior: smooth;
   font-family: 'Inter', system-ui, sans-serif;
-  background: linear-gradient(120deg, #f8fafc 0%, #f1f5f9 50%, #e0e7ef 100%);
+  background: #fbfaf6;
   color: #1f2937;
 }
 
@@ -52,6 +52,17 @@ h1, h2, h3, h4, h5, h6 {
 
 
 @layer components {
+  /* Rasi design tokens: buttons (green primary, outline, gold highlight) and cards */
+  .rf-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors duration-200
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70;
+  }
+  .rf-btn-primary { @apply rf-btn bg-brand-700 text-white shadow-sm hover:bg-brand-800 active:bg-brand-900; }
+  .rf-btn-outline { @apply rf-btn border border-brand-600 bg-white text-brand-800 hover:bg-brand-50 active:bg-brand-100; }
+  .rf-btn-gold { @apply rf-btn bg-gold-400 text-brand-900 shadow-sm hover:bg-gold-300 active:bg-gold-500; }
+  .rf-btn-light { @apply rf-btn bg-white text-brand-800 hover:bg-brand-50; }
+  .rf-card { @apply rounded-2xl border border-gray-200 bg-white shadow-card; }
+  .rf-eyebrow { @apply text-sm font-semibold uppercase tracking-[0.16em] text-rasi-700; }
   .premium-section {
     @apply bg-white/90 rounded-2xl shadow-xl p-6 md:p-10 mb-10 border border-gray-100;
   }
@@ -60,22 +71,22 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .btn-primary {
-    @apply bg-gradient-to-r from-red-600 to-red-700 text-white px-7 py-3 rounded-xl font-semibold tracking-wide shadow-xl hover:from-red-700 hover:to-red-800 hover:scale-105 transition-all duration-300 hover:shadow-2xl border-0;
+    @apply bg-brand-700 text-white px-7 py-3 rounded-xl font-semibold tracking-wide shadow-md hover:bg-brand-800 transition-colors duration-200 border-0;
   }
 
 
   .btn-secondary {
-    @apply bg-gradient-to-r from-green-600 to-green-700 text-white px-7 py-3 rounded-xl font-semibold tracking-wide shadow-xl hover:from-green-700 hover:to-green-800 hover:scale-105 transition-all duration-300 hover:shadow-2xl border-0;
+    @apply bg-gold-400 text-brand-900 px-7 py-3 rounded-xl font-semibold tracking-wide shadow-md hover:bg-gold-300 transition-colors duration-200 border-0;
   }
 
 
   .btn-outline {
-    @apply border-2 border-red-600 text-red-600 px-7 py-3 rounded-xl font-semibold tracking-wide bg-white hover:bg-red-600 hover:text-white hover:scale-105 transition-all duration-300 shadow hover:shadow-xl;
+    @apply border-2 border-brand-700 text-brand-800 px-7 py-3 rounded-xl font-semibold tracking-wide bg-white hover:bg-brand-700 hover:text-white transition-colors duration-200;
   }
 
 
   .card {
-    @apply bg-white/95 rounded-3xl shadow-2xl hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden p-6 md:p-8;
+    @apply bg-white rounded-2xl shadow-card border border-gray-200 overflow-hidden p-6 md:p-8;
   }
 
   .card-hover {
@@ -93,11 +104,11 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-red-600 via-amber-500 to-green-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-rasi-700 via-gold-500 to-brand-700 bg-clip-text text-transparent;
   }
 
   .input-field {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-600 
            focus:border-transparent outline-none transition-all duration-300;
   }
 
@@ -113,8 +124,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 5px rgba(220, 38, 38, 0.5); }
-  50% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.8); }
+  0%, 100% { box-shadow: 0 0 5px rgba(24, 92, 54, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(24, 92, 54, 0.8); }
 }
 
 .animate-float {
@@ -127,15 +138,15 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Gradient backgrounds */
 .bg-gradient-primary {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  background: linear-gradient(135deg, #7a2420 0%, #611d1a 100%);
 }
 
 .bg-gradient-secondary {
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  background: linear-gradient(135deg, #1f7142 0%, #185c36 100%);
 }
 
 .bg-gradient-hero {
-  background: linear-gradient(135deg, #fef2f2 0%, #f0fdf4 50%, #fffbeb 100%);
+  background: linear-gradient(135deg, #f1f8f3 0%, #fbfaf6 50%, #fdf8e8 100%);
 }
 
 /* Scrollbar styling */
@@ -148,12 +159,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #dc2626, #16a34a);
+  background: linear-gradient(180deg, #185c36, #1f7142);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #b91c1c, #15803d);
+  background: linear-gradient(180deg, #144a2c, #185c36);
 }
 
 /* Floating Buttons Animations */

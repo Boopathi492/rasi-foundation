@@ -35,7 +35,7 @@ export default async function handler(req, res) {
       res.status(200).json(result);
     } catch (error) {
       console.error('Error fetching colleges:', error);
-      res.status(500).json({ message: 'Internal server error', error: error.message });
+      res.status(500).json({ message: 'Internal server error' });
     }
   } else {
     res.status(405).json({ message: 'Method not allowed' });

@@ -1,5 +1,6 @@
 import dbConnect from '@/backend/lib/mongodb';
 import College from '@/backend/models/College';
+import { withAuth } from '@/backend/lib/auth';
 
 // Initial seed data - all colleges
 const initialColleges = [
@@ -87,7 +88,8 @@ const initialColleges = [
     { name: 'Christ the King Engineering College', location: 'Karamadai', district: 'Coimbatore Zone', tneaCode: '2650' },
 ];
 
-export default async function handler(req, res) {
+// Admin JWT required; this seed route was previously open to anyone.
+async function handler(req, res) {
     if (req.method !== 'GET' && req.method !== 'POST') {
         return res.status(405).json({ message: 'Method not allowed' });
     }
@@ -122,6 +124,8 @@ export default async function handler(req, res) {
         });
     } catch (error) {
         console.error('Error seeding colleges:', error);
-        res.status(500).json({ message: 'Internal server error', error: error.message });
+        res.status(500).json({ message: 'Internal server error' });
     }
 }
+
+export default withAuth(handler);

@@ -442,9 +442,9 @@ const districtColors = {
   'Namakkal District': 'from-red-500 to-red-600',
   'Salem District': 'from-green-500 to-green-600',
   'Erode District': 'from-blue-500 to-blue-600',
-  'Coimbatore Zone': 'from-purple-500 to-purple-600',
+  'Coimbatore Zone': 'from-rasi-700 to-purple-600',
   'Bengaluru Zone': 'from-indigo-500 to-indigo-600',
-  'Women Centric Colleges': 'from-pink-500 to-rose-600',
+  'Women Centric Colleges': 'from-rasi-500 to-rose-600',
   'Well Connected Universities': 'from-teal-500 to-cyan-600',
 };
 
@@ -667,7 +667,7 @@ export default function Colleges({ collegesData }) {
       </section>
 
       {/* Women-Centric Colleges Highlight Banner */}
-      <section className="py-8 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 relative overflow-hidden">
+      <section className="py-8 bg-gradient-to-r from-rasi-500 via-rasi-700 to-rasi-500 relative overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-1/4 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
@@ -691,7 +691,7 @@ export default function Colleges({ collegesData }) {
             </div>
             <button
               onClick={() => setShowWomenColleges(true)}
-              className="group flex items-center gap-2 bg-white text-pink-600 px-6 py-3 rounded-xl font-bold hover:bg-pink-50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+              className="group flex items-center gap-2 bg-white text-rasi-700 px-6 py-3 rounded-xl font-bold hover:bg-rasi-50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
             >
               <span>View Women Colleges</span>
               <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
@@ -838,7 +838,7 @@ export default function Colleges({ collegesData }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden animate-slideIn">
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 p-6 text-white relative">
+            <div className="bg-gradient-to-r from-rasi-500 via-rasi-700 to-rasi-500 p-6 text-white relative">
               <button
                 onClick={() => setShowWomenColleges(false)}
                 className="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors"
@@ -864,18 +864,18 @@ export default function Colleges({ collegesData }) {
                   <Link
                     key={index}
                     href={`/contact?college=${encodeURIComponent(college.name)}`}
-                    className="group block p-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                    className="group block p-4 bg-gradient-to-r from-rasi-50 to-rasi-50 rounded-xl border border-rasi-100 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <div className="w-12 h-12 bg-gradient-to-br from-rasi-500 to-rasi-700 rounded-xl flex items-center justify-center text-white font-bold shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
                         {index + 1}
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-gray-800 group-hover:text-pink-700 transition-colors text-lg">
+                        <h3 className="font-bold text-gray-800 group-hover:text-rasi-800 transition-colors text-lg">
                           {college.name}
                         </h3>
                         <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
-                          <FaMapMarkerAlt className="text-pink-500" />
+                          <FaMapMarkerAlt className="text-rasi-500" />
                           <span>{college.location}</span>
                         </div>
 
@@ -886,7 +886,7 @@ export default function Colleges({ collegesData }) {
                             {(college.departments || []).map((dept, deptIndex) => (
                               <span
                                 key={deptIndex}
-                                className="inline-flex items-center text-xs bg-white text-purple-700 px-2 py-1 rounded-full border border-purple-200"
+                                className="inline-flex items-center text-xs bg-white text-rasi-800 px-2 py-1 rounded-full border border-purple-200"
                               >
                                 {dept}
                               </span>
@@ -895,7 +895,7 @@ export default function Colleges({ collegesData }) {
                         </div>
 
                         {/* Click indicator */}
-                        <div className="mt-3 flex items-center gap-2 text-pink-600 text-sm font-medium">
+                        <div className="mt-3 flex items-center gap-2 text-rasi-700 text-sm font-medium">
                           <span>Get Counseling</span>
                           <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
                         </div>
@@ -907,7 +907,7 @@ export default function Colleges({ collegesData }) {
 
               {/* Total Count */}
               <div className="mt-6 text-center">
-                <span className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-100 to-purple-100 text-pink-700 px-4 py-2 rounded-full font-semibold">
+                <span className="inline-flex items-center gap-2 bg-gradient-to-r from-rasi-100 to-rasi-100 text-rasi-800 px-4 py-2 rounded-full font-semibold">
                   <FaUniversity />
                   Total: {displayWomenColleges.length} Colleges
                 </span>
@@ -918,7 +918,7 @@ export default function Colleges({ collegesData }) {
             <div className="p-4 bg-gray-50 border-t border-gray-100">
               <button
                 onClick={() => setShowWomenColleges(false)}
-                className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-3 rounded-xl font-bold hover:shadow-lg transition-all duration-300"
+                className="w-full bg-gradient-to-r from-rasi-500 to-rasi-700 text-white py-3 rounded-xl font-bold hover:shadow-lg transition-all duration-300"
               >
                 Close
               </button>

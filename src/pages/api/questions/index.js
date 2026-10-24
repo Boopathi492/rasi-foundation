@@ -21,10 +21,16 @@ export default async function handler(req, res) {
 
     case 'POST':
       try {
-        const question = await Question.create(req.body);
-        res.status(201).json({ success: true, data: question });
+        // Whitelist: visitors must not be able to set isAnswered / isPublished / answer.
+        const { name, email, phone, category, question: text } = req.body || {};
+        const question = await Question.create({ name, email, phone, category, question: text });
+        res.status(201).json({ success: true, data: { _id: question._id } });
       } catch (error) {
-        res.status(400).json({ success: false, error: error.message });
+        if (error.name === 'ValidationError') {
+          return res.status(400).json({ success: false, error: error.message });
+        }
+        console.error('Submit error:', error.message);
+        res.status(500).json({ success: false, error: 'Could not save your submission. Please try again.' });
       }
       break;
 

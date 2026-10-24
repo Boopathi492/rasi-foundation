@@ -1,32 +1,25 @@
 import dbConnect from '@/backend/lib/mongodb';
 import Contact from '@/backend/models/Contact';
 
+// Public endpoint: submit only. Listing/reading contacts is admin-only via /api/admin/contacts.
 export default async function handler(req, res) {
-  const { method } = req;
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
 
-  await dbConnect();
-
-  switch (method) {
-    case 'GET':
-      try {
-        const contacts = await Contact.find({}).sort({ createdAt: -1 });
-        res.status(200).json({ success: true, data: contacts });
-      } catch (error) {
-        res.status(400).json({ success: false, error: error.message });
-      }
-      break;
-
-    case 'POST':
-      try {
-        const contact = await Contact.create(req.body);
-        res.status(201).json({ success: true, data: contact });
-      } catch (error) {
-        res.status(400).json({ success: false, error: error.message });
-      }
-      break;
-
-    default:
-      res.status(405).json({ success: false, error: 'Method not allowed' });
-      break;
+  try {
+    await dbConnect();
+    // Whitelist fields so visitors cannot set `status` or other server-managed values.
+    const { name, email, phone, subject, message } = req.body || {};
+    const contact = await Contact.create({ name, email, phone, subject, message });
+    // Do not echo the stored record back to the public caller.
+    return res.status(201).json({ success: true, data: { _id: contact._id } });
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ success: false, error: error.message });
+    }
+    console.error('Submit error:', error.message);
+    return res.status(500).json({ success: false, error: 'Could not save your submission. Please try again.' });
   }
 }
