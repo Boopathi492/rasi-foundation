@@ -65,7 +65,7 @@ export default function Marquee({ children, label, speed = 0.5, className = '', 
       cancelAnimationFrame(frame);
       window.clearTimeout(nudgeTimerRef.current);
     };
-  }, [reduced, overflowing, speed, children]);
+  }, [reduced, overflowing, speed]);
 
   // Keep manual scrolling inside the seamless loop
   const onScroll = () => {
@@ -74,7 +74,9 @@ export default function Marquee({ children, label, speed = 0.5, className = '', 
     const loop = el.scrollWidth / 2;
     if (el.scrollLeft >= loop) el.scrollLeft -= loop;
     else if (el.scrollLeft <= 0 && pausedRef.current) el.scrollLeft += loop;
-    posRef.current = el.scrollLeft;
+    // Only follow manual scrolling. While auto-scrolling, scrollLeft is rounded by the browser and
+    // copying it back would swallow the sub-pixel steps, so slow tickers would never move.
+    if (pausedRef.current) posRef.current = el.scrollLeft;
   };
 
   // Mouse drag-to-scroll (touch and trackpad already scroll natively)

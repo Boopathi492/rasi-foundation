@@ -1,10 +1,17 @@
-import { useState, useEffect } from 'react';
-import Layout from '@/frontend/components/Layout';
-import BengaluruColleges from '@/frontend/components/BengaluruColleges';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { FaMapMarkerAlt, FaUniversity, FaCode, FaGraduationCap, FaSpinner, FaFemale, FaArrowRight, FaTimes, FaSearch } from 'react-icons/fa';
+import {
+  FaMapMarkerAlt, FaUniversity, FaCode, FaGraduationCap, FaFemale, FaArrowRight, FaTimes, FaSearch, FaCalendarCheck,
+} from 'react-icons/fa';
+import Layout from '@/frontend/components/Layout';
+import PageBanner from '@/frontend/components/PageBanner';
+import BengaluruColleges from '@/frontend/components/BengaluruColleges';
+import BannerCrop from '@/frontend/components/home/BannerCrop';
+import Reveal from '@/frontend/components/home/Reveal';
+import Marquee from '@/frontend/components/home/Marquee';
 import dbConnect from '@/backend/lib/mongodb';
 import College from '@/backend/models/College';
+import { CONTACT, ROUTES } from '@/data/siteConfig';
 
 // Fallback static data in case database is empty
 // Courses updated from official college websites (December 2024)
@@ -438,17 +445,6 @@ const fallbackData = [
   },
 ];
 
-const districtColors = {
-  'Namakkal District': 'from-red-500 to-red-600',
-  'Salem District': 'from-green-500 to-green-600',
-  'Erode District': 'from-blue-500 to-blue-600',
-  'Coimbatore Zone': 'from-rasi-700 to-purple-600',
-  'Bengaluru Zone': 'from-indigo-500 to-indigo-600',
-  'Women Centric Colleges': 'from-rasi-500 to-rose-600',
-  'Well Connected Universities': 'from-teal-500 to-cyan-600',
-};
-
-// Use Static Site Generation with Incremental Static Regeneration for faster loading
 export async function getStaticProps() {
   try {
     await dbConnect();
@@ -511,22 +507,119 @@ export async function getStaticProps() {
   }
 }
 
+
+const PAGE_SIZE = 12;
+
+function CollegeModal({ college, onClose }) {
+  const closeRef = useRef(null);
+  useEffect(() => {
+    const previous = document.activeElement;
+    closeRef.current?.focus();
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = overflow;
+      previous?.focus?.();
+    };
+  }, [onClose]);
+
+  const departments = college.departments || [];
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="college-dialog-title"
+        className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl bg-white shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative bg-gradient-to-r from-forest to-forest-dark p-6 pr-14 text-white">
+          <button ref={closeRef} type="button" onClick={onClose} aria-label="Close dialog" className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 hover:bg-white/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+            <FaTimes aria-hidden="true" />
+          </button>
+          <h2 id="college-dialog-title" className="font-heading text-xl font-bold">{college.name}</h2>
+          <p className="mt-1 flex items-center gap-1.5 text-sm text-white/80"><FaMapMarkerAlt aria-hidden="true" /> {college.location}</p>
+          {college.tneaCode && <p className="mt-1 text-sm text-white/80">TNEA Code: {college.tneaCode}</p>}
+        </div>
+        <div className="flex-1 overflow-y-auto p-6">
+          <h3 className="mb-3 font-sans text-base font-semibold text-gray-900">
+            Departments {departments.length > 0 && <span className="text-sm font-normal text-gray-500">({departments.length})</span>}
+          </h3>
+          {departments.length > 0 ? (
+            <ul className="space-y-2">
+              {departments.map((dept) => (
+                <li key={dept} className="flex items-center gap-3 rounded-xl bg-gray-50 px-3 py-2.5 text-sm font-medium text-gray-700">
+                  <FaGraduationCap className="shrink-0 text-forest" aria-hidden="true" /> {dept}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="py-4 text-center text-sm text-gray-600">No department information is listed for this college yet.</p>
+          )}
+        </div>
+        <div className="flex gap-3 border-t border-gray-100 bg-gray-50 p-4">
+          <button type="button" onClick={onClose} className="flex-1 rounded-full border-2 border-gray-300 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-100">Close</button>
+          <Link href={`/contact?college=${encodeURIComponent(college.name)}`} className="flex-1 rounded-full bg-crimson py-2.5 text-center text-sm font-semibold text-white hover:bg-crimson-dark">Enquire about this college</Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Colleges({ collegesData }) {
   const [showWomenColleges, setShowWomenColleges] = useState(false);
   const [selectedCollege, setSelectedCollege] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [zone, setZone] = useState('all');
+  const [onlyTnea, setOnlyTnea] = useState(false);
+  const [visible, setVisible] = useState(PAGE_SIZE);
+  const directoryRef = useRef(null);
 
-  // Filter colleges based on search term
-  const filteredCollegesData = collegesData.map(district => ({
-    ...district,
-    colleges: district.colleges.filter(college =>
-      college.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      college.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (college.departments && college.departments.some(dept => dept.toLowerCase().includes(searchTerm.toLowerCase())))
-    )
-  })).filter(district => district.colleges.length > 0);
+  // Flatten the zone groups; only real fields are used (name, location, zone, TNEA code, note, departments).
+  const allColleges = useMemo(() => {
+    const seen = new Set();
+    const list = [];
+    (collegesData || []).forEach((group) => {
+      (group.colleges || []).forEach((c) => {
+        const key = `${group.district}|${(c.name || '').toLowerCase()}`;
+        if (!c.name || seen.has(key)) return;
+        seen.add(key);
+        list.push({ ...c, zone: group.district });
+      });
+    });
+    return list;
+  }, [collegesData]);
 
-  const totalColleges = collegesData.reduce((acc, district) => acc + district.colleges.length, 0);
+  const zones = useMemo(() => [...new Set(allColleges.map((c) => c.zone))], [allColleges]);
+
+  const filtered = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
+    return allColleges.filter((c) => {
+      if (zone !== 'all' && c.zone !== zone) return false;
+      if (onlyTnea && !c.tneaCode) return false;
+      if (!q) return true;
+      return (
+        c.name.toLowerCase().includes(q) ||
+        (c.location || '').toLowerCase().includes(q) ||
+        (c.departments || []).some((d) => d.toLowerCase().includes(q))
+      );
+    });
+  }, [allColleges, searchTerm, zone, onlyTnea]);
+
+  useEffect(() => { setVisible(PAGE_SIZE); }, [searchTerm, zone, onlyTnea]);
+
+  const shown = filtered.slice(0, visible);
+  const showcase = allColleges.filter((c) => !/bengaluru|bangalore/i.test(`${c.zone} ${c.location}`)).slice(0, 24);
+  const closeCollege = useCallback(() => setSelectedCollege(null), []);
+
+  const jumpToCollege = (name) => {
+    setSearchTerm(name);
+    setZone('all');
+    directoryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   // Women-Centric Engineering Colleges Data with Departments (Updated from official websites)
   const womenColleges = [
@@ -623,395 +716,223 @@ export default function Colleges({ collegesData }) {
   // Use DB data if available, otherwise use static fallback
   const displayWomenColleges = dbWomenColleges.length > 0 ? dbWomenColleges : womenColleges;
 
+  useEffect(() => {
+    if (!showWomenColleges) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setShowWomenColleges(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [showWomenColleges]);
+
+  const field = 'w-full rounded-full border-2 border-gray-200 bg-white px-4 py-3 text-sm focus:border-forest focus:outline-none focus-visible:ring-2 focus-visible:ring-forest/30';
 
   return (
     <Layout
       title="Colleges Available"
-      description="Explore top engineering colleges in Tamil Nadu - Namakkal, Salem, Erode, and Coimbatore districts. Get expert guidance for college admissions from Rasi Foundation."
+      description="Explore engineering colleges in Tamil Nadu - Namakkal, Salem, Erode, and Coimbatore. Get expert guidance for college admissions from Rasi Foundation."
       keywords="engineering colleges Tamil Nadu, colleges in Namakkal, colleges in Salem, colleges in Erode, colleges in Coimbatore, TNEA counseling, engineering admission"
     >
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-red-600 via-red-700 to-green-700 text-white py-16 md:py-24 overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-green-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-              <FaUniversity className="text-amber-300" />
-              <span className="text-sm font-medium">Partner Institutions</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              Colleges <span className="text-amber-300">Available</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-white/90 mb-8">
-              Explore {totalColleges}+ Top Engineering Colleges across Tamil Nadu
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-xl">
-                <span className="text-3xl font-bold text-amber-300">{collegesData.length}</span>
-                <p className="text-sm">Districts</p>
-              </div>
-              <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-xl">
-                <span className="text-3xl font-bold text-amber-300">{totalColleges}+</span>
-                <p className="text-sm">Colleges</p>
-              </div>
-              <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-xl">
-                <span className="text-3xl font-bold text-amber-300">100%</span>
-                <p className="text-sm">Guidance</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Women-Centric Colleges Highlight Banner */}
-      <section className="py-8 bg-gradient-to-r from-rasi-500 via-rasi-700 to-rasi-500 relative overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
-          <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-white/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center animate-bounce-slow">
-                <FaFemale className="text-3xl text-white" />
-              </div>
-              <div className="text-white">
-                <h3 className="text-xl md:text-2xl font-bold flex items-center gap-2">
-                  🌸 Women-Centric Engineering Colleges
-                </h3>
-                <p className="text-white/80 text-sm md:text-base">
-                  Discover exclusive engineering institutions for women in Tamil Nadu
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowWomenColleges(true)}
-              className="group flex items-center gap-2 bg-white text-rasi-700 px-6 py-3 rounded-xl font-bold hover:bg-rasi-50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
-            >
-              <span>View Women Colleges</span>
-              <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
+      <PageBanner
+        eyebrow="College Directory"
+        title="Find the right college for your course"
+        stats={[
+          { value: allColleges.length, label: 'Colleges listed' },
+          { value: zones.length, label: 'Zones / districts' },
+        ]}
+        actions={
+          <>
+            <button type="button" onClick={() => directoryRef.current?.scrollIntoView({ behavior: 'smooth' })} className="rf-btn-gold px-6 py-3">
+              <FaSearch aria-hidden="true" /> Search Colleges
             </button>
+            <Link href={ROUTES.counselling} className="rf-btn border border-white/40 px-6 py-3 text-white hover:bg-white/10 focus-visible:ring-white focus-visible:ring-offset-forest">
+              <FaCalendarCheck aria-hidden="true" /> Book Counselling
+            </Link>
+          </>
+        }
+        aside={
+          <Reveal className="relative">
+            <BannerCrop
+              src="/images/banners/hero-5-students-today-leaders-tomorrow.png"
+              alt="Students walking together on a college campus"
+              region={{ x: 900, y: 80, w: 640, h: 560 }}
+              sizes="(min-width: 1024px) 40vw, 90vw"
+              className="aspect-[8/7] rounded-[2.5rem] shadow-card-hover ring-8 ring-white/20"
+            />
+          </Reveal>
+        }
+      >
+        Browse the colleges in the Rasi Foundation directory by zone, location and department, and talk to a counsellor before you decide.
+      </PageBanner>
+
+      {/* Automatic showcase of listed colleges (no logos are stored, so an icon is shown rather than an invented logo) */}
+      {showcase.length > 0 && (
+        <section aria-labelledby="college-showcase-heading" className="bg-[#fbfaf6] pb-6 pt-2">
+          <div className="container mx-auto">
+            <h2 id="college-showcase-heading" className="mb-4 font-heading text-2xl font-bold text-gray-900">Colleges in our directory</h2>
+            <Marquee label="Colleges in our directory" speed={0.5} arrows>
+              {showcase.map((c) => (
+                <button
+                  key={`${c.zone}-${c.name}`}
+                  type="button"
+                  onClick={() => jumpToCollege(c.name)}
+                  aria-label={`Show ${c.name} in the directory`}
+                  className="group flex h-36 w-52 shrink-0 flex-col items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 text-center shadow-sm transition-all hover:-translate-y-1 hover:border-gold-300 hover:shadow-card-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-forest sm:w-56"
+                >
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-forest/10 text-xl text-forest transition-colors group-hover:bg-forest group-hover:text-white"><FaUniversity aria-hidden="true" /></span>
+                  <span className="line-clamp-2 text-[13px] font-semibold leading-snug text-gray-900">{c.name}</span>
+                  <span className="flex items-center gap-1 text-[11px] text-gray-600"><FaMapMarkerAlt className="text-crimson" aria-hidden="true" />{c.location}</span>
+                </button>
+              ))}
+            </Marquee>
           </div>
-        </div>
+        </section>
+      )}
 
-        {/* Sparkle decorations */}
-        <div className="absolute top-2 left-10 text-white/30 text-2xl">✦</div>
-        <div className="absolute bottom-2 right-16 text-white/30 text-xl">✦</div>
-        <div className="absolute top-1/2 right-1/3 text-white/20 text-lg">✦</div>
-      </section>
+      {/* Directory */}
+      <section ref={directoryRef} aria-labelledby="directory-heading" className="scroll-mt-24 bg-[#fbfaf6] py-12">
+        <div className="container mx-auto">
+          <p className="rf-eyebrow">Directory</p>
+          <h2 id="directory-heading" className="font-heading text-3xl font-bold text-gray-900 md:text-4xl">Search and filter colleges</h2>
 
-      {/* Bengaluru College Tie-Ups */}
-      <BengaluruColleges />
-
-      {/* Colleges by District */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          {/* Search Box */}
-          <div className="max-w-2xl mx-auto mb-12 relative">
+          <div className="mt-6 grid gap-3 rounded-3xl border border-gray-100 bg-white p-4 shadow-card md:grid-cols-[1.6fr_1fr_auto] md:items-center">
             <div className="relative">
-              <input
-                type="text"
-                placeholder="Search colleges, locations, or departments..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-6 py-4 pl-14 rounded-full border-2 border-gray-200 focus:border-red-500 focus:outline-none shadow-sm text-lg transition-colors"
-              />
-              <FaSearch className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+              <label htmlFor="college-search" className="sr-only">Search colleges by name, location or department</label>
+              <FaSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+              <input id="college-search" type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by college, location or department" className={`${field} pl-11`} />
             </div>
+            <div>
+              <label htmlFor="college-zone" className="sr-only">Filter by zone or district</label>
+              <select id="college-zone" value={zone} onChange={(e) => setZone(e.target.value)} className={field}>
+                <option value="all">All zones and districts</option>
+                {zones.map((z) => <option key={z} value={z}>{z}</option>)}
+              </select>
+            </div>
+            <label className="flex cursor-pointer items-center gap-2 px-2 text-sm font-medium text-gray-700">
+              <input type="checkbox" checked={onlyTnea} onChange={(e) => setOnlyTnea(e.target.checked)} className="h-4 w-4 accent-forest" />
+              Has TNEA code
+            </label>
           </div>
 
-          {filteredCollegesData.length > 0 ? (
-            filteredCollegesData.map((district, districtIndex) => (
-              <div key={districtIndex} className="mb-12 last:mb-0">
-                {/* District Header */}
-                <div className={`bg-gradient-to-r ${districtColors[district.district] || 'from-gray-500 to-gray-600'} text-white rounded-2xl p-6 mb-6 shadow-lg`}>
-                  <div className="flex items-center gap-3">
-                    <FaMapMarkerAlt className="text-2xl" />
-                    <h2 className="text-2xl md:text-3xl font-bold">
-                      {district.district} – Engineering Colleges
-                    </h2>
-                  </div>
-                  <p className="mt-2 text-white/80">
-                    {district.colleges.length} institutions available
-                  </p>
-                </div>
+          <p className="mt-4 text-sm text-gray-600" aria-live="polite">
+            Showing {Math.min(shown.length, filtered.length)} of {filtered.length} colleges
+            {(searchTerm || zone !== 'all' || onlyTnea) && (
+              <button type="button" onClick={() => { setSearchTerm(''); setZone('all'); setOnlyTnea(false); }} className="ml-3 font-semibold text-crimson underline">Clear filters</button>
+            )}
+          </p>
 
-                {/* Colleges Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {district.colleges.map((college, collegeIndex) => (
-                    <div
-                      key={college._id || collegeIndex}
-                      className="bg-white rounded-xl p-5 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-red-200 hover:-translate-y-1 group"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className={`flex-shrink-0 w-10 h-10 bg-gradient-to-r ${districtColors[district.district] || 'from-gray-500 to-gray-600'} text-white rounded-lg flex items-center justify-center font-bold text-sm`}>
-                          {collegeIndex + 1}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <button
-                            onClick={() => setSelectedCollege({ ...college, districtColor: districtColors[district.district] })}
-                            className="font-semibold text-gray-800 group-hover:text-red-600 transition-colors line-clamp-2 text-left hover:underline cursor-pointer"
-                          >
-                            {college.name}
-                          </button>
-                          <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
-                            <FaMapMarkerAlt className="text-xs text-red-500" />
-                            <span>{college.location}</span>
-                          </div>
-                          {college.tneaCode && (
-                            <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
-                              <FaCode className="text-xs text-blue-500" />
-                              <span>TNEA Code: <strong className="text-blue-600">{college.tneaCode}</strong></span>
-                            </div>
-                          )}
-                          {college.note && (
-                            <span className="inline-block mt-2 text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
-                              {college.note}
-                            </span>
-                          )}
-
-                          {/* View Departments Button */}
-                          {college.departments && college.departments.length > 0 && (
-                            <button
-                              onClick={() => setSelectedCollege({ ...college, districtColor: districtColors[district.district] })}
-                              className="mt-3 flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                            >
-                              📚 View {college.departments.length} Departments
-                              <FaArrowRight className="text-xs" />
-                            </button>
-                          )}
-                        </div>
-                      </div>
+          {shown.length > 0 ? (
+            <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {shown.map((c, i) => (
+                <Reveal as="li" key={`${c.zone}-${c._id || c.name}`} delay={(i % 3) * 0.05} className="group flex flex-col rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-gold-300 hover:shadow-card-hover">
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-forest/10 text-xl text-forest"><FaUniversity aria-hidden="true" /></span>
+                    <div className="min-w-0">
+                      <h3 className="line-clamp-2 font-sans text-base font-semibold leading-snug text-gray-900">{c.name}</h3>
+                      <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-600"><FaMapMarkerAlt className="shrink-0 text-xs text-crimson" aria-hidden="true" />{c.location}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
-            ))
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="rounded-full bg-forest/10 px-2.5 py-1 text-xs font-semibold text-forest">{c.zone}</span>
+                    {c.tneaCode && <span className="inline-flex items-center gap-1 rounded-full bg-gold-100 px-2.5 py-1 text-xs font-semibold text-gold-600"><FaCode aria-hidden="true" /> TNEA {c.tneaCode}</span>}
+                    {c.note && <span className="rounded-full bg-crimson/10 px-2.5 py-1 text-xs font-semibold text-crimson">{c.note}</span>}
+                  </div>
+                  <div className="mt-auto flex flex-wrap items-center gap-3 pt-4">
+                    {c.departments && c.departments.length > 0 && (
+                      <button type="button" onClick={() => setSelectedCollege(c)} className="inline-flex items-center gap-2 rounded-full border border-forest px-4 py-2 text-xs font-semibold text-forest hover:bg-forest hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2">
+                        View {c.departments.length} departments <FaArrowRight aria-hidden="true" />
+                      </button>
+                    )}
+                    <Link href={`/contact?college=${encodeURIComponent(c.name)}`} className="inline-flex items-center gap-2 text-xs font-semibold text-crimson hover:underline">
+                      Enquire <FaArrowRight aria-hidden="true" />
+                    </Link>
+                  </div>
+                </Reveal>
+              ))}
+            </ul>
           ) : (
-            <div className="text-center py-10">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-                <FaSearch className="text-gray-400 text-2xl" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">No colleges found</h3>
-              <p className="text-gray-500">
-                We couldn&apos;t find any colleges matching &quot;{searchTerm}&quot;. Try a different keyword.
-              </p>
+            <div className="mt-8 rounded-3xl border border-gray-200 bg-white p-10 text-center">
+              <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-xl text-gray-400"><FaSearch aria-hidden="true" /></span>
+              <h3 className="font-sans text-lg font-semibold text-gray-900">No colleges found</h3>
+              <p className="mt-1 text-sm text-gray-600">Try a different keyword or clear the filters.</p>
+            </div>
+          )}
+
+          {visible < filtered.length && (
+            <div className="mt-8 text-center">
+              <button type="button" onClick={() => setVisible((v) => v + PAGE_SIZE)} className="rf-btn-primary !rounded-full px-8 py-3">
+                Load more colleges ({filtered.length - visible} remaining)
+              </button>
             </div>
           )}
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-red-600 to-green-600 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <FaGraduationCap className="text-5xl mx-auto mb-6 text-amber-300" />
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Need Help Choosing the Right College?
-          </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Get personalized guidance from our expert counselors. We&apos;ll help you find the perfect college based on your rank, preferences, and career goals.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              href="/contact"
-              className="bg-white text-red-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-lg"
-            >
-              Get Free Counseling
-            </Link>
-            <a
-              href="tel:+919789446100"
-              className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-red-600 transition-all duration-300"
-            >
-              Call: +91 97894 46100
-            </a>
+      {/* Women-centric colleges (existing content) */}
+      <section aria-labelledby="women-heading" className="bg-white py-10">
+        <div className="container mx-auto">
+          <div className="flex flex-col items-start justify-between gap-5 rounded-3xl bg-gradient-to-r from-[#7d0a1f] via-crimson to-[#7d0a1f] p-6 text-white shadow-card-hover md:flex-row md:items-center md:p-8">
+            <div className="flex items-center gap-4">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-2xl"><FaFemale aria-hidden="true" /></span>
+              <div>
+                <h2 id="women-heading" className="font-heading text-xl font-bold md:text-2xl">Women-Centric Engineering Colleges</h2>
+                <p className="text-sm text-white/80">Engineering institutions for women in Tamil Nadu.</p>
+              </div>
+            </div>
+            <button type="button" onClick={() => setShowWomenColleges(true)} className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-crimson hover:bg-gold-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-crimson">
+              View Women Colleges <FaArrowRight className="transition-transform group-hover:translate-x-1" aria-hidden="true" />
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Women-Centric Colleges Modal */}
+      {/* Bengaluru College Tie-Ups (existing component) */}
+      <BengaluruColleges />
+
+      {/* CTA */}
+      <section aria-labelledby="colleges-cta" className="bg-white py-14">
+        <div className="container mx-auto">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-forest-dark to-forest px-8 py-12 text-center text-white">
+            <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-gold-400" />
+            <FaGraduationCap className="mx-auto mb-4 text-4xl text-gold-300" aria-hidden="true" />
+            <h2 id="colleges-cta" className="font-heading text-3xl font-bold md:text-4xl">Need help choosing the right college?</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-white/85">Talk to a counsellor about your marks, preferences and career goals before you apply.</p>
+            <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link href={ROUTES.counselling} className="rf-btn-gold px-7 py-3"><FaCalendarCheck aria-hidden="true" /> Book Counselling</Link>
+              <a href={`tel:${CONTACT.phoneTel}`} className="rf-btn border border-white/40 px-7 py-3 text-white hover:bg-white/10 focus-visible:ring-white focus-visible:ring-offset-forest">Call {CONTACT.phoneDisplay}</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Women-Centric Colleges dialog */}
       {showWomenColleges && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden animate-slideIn">
-            {/* Modal Header */}
-            <div className="bg-gradient-to-r from-rasi-500 via-rasi-700 to-rasi-500 p-6 text-white relative">
-              <button
-                onClick={() => setShowWomenColleges(false)}
-                className="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors"
-              >
-                <FaTimes className="text-xl" />
-              </button>
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
-                  <FaFemale className="text-3xl" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold">🌸 Women-Centric Engineering Colleges</h2>
-                  <p className="text-white/80">Exclusive institutions for women in Tamil Nadu</p>
-                </div>
-              </div>
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/60 p-4" onClick={() => setShowWomenColleges(false)}>
+          <div role="dialog" aria-modal="true" aria-labelledby="women-dialog-title" className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="relative bg-gradient-to-r from-[#7d0a1f] to-crimson p-6 pr-14 text-white">
+              <button type="button" autoFocus onClick={() => setShowWomenColleges(false)} aria-label="Close dialog" className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 hover:bg-white/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"><FaTimes aria-hidden="true" /></button>
+              <h2 id="women-dialog-title" className="font-heading text-2xl font-bold">Women-Centric Engineering Colleges</h2>
+              <p className="text-sm text-white/80">Select a college to ask a counsellor about it.</p>
             </div>
-
-            {/* Modal Body - Colleges List */}
-            <div className="p-6 overflow-y-auto max-h-[60vh]">
-              <p className="text-sm text-gray-500 mb-4 text-center">Click on any college to get counseling</p>
-              <div className="space-y-4">
-                {displayWomenColleges.map((college, index) => (
-                  <Link
-                    key={index}
-                    href={`/contact?college=${encodeURIComponent(college.name)}`}
-                    className="group block p-4 bg-gradient-to-r from-rasi-50 to-rasi-50 rounded-xl border border-rasi-100 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-rasi-500 to-rasi-700 rounded-xl flex items-center justify-center text-white font-bold shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
-                        {index + 1}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-bold text-gray-800 group-hover:text-rasi-800 transition-colors text-lg">
-                          {college.name}
-                        </h3>
-                        <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
-                          <FaMapMarkerAlt className="text-rasi-500" />
-                          <span>{college.location}</span>
-                        </div>
-
-                        {/* Departments */}
-                        <div className="mt-3">
-                          <p className="text-xs text-gray-500 font-medium mb-2">📚 Departments Available:</p>
-                          <div className="flex flex-wrap gap-2">
-                            {(college.departments || []).map((dept, deptIndex) => (
-                              <span
-                                key={deptIndex}
-                                className="inline-flex items-center text-xs bg-white text-rasi-800 px-2 py-1 rounded-full border border-purple-200"
-                              >
-                                {dept}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Click indicator */}
-                        <div className="mt-3 flex items-center gap-2 text-rasi-700 text-sm font-medium">
-                          <span>Get Counseling</span>
-                          <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
-                        </div>
-                      </div>
-                    </div>
+            <ul className="space-y-3 overflow-y-auto p-6">
+              {displayWomenColleges.map((college) => (
+                <li key={college.name}>
+                  <Link href={`/contact?college=${encodeURIComponent(college.name)}`} className="group block rounded-2xl border border-gray-100 bg-gray-50 p-4 transition-all hover:border-gold-300 hover:shadow-card">
+                    <h3 className="font-sans text-base font-semibold text-gray-900 group-hover:text-crimson">{college.name}</h3>
+                    <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-600"><FaMapMarkerAlt className="text-crimson" aria-hidden="true" />{college.location}</p>
+                    {(college.departments || []).length > 0 && (
+                      <p className="mt-2 flex flex-wrap gap-1.5">
+                        {college.departments.map((d) => <span key={d} className="rounded-full border border-gray-200 bg-white px-2 py-0.5 text-[11px] text-gray-700">{d}</span>)}
+                      </p>
+                    )}
+                    <span className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-crimson">Enquire <FaArrowRight aria-hidden="true" /></span>
                   </Link>
-                ))}
-              </div>
-
-              {/* Total Count */}
-              <div className="mt-6 text-center">
-                <span className="inline-flex items-center gap-2 bg-gradient-to-r from-rasi-100 to-rasi-100 text-rasi-800 px-4 py-2 rounded-full font-semibold">
-                  <FaUniversity />
-                  Total: {displayWomenColleges.length} Colleges
-                </span>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-4 bg-gray-50 border-t border-gray-100">
-              <button
-                onClick={() => setShowWomenColleges(false)}
-                className="w-full bg-gradient-to-r from-rasi-500 to-rasi-700 text-white py-3 rounded-xl font-bold hover:shadow-lg transition-all duration-300"
-              >
-                Close
-              </button>
-            </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       )}
 
-      {/* College Departments Modal */}
-      {selectedCollege && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
-          onClick={() => setSelectedCollege(null)}
-        >
-          <div
-            className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden animate-slideIn"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className={`bg-gradient-to-r ${selectedCollege.districtColor || 'from-red-500 to-red-600'} p-6 text-white relative`}>
-              <button
-                onClick={() => setSelectedCollege(null)}
-                className="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors"
-              >
-                <FaTimes className="text-xl" />
-              </button>
-              <div className="flex items-center gap-4 pr-10">
-                <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
-                  <FaUniversity className="text-2xl" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold">{selectedCollege.name}</h2>
-                  <div className="flex items-center gap-1 text-white/80 text-sm mt-1">
-                    <FaMapMarkerAlt />
-                    <span>{selectedCollege.location}</span>
-                  </div>
-                  {selectedCollege.tneaCode && (
-                    <div className="flex items-center gap-1 text-white/80 text-sm mt-1">
-                      <FaCode />
-                      <span>TNEA Code: {selectedCollege.tneaCode}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Body - Departments List */}
-            <div className="p-6 overflow-y-auto flex-1" style={{ maxHeight: '60vh' }}>
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                📚 Departments Available
-                <span className="text-sm font-normal text-gray-500">
-                  ({selectedCollege.departments?.length || 0} courses)
-                </span>
-              </h3>
-
-              {selectedCollege.departments && selectedCollege.departments.length > 0 ? (
-                <div className="space-y-3">
-                  {selectedCollege.departments.map((dept, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
-                    >
-                      <div className={`w-8 h-8 bg-gradient-to-r ${selectedCollege.districtColor || 'from-red-500 to-red-600'} rounded-lg flex items-center justify-center text-white font-bold text-sm`}>
-                        {index + 1}
-                      </div>
-                      <span className="font-medium text-gray-700">{dept}</span>
-                      <FaGraduationCap className="ml-auto text-gray-400" />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500 text-center py-4">No department information available</p>
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-3">
-              <button
-                onClick={() => setSelectedCollege(null)}
-                className="flex-1 border-2 border-gray-300 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-100 transition-all duration-300"
-              >
-                Close
-              </button>
-              <Link
-                href="/contact"
-                className={`flex-1 bg-gradient-to-r ${selectedCollege.districtColor || 'from-red-500 to-red-600'} text-white py-3 rounded-xl font-bold hover:shadow-lg transition-all duration-300 text-center`}
-              >
-                Get Counseling
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+      {selectedCollege && <CollegeModal college={selectedCollege} onClose={closeCollege} />}
     </Layout>
   );
 }

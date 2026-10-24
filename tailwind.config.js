@@ -69,6 +69,9 @@ module.exports = {
           800: '#611d1a',
           900: '#4a1715',
         },
+        // Header palette sampled from the supplied header reference
+        crimson: { DEFAULT: '#b0102e', dark: '#8f0b24' },
+        forest: { DEFAULT: '#075544', dark: '#054235' },
         accent: {
           50: '#fffbeb',
           100: '#fef3c7',
@@ -89,6 +92,8 @@ module.exports = {
       fontFamily: {
         heading: ['"Playfair Display"', 'Georgia', 'serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Oswald', '"Arial Narrow"', 'sans-serif'],
+        script: ['Caveat', 'cursive'],
       },
     },
   },
