@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         if (!testSession) {
             return res.status(404).json({
                 success: false,
-                message: 'Test session not found',
+                message: 'Examination session not found',
             });
         }
 
@@ -33,64 +33,71 @@ export default async function handler(req, res) {
         if (testSession.status !== 'in_progress') {
             return res.status(400).json({
                 success: false,
-                message: `Test is ${testSession.status}. Cannot fetch questions.`,
+                message: `Examination is ${testSession.status}. Cannot fetch questions.`,
             });
         }
 
-        // Check if time has expired
-        const endTime = new Date(testSession.startTime);
-        endTime.setMinutes(endTime.getMinutes() + testSession.duration);
+        // Authoritative server-side deadline check
+        const startTime = new Date(testSession.startTime);
+        const endTime = new Date(startTime.getTime() + (testSession.duration * 60 * 1000));
+        const now = new Date();
 
-        if (new Date() > endTime) {
+        if (now > endTime) {
             testSession.status = 'expired';
             await testSession.save();
             return res.status(400).json({
                 success: false,
-                message: 'Test time has expired',
+                message: 'Examination duration has expired',
             });
         }
 
-        // Calculate remaining time
-        const remainingMs = endTime.getTime() - new Date().getTime();
+        // Calculate remaining seconds
+        const remainingMs = Math.max(0, endTime.getTime() - now.getTime());
         const remainingMinutes = Math.floor(remainingMs / 60000);
-        const remainingSeconds = Math.floor((remainingMs % 60000) / 1000);
+        const remainingSeconds = Math.floor(remainingMs / 1000);
 
         // Get question IDs from session
         const questionIds = testSession.questions.map(q => q.questionId);
 
-        // Fetch full question details (without correct answers for security)
+        // Fetch questions without exposing correctAnswer or explanation
         const questions = await ScholarshipQuestion.find(
             { _id: { $in: questionIds } },
-            { correctAnswer: 0, explanation: 0 } // Exclude answer and explanation
+            { correctAnswer: 0, explanation: 0, explanationTamil: 0 }
         );
 
-        // Create a map for quick lookup
         const questionMap = {};
         questions.forEach(q => {
             questionMap[q._id.toString()] = q;
         });
 
-        // Build response with questions in order
+        const isTamil = testSession.language === 'Tamil';
+
+        // Build ordered question list
         const orderedQuestions = testSession.questions.map((q, index) => {
-            const fullQuestion = questionMap[q.questionId.toString()];
+            const fullQuestion = questionMap[q.questionId?.toString()];
             if (!fullQuestion) return null;
 
-            // Find if student already answered this question
             const existingAnswer = testSession.answers.find(
                 a => a.questionId.toString() === q.questionId.toString()
             );
 
+            // Select language-specific content
+            const useTamil = isTamil && fullQuestion.questionTextTamil && fullQuestion.optionsTamil && fullQuestion.optionsTamil.length === 4;
+            const questionText = useTamil ? fullQuestion.questionTextTamil : fullQuestion.questionText;
+            const options = useTamil ? fullQuestion.optionsTamil : fullQuestion.options;
+
             return {
                 index: index + 1,
                 id: fullQuestion._id,
-                subject: fullQuestion.subject,
-                questionText: fullQuestion.questionText,
-                options: fullQuestion.options,
+                subject: q.subject || fullQuestion.subject,
+                questionText,
+                options,
+                isTamil: Boolean(useTamil),
                 selectedAnswer: existingAnswer?.selectedAnswer || null,
             };
         }).filter(Boolean);
 
-        // Group questions by subject
+        // Group by subject
         const questionsBySubject = {};
         testSession.subjects.forEach(subject => {
             questionsBySubject[subject] = orderedQuestions.filter(q => q.subject === subject);
@@ -101,6 +108,8 @@ export default async function handler(req, res) {
             data: {
                 sessionId: testSession._id,
                 subjects: testSession.subjects,
+                language: testSession.language || 'English',
+                pageSize: testSession.pageSize || 5,
                 totalQuestions: orderedQuestions.length,
                 questions: orderedQuestions,
                 questionsBySubject,
@@ -112,7 +121,7 @@ export default async function handler(req, res) {
                     endTime,
                 },
                 progress: {
-                    answered: testSession.answers.filter(a => a.selectedAnswer).length,
+                    answered: testSession.answers.filter(a => a.selectedAnswer !== null && a.selectedAnswer !== '').length,
                     total: orderedQuestions.length,
                 },
             },
@@ -122,7 +131,7 @@ export default async function handler(req, res) {
         console.error('Get questions error:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to fetch questions',
+            message: 'Failed to fetch examination questions',
             error: process.env.NODE_ENV === 'development' ? error.message : undefined,
         });
     }

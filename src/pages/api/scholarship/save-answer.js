@@ -19,13 +19,8 @@ export default async function handler(req, res) {
             });
         }
 
-        // Validate answer
-        if (answer && !['A', 'B', 'C', 'D'].includes(answer)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid answer. Must be A, B, C, or D',
-            });
-        }
+        // Validate answer (A, B, C, D, or null)
+        const validAnswer = answer && ['A', 'B', 'C', 'D'].includes(answer) ? answer : null;
 
         // Find test session
         const testSession = await TestSession.findById(sessionId);
@@ -33,7 +28,7 @@ export default async function handler(req, res) {
         if (!testSession) {
             return res.status(404).json({
                 success: false,
-                message: 'Test session not found',
+                message: 'Examination session not found',
             });
         }
 
@@ -41,32 +36,32 @@ export default async function handler(req, res) {
         if (testSession.status !== 'in_progress') {
             return res.status(400).json({
                 success: false,
-                message: `Cannot submit answer. Test is ${testSession.status}.`,
+                message: `Cannot submit answer. Examination is ${testSession.status}.`,
             });
         }
 
-        // Check if time has expired
-        const endTime = new Date(testSession.startTime);
-        endTime.setMinutes(endTime.getMinutes() + testSession.duration);
+        // Authoritative server-side deadline check
+        const startTime = new Date(testSession.startTime);
+        const endTime = new Date(startTime.getTime() + (testSession.duration * 60 * 1000));
 
         if (new Date() > endTime) {
             testSession.status = 'expired';
             await testSession.save();
             return res.status(400).json({
                 success: false,
-                message: 'Test time has expired',
+                message: 'Examination time has expired',
             });
         }
 
         // Verify question belongs to this session
         const sessionQuestion = testSession.questions.find(
-            q => q.questionId.toString() === questionId
+            q => q.questionId.toString() === questionId.toString()
         );
 
         if (!sessionQuestion) {
             return res.status(400).json({
                 success: false,
-                message: 'This question is not part of your test',
+                message: 'This question does not belong to your examination paper',
             });
         }
 
@@ -75,30 +70,28 @@ export default async function handler(req, res) {
         if (!question) {
             return res.status(404).json({
                 success: false,
-                message: 'Question not found',
+                message: 'Question not found in question bank',
             });
         }
 
-        const isCorrect = answer === question.correctAnswer;
+        const isCorrect = validAnswer !== null && validAnswer === question.correctAnswer;
 
         // Find existing answer or create new
         const existingAnswerIndex = testSession.answers.findIndex(
-            a => a.questionId.toString() === questionId
+            a => a.questionId.toString() === questionId.toString()
         );
 
         const answerData = {
             questionId,
-            subject: question.subject,
-            selectedAnswer: answer || null,
-            isCorrect: answer ? isCorrect : false,
-            timeTaken: 0, // Can be tracked from frontend
+            subject: sessionQuestion.subject || question.subject,
+            selectedAnswer: validAnswer,
+            isCorrect,
+            timeTaken: 0,
         };
 
         if (existingAnswerIndex >= 0) {
-            // Update existing answer
             testSession.answers[existingAnswerIndex] = answerData;
         } else {
-            // Add new answer
             testSession.answers.push(answerData);
         }
 
@@ -109,7 +102,7 @@ export default async function handler(req, res) {
             message: 'Answer saved',
             data: {
                 saved: true,
-                answered: testSession.answers.filter(a => a.selectedAnswer).length,
+                answered: testSession.answers.filter(a => a.selectedAnswer !== null && a.selectedAnswer !== '').length,
                 total: testSession.totalQuestions,
             },
         });

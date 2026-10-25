@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import Image from 'next/image';
 import {
     FaClock,
     FaCheckCircle,
@@ -9,13 +10,10 @@ import {
     FaArrowRight,
     FaExclamationTriangle,
     FaPaperPlane,
-    FaAtom,
-    FaFlask,
-    FaCalculator,
-    FaLeaf,
-    FaDna,
-    FaBookmark,
-    FaTimes
+    FaTimes,
+    FaListOl,
+    FaSpinner,
+    FaCheck
 } from 'react-icons/fa';
 
 export default function ExamPage() {
@@ -25,42 +23,85 @@ export default function ExamPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [examData, setExamData] = useState(null);
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState({});
     const [timeRemaining, setTimeRemaining] = useState(0);
     const [showSubmitModal, setShowSubmitModal] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [activeSubject, setActiveSubject] = useState('all');
-    const [savingAnswer, setSavingAnswer] = useState(false);
-
-    // Subject icons mapping
-    const subjectIcons = {
-        'Physics': FaAtom,
-        'Chemistry': FaFlask,
-        'Mathematics': FaCalculator,
-        'Botany': FaLeaf,
-        'Zoology': FaDna,
-        'Biology': FaDna,
-    };
-
-    // Subject colors
-    const subjectColors = {
-        'Physics': 'bg-blue-500',
-        'Chemistry': 'bg-green-500',
-        'Mathematics': 'bg-purple-500',
-        'Botany': 'bg-emerald-500',
-        'Zoology': 'bg-rose-500',
-        'Biology': 'bg-amber-500',
-    };
+    const [pageSize, setPageSize] = useState(5); // 5 or 10 questions per page
+    const [currentPage, setCurrentPage] = useState(1);
+    const [savingId, setSavingId] = useState(null);
 
     // Fetch exam data
+    const fetchExamData = useCallback(async () => {
+        try {
+            const response = await fetch(`/api/scholarship/questions?sessionId=${session}`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to load examination');
+            }
+
+            setExamData(data.data);
+            if (data.data.pageSize) {
+                setPageSize(data.data.pageSize);
+            }
+
+            // Populate answers from server session
+            const existingAnswers = {};
+            data.data.questions.forEach(q => {
+                if (q.selectedAnswer) {
+                    existingAnswers[q.id] = q.selectedAnswer;
+                }
+            });
+            setAnswers(existingAnswers);
+
+            // Authoritative server remaining time
+            const { remainingSeconds } = data.data.timing;
+            setTimeRemaining(Math.max(0, remainingSeconds));
+
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [session]);
+
     useEffect(() => {
         if (session) {
             fetchExamData();
         }
-    }, [session]);
+    }, [session, fetchExamData]);
 
-    // Timer countdown
+    const handleSubmit = useCallback(async () => {
+        if (submitting) return;
+        setSubmitting(true);
+        try {
+            const response = await fetch('/api/scholarship/submit-test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId: session }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to submit examination');
+            }
+
+            router.push(`/scholarship-test/result?session=${session}`);
+        } catch (err) {
+            setError(err.message);
+            setSubmitting(false);
+        }
+    }, [session, submitting, router]);
+
+    const handleAutoSubmit = useCallback(async () => {
+        setShowSubmitModal(false);
+        await handleSubmit();
+    }, [handleSubmit]);
+
+    // Timer countdown with auto-submit on expiry
     useEffect(() => {
         if (timeRemaining <= 0) return;
 
@@ -76,47 +117,15 @@ export default function ExamPage() {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [timeRemaining]);
+    }, [timeRemaining, handleAutoSubmit]);
 
-    const fetchExamData = async () => {
-        try {
-            const response = await fetch(`/api/scholarship/questions?sessionId=${session}`);
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Failed to load exam');
-            }
-
-            setExamData(data.data);
-
-            // Initialize answers from existing responses
-            const existingAnswers = {};
-            data.data.questions.forEach(q => {
-                if (q.selectedAnswer) {
-                    existingAnswers[q.id] = q.selectedAnswer;
-                }
-            });
-            setAnswers(existingAnswers);
-
-            // Set remaining time
-            const { remainingMinutes, remainingSeconds } = data.data.timing;
-            setTimeRemaining(remainingMinutes * 60 + remainingSeconds);
-
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
+    // Autosave single answer selection
     const saveAnswer = async (questionId, answer) => {
-        setSavingAnswer(true);
+        setSavingId(questionId);
         try {
             await fetch('/api/scholarship/save-answer', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     sessionId: session,
                     questionId,
@@ -126,7 +135,7 @@ export default function ExamPage() {
         } catch (err) {
             console.error('Failed to save answer:', err);
         } finally {
-            setSavingAnswer(false);
+            setSavingId(null);
         }
     };
 
@@ -136,38 +145,6 @@ export default function ExamPage() {
             [questionId]: answer,
         }));
         saveAnswer(questionId, answer);
-    };
-
-    const handleAutoSubmit = async () => {
-        setShowSubmitModal(false);
-        await handleSubmit();
-    };
-
-    const handleSubmit = async () => {
-        setSubmitting(true);
-        try {
-            const response = await fetch('/api/scholarship/submit-test', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    sessionId: session,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Failed to submit test');
-            }
-
-            // Navigate to results page
-            router.push(`/scholarship-test/result?session=${session}`);
-        } catch (err) {
-            setError(err.message);
-            setSubmitting(false);
-        }
     };
 
     const formatTime = (seconds) => {
@@ -181,404 +158,455 @@ export default function ExamPage() {
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
-    const getFilteredQuestions = () => {
+    // Filter by subject tab
+    const filteredQuestions = useMemo(() => {
         if (!examData?.questions) return [];
         if (activeSubject === 'all') return examData.questions;
         return examData.questions.filter(q => q.subject === activeSubject);
-    };
+    }, [examData, activeSubject]);
 
-    const filteredQuestions = getFilteredQuestions();
-    const currentQuestion = filteredQuestions[currentQuestionIndex];
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredQuestions.length / pageSize) || 1;
+    const paginatedQuestions = useMemo(() => {
+        const start = (currentPage - 1) * pageSize;
+        return filteredQuestions.slice(start, start + pageSize);
+    }, [filteredQuestions, currentPage, pageSize]);
 
-    const getProgress = () => {
-        if (!examData?.questions) return { answered: 0, total: 0 };
-        const answered = Object.keys(answers).length;
-        return { answered, total: examData.questions.length };
-    };
+    // Counts
+    const answeredCount = Object.keys(answers).filter(k => answers[k] !== null && answers[k] !== '').length;
+    const totalQuestionsCount = examData?.questions?.length || 60;
+    const unansweredCount = Math.max(0, totalQuestionsCount - answeredCount);
 
-    const progress = getProgress();
+    // Timer visual status
+    const isCritical = timeRemaining < 300; // < 5 mins
+    const isWarning = timeRemaining < 900 && !isCritical; // < 15 mins
 
     if (loading) {
         return (
-            <>
-                <Head>
-                    <title>Loading Exam... | RASI Foundation</title>
-                </Head>
-                <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-                    <div className="text-center">
-                        <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                        <p className="text-gray-600">Loading your exam...</p>
-                    </div>
+            <div className="min-h-screen bg-[#f8faf9] flex items-center justify-center p-4">
+                <div className="text-center">
+                    <div className="h-12 w-12 border-4 border-forest border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                    <p className="text-sm font-semibold text-gray-700">Loading your examination session…</p>
                 </div>
-            </>
+            </div>
         );
     }
 
     if (error && !examData) {
         return (
-            <>
-                <Head>
-                    <title>Error | RASI Foundation</title>
-                </Head>
-                <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-                    <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
-                        <div className="w-16 h-16 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
-                            <FaExclamationTriangle className="text-3xl text-red-600" />
-                        </div>
-                        <h1 className="text-2xl font-bold text-gray-800 mb-4">Error</h1>
-                        <p className="text-gray-600 mb-6">{error}</p>
-                        <button
-                            onClick={() => router.push('/scholarship-test')}
-                            className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-colors"
-                        >
-                            Back to Scholarship Test
-                        </button>
+            <div className="min-h-screen bg-[#f8faf9] flex items-center justify-center p-4">
+                <div className="max-w-md w-full rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-md">
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-crimson">
+                        <FaExclamationTriangle className="text-2xl" />
                     </div>
+                    <h1 className="text-xl font-bold text-gray-900 mb-2">Examination Unavailable</h1>
+                    <p className="text-xs text-gray-600 mb-6">{error}</p>
+                    <button
+                        onClick={() => router.push('/scholarship-test')}
+                        className="rf-btn-primary px-6 py-2.5 text-xs font-semibold !rounded-lg"
+                    >
+                        Return to Scholarship Portal
+                    </button>
                 </div>
-            </>
+            </div>
         );
     }
 
     return (
         <>
             <Head>
-                <title>Scholarship Exam | RASI Foundation</title>
+                <title>Official Scholarship Examination — Rasi Foundation</title>
                 <meta name="robots" content="noindex, nofollow" />
             </Head>
 
-            <div className="min-h-screen bg-gray-100 flex flex-col">
-                {/* Header / Timer Bar */}
-                <header className="sticky top-0 z-50 bg-white shadow-md">
-                    <div className="container mx-auto px-4 py-3">
-                        <div className="flex items-center justify-between">
-                            {/* Logo/Title */}
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
-                                    <FaQuestionCircle className="text-white text-xl" />
-                                </div>
-                                <div className="hidden sm:block">
-                                    <h1 className="font-bold text-gray-800">RASI Foundation</h1>
-                                    <p className="text-xs text-gray-500">Scholarship Test</p>
-                                </div>
+            <div className="min-h-screen bg-[#f4f7f5] flex flex-col">
+                {/* Authoritative Examination Fixed Header */}
+                <header className="sticky top-0 z-40 border-b border-gray-200 bg-white shadow-sm">
+                    <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+                        {/* Brand */}
+                        <div className="flex items-center gap-3">
+                            <Image
+                                src="/rasi-logo.png"
+                                alt="Rasi Foundation"
+                                width={36}
+                                height={36}
+                                className="h-9 w-9 rounded-full object-contain"
+                            />
+                            <div>
+                                <span className="font-heading text-sm font-bold tracking-tight text-forest block leading-tight">
+                                    RASI FOUNDATION
+                                </span>
+                                <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider block">
+                                    Scholarship Examination • {examData?.language || 'English'} Medium
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Center / Right: Timer & Pagination toggle */}
+                        <div className="flex items-center gap-3 sm:gap-4">
+                            {/* Page size toggle */}
+                            <div className="hidden sm:flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 p-1 text-[11px] font-semibold text-gray-600">
+                                <span>Show:</span>
+                                <button
+                                    type="button"
+                                    onClick={() => { setPageSize(5); setCurrentPage(1); }}
+                                    className={`px-2 py-0.5 rounded ${pageSize === 5 ? 'bg-forest text-white' : 'hover:text-forest'}`}
+                                >
+                                    5 / page
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => { setPageSize(10); setCurrentPage(1); }}
+                                    className={`px-2 py-0.5 rounded ${pageSize === 10 ? 'bg-forest text-white' : 'hover:text-forest'}`}
+                                >
+                                    10 / page
+                                </button>
                             </div>
 
-                            {/* Timer */}
-                            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl font-mono text-lg font-bold ${timeRemaining <= 300
-                                    ? 'bg-red-100 text-red-600 animate-pulse'
-                                    : timeRemaining <= 600
-                                        ? 'bg-amber-100 text-amber-600'
-                                        : 'bg-green-100 text-green-600'
-                                }`}>
-                                <FaClock />
+                            {/* Authoritative Countdown Timer */}
+                            <div className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 border font-mono text-sm sm:text-base font-bold shadow-sm ${
+                                isCritical
+                                    ? 'border-crimson bg-red-50 text-crimson animate-pulse'
+                                    : isWarning
+                                    ? 'border-amber-400 bg-amber-50 text-amber-800'
+                                    : 'border-forest/25 bg-[#f4f9f6] text-forest'
+                            }`}>
+                                <FaClock className={`text-xs ${isCritical ? 'text-crimson' : 'text-forest'}`} />
                                 <span>{formatTime(timeRemaining)}</span>
                             </div>
 
-                            {/* Progress */}
-                            <div className="hidden md:flex items-center gap-4">
-                                <div className="text-right">
-                                    <p className="text-sm text-gray-500">Progress</p>
-                                    <p className="font-bold text-gray-800">{progress.answered} / {progress.total}</p>
-                                </div>
-                                <div className="w-32 h-3 bg-gray-200 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-300"
-                                        style={{ width: `${(progress.answered / progress.total) * 100}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-
-                            {/* Submit Button */}
+                            {/* Finish Button */}
                             <button
+                                type="button"
                                 onClick={() => setShowSubmitModal(true)}
-                                className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition-all flex items-center gap-2"
+                                className="rf-btn-maroon px-4 py-2 text-xs font-bold !rounded-lg flex items-center gap-1.5 shadow-sm"
                             >
-                                <FaPaperPlane />
-                                <span className="hidden sm:inline">Submit</span>
+                                <FaPaperPlane className="text-[10px]" />
+                                <span className="hidden sm:inline">Finish &</span>
+                                <span>Submit</span>
                             </button>
                         </div>
                     </div>
+
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-100 h-1">
+                        <div
+                            className="bg-forest h-1 transition-all duration-300"
+                            style={{ width: `${(answeredCount / totalQuestionsCount) * 100}%` }}
+                        />
+                    </div>
                 </header>
 
-                {/* Main Content */}
-                <main className="flex-1 container mx-auto px-4 py-6">
-                    <div className="flex flex-col lg:flex-row gap-6">
-                        {/* Question Panel */}
-                        <div className="flex-1">
-                            {/* Subject Tabs */}
-                            <div className="bg-white rounded-xl shadow-md mb-4 p-2 overflow-x-auto">
-                                <div className="flex gap-2 min-w-max">
-                                    <button
-                                        onClick={() => { setActiveSubject('all'); setCurrentQuestionIndex(0); }}
-                                        className={`px-4 py-2 rounded-lg font-medium transition-all ${activeSubject === 'all'
-                                                ? 'bg-indigo-600 text-white'
-                                                : 'text-gray-600 hover:bg-gray-100'
+                {/* Main Exam Content Area */}
+                <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col lg:flex-row gap-6 p-4 sm:p-6">
+                    {/* Questions Column */}
+                    <div className="flex-1 space-y-4">
+                        {/* Subject Tabs & Pagination header */}
+                        <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-xs flex flex-wrap items-center justify-between gap-2">
+                            {/* Subject filter tabs */}
+                            <div className="flex flex-wrap items-center gap-1">
+                                <button
+                                    type="button"
+                                    onClick={() => { setActiveSubject('all'); setCurrentPage(1); }}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                                        activeSubject === 'all'
+                                            ? 'bg-forest text-white shadow-xs'
+                                            : 'text-gray-600 hover:bg-gray-100'
+                                    }`}
+                                >
+                                    All Questions ({totalQuestionsCount})
+                                </button>
+                                {examData?.subjects?.map(s => {
+                                    const count = examData.questions.filter(q => q.subject === s).length;
+                                    return (
+                                        <button
+                                            key={s}
+                                            type="button"
+                                            onClick={() => { setActiveSubject(s); setCurrentPage(1); }}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                                                activeSubject === s
+                                                    ? 'bg-forest text-white shadow-xs'
+                                                    : 'text-gray-600 hover:bg-gray-100'
                                             }`}
+                                        >
+                                            {s} ({count})
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Page Info */}
+                            <span className="text-xs font-medium text-gray-500">
+                                Page <strong className="text-gray-900">{currentPage}</strong> of {totalPages}
+                            </span>
+                        </div>
+
+                        {/* Questions List */}
+                        <div className="space-y-4">
+                            {paginatedQuestions.map((q) => {
+                                const selected = answers[q.id];
+                                const isSavingThis = savingId === q.id;
+
+                                return (
+                                    <div
+                                        key={q.id}
+                                        id={`question-${q.index}`}
+                                        className="rounded-xl border border-gray-200 bg-white p-5 shadow-xs transition-shadow hover:shadow-sm"
                                     >
-                                        All ({examData?.questions?.length || 0})
-                                    </button>
-                                    {examData?.subjects?.map(subject => {
-                                        const Icon = subjectIcons[subject] || FaQuestionCircle;
-                                        const count = examData.questions.filter(q => q.subject === subject).length;
-                                        const answeredCount = examData.questions.filter(q => q.subject === subject && answers[q.id]).length;
+                                        {/* Question Header */}
+                                        <div className="flex items-start justify-between gap-3 mb-3 border-b border-gray-100 pb-2.5">
+                                            <div className="flex items-center gap-2">
+                                                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-forest/10 font-bold text-xs text-forest">
+                                                    Q{q.index}
+                                                </span>
+                                                <span className="rounded bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600">
+                                                    {q.subject}
+                                                </span>
+                                            </div>
+                                            {selected ? (
+                                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-forest">
+                                                    <FaCheck className="text-[10px]" /> Answered
+                                                </span>
+                                            ) : (
+                                                <span className="text-[11px] font-medium text-gray-400">
+                                                    Unanswered
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Question Text */}
+                                        <p className="text-sm sm:text-base font-medium text-gray-900 leading-relaxed mb-4">
+                                            {q.questionText}
+                                        </p>
+
+                                        {/* 4 Options */}
+                                        <div className="space-y-2">
+                                            {q.options?.map((opt) => {
+                                                const isSelected = selected === opt.label;
+                                                return (
+                                                    <label
+                                                        key={opt.label}
+                                                        className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer transition-all ${
+                                                            isSelected
+                                                                ? 'border-forest bg-forest/10 text-gray-900 font-semibold shadow-xs'
+                                                                : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50/70 text-gray-700'
+                                                        }`}
+                                                    >
+                                                        <input
+                                                            type="radio"
+                                                            name={`question-${q.id}`}
+                                                            value={opt.label}
+                                                            checked={isSelected}
+                                                            onChange={() => handleAnswerSelect(q.id, opt.label)}
+                                                            className="mt-0.5 h-4 w-4 text-forest focus:ring-forest"
+                                                        />
+                                                        <span className="flex-1 text-xs sm:text-sm leading-snug">
+                                                            <strong className="mr-1.5 font-bold text-gray-900">({opt.label})</strong>
+                                                            {opt.text}
+                                                        </span>
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+
+                                        {/* Saving Indicator */}
+                                        {isSavingThis && (
+                                            <div className="mt-2 text-right">
+                                                <span className="inline-flex items-center gap-1 text-[10px] text-gray-400 italic">
+                                                    <FaSpinner className="animate-spin text-[8px]" /> saving answer…
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Pagination Footer Controls */}
+                        <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-xs flex items-center justify-between gap-3">
+                            <button
+                                type="button"
+                                disabled={currentPage === 1}
+                                onClick={() => {
+                                    setCurrentPage(p => Math.max(1, p - 1));
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                className="rf-btn-outline px-4 py-2 text-xs font-semibold !rounded-lg disabled:opacity-40"
+                            >
+                                <FaArrowLeft className="text-[10px]" />
+                                <span>Previous Page</span>
+                            </button>
+
+                            <span className="text-xs font-medium text-gray-600">
+                                Showing questions {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filteredQuestions.length)} of {filteredQuestions.length}
+                            </span>
+
+                            {currentPage < totalPages ? (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setCurrentPage(p => Math.min(totalPages, p + 1));
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    }}
+                                    className="rf-btn-primary px-5 py-2 text-xs font-semibold !rounded-lg"
+                                >
+                                    <span>Next Page</span>
+                                    <FaArrowRight className="text-[10px]" />
+                                </button>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowSubmitModal(true)}
+                                    className="rf-btn-maroon px-5 py-2 text-xs font-bold !rounded-lg shadow-sm"
+                                >
+                                    <span>Review & Submit</span>
+                                    <FaPaperPlane className="text-[10px]" />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Question Navigator Sidebar */}
+                    <aside className="w-full lg:w-80 shrink-0 space-y-4">
+                        {/* Summary Box */}
+                        <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-xs">
+                            <h3 className="font-bold text-xs uppercase tracking-wider text-gray-900 mb-3 flex items-center gap-1.5">
+                                <FaListOl className="text-forest" />
+                                <span>Question Navigator</span>
+                            </h3>
+
+                            <div className="grid grid-cols-2 gap-2 text-xs mb-4">
+                                <div className="rounded-lg bg-forest/10 p-2.5 text-center">
+                                    <span className="block text-lg font-extrabold text-forest">{answeredCount}</span>
+                                    <span className="text-[11px] font-semibold text-forest/90">Answered</span>
+                                </div>
+                                <div className="rounded-lg bg-gray-100 p-2.5 text-center">
+                                    <span className="block text-lg font-extrabold text-gray-700">{unansweredCount}</span>
+                                    <span className="text-[11px] font-semibold text-gray-600">Unanswered</span>
+                                </div>
+                            </div>
+
+                            {/* All 60 Question Pills */}
+                            <div className="max-h-[360px] overflow-y-auto pr-1">
+                                <div className="grid grid-cols-5 gap-1.5">
+                                    {examData?.questions?.map((q) => {
+                                        const isAnswered = Boolean(answers[q.id]);
+                                        // Find which page this question belongs to in current filter
+                                        const questionIndexInFiltered = filteredQuestions.findIndex(fq => fq.id === q.id);
+                                        const targetPage = questionIndexInFiltered >= 0
+                                            ? Math.floor(questionIndexInFiltered / pageSize) + 1
+                                            : null;
 
                                         return (
                                             <button
-                                                key={subject}
-                                                onClick={() => { setActiveSubject(subject); setCurrentQuestionIndex(0); }}
-                                                className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${activeSubject === subject
-                                                        ? 'bg-indigo-600 text-white'
-                                                        : 'text-gray-600 hover:bg-gray-100'
-                                                    }`}
+                                                key={q.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    if (activeSubject !== 'all' && q.subject !== activeSubject) {
+                                                        setActiveSubject('all');
+                                                    }
+                                                    if (targetPage) {
+                                                        setCurrentPage(targetPage);
+                                                    }
+                                                    setTimeout(() => {
+                                                        const el = document.getElementById(`question-${q.index}`);
+                                                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                                    }, 50);
+                                                }}
+                                                className={`h-8 rounded-md text-xs font-bold transition-all ${
+                                                    isAnswered
+                                                        ? 'bg-forest text-white shadow-xs'
+                                                        : 'border border-gray-200 bg-white text-gray-700 hover:border-forest/50'
+                                                }`}
                                             >
-                                                <Icon />
-                                                <span>{subject}</span>
-                                                <span className={`text-xs px-2 py-0.5 rounded-full ${activeSubject === subject
-                                                        ? 'bg-white/20'
-                                                        : 'bg-gray-200'
-                                                    }`}>
-                                                    {answeredCount}/{count}
-                                                </span>
+                                                {q.index}
                                             </button>
                                         );
                                     })}
                                 </div>
                             </div>
 
-                            {/* Question Card */}
-                            {currentQuestion && (
-                                <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
-                                    {/* Question Header */}
-                                    <div className="flex items-center justify-between mb-6">
-                                        <div className="flex items-center gap-3">
-                                            <span className={`${subjectColors[currentQuestion.subject]} text-white px-3 py-1 rounded-full text-sm font-medium`}>
-                                                {currentQuestion.subject}
-                                            </span>
-                                            <span className="text-gray-500 text-sm">
-                                                Question {currentQuestionIndex + 1} of {filteredQuestions.length}
-                                            </span>
-                                        </div>
-                                        {answers[currentQuestion.id] && (
-                                            <span className="flex items-center gap-1 text-green-600 text-sm">
-                                                <FaCheckCircle />
-                                                Answered
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    {/* Question Text */}
-                                    <div className="mb-8">
-                                        <h2 className="text-xl md:text-2xl font-semibold text-gray-800 leading-relaxed">
-                                            {currentQuestion.questionText}
-                                        </h2>
-                                    </div>
-
-                                    {/* Options */}
-                                    <div className="space-y-4">
-                                        {currentQuestion.options.map((option) => {
-                                            const isSelected = answers[currentQuestion.id] === option.label;
-
-                                            return (
-                                                <button
-                                                    key={option.label}
-                                                    onClick={() => handleAnswerSelect(currentQuestion.id, option.label)}
-                                                    className={`w-full p-4 md:p-5 rounded-xl border-2 text-left transition-all duration-200 flex items-start gap-4 ${isSelected
-                                                            ? 'border-indigo-600 bg-indigo-50 shadow-md'
-                                                            : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
-                                                        }`}
-                                                >
-                                                    <span className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0 ${isSelected
-                                                            ? 'bg-indigo-600 text-white'
-                                                            : 'bg-gray-200 text-gray-600'
-                                                        }`}>
-                                                        {option.label}
-                                                    </span>
-                                                    <span className={`text-lg ${isSelected ? 'text-indigo-700 font-medium' : 'text-gray-700'}`}>
-                                                        {option.text}
-                                                    </span>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-
-                                    {/* Saving indicator */}
-                                    {savingAnswer && (
-                                        <div className="mt-4 text-sm text-gray-500 flex items-center gap-2">
-                                            <div className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                                            Saving answer...
-                                        </div>
-                                    )}
-
-                                    {/* Navigation */}
-                                    <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
-                                        <button
-                                            onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
-                                            disabled={currentQuestionIndex === 0}
-                                            className="flex items-center gap-2 px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:border-indigo-500 hover:text-indigo-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            <FaArrowLeft />
-                                            Previous
-                                        </button>
-                                        <button
-                                            onClick={() => setCurrentQuestionIndex(prev => Math.min(filteredQuestions.length - 1, prev + 1))}
-                                            disabled={currentQuestionIndex === filteredQuestions.length - 1}
-                                            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            Next
-                                            <FaArrowRight />
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Question Navigator (Sidebar) */}
-                        <div className="lg:w-72">
-                            <div className="bg-white rounded-2xl shadow-lg p-4 sticky top-24">
-                                <h3 className="font-bold text-gray-800 mb-4">Question Navigator</h3>
-
-                                {/* Legend */}
-                                <div className="flex flex-wrap gap-3 mb-4 text-xs">
-                                    <span className="flex items-center gap-1">
-                                        <span className="w-4 h-4 bg-green-500 rounded"></span>
-                                        Answered
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <span className="w-4 h-4 bg-gray-300 rounded"></span>
-                                        Not Answered
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <span className="w-4 h-4 bg-indigo-600 rounded"></span>
-                                        Current
-                                    </span>
-                                </div>
-
-                                {/* Question Grid */}
-                                <div className="max-h-96 overflow-y-auto pr-2">
-                                    {examData?.subjects?.map(subject => (
-                                        <div key={subject} className="mb-4">
-                                            <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center gap-2">
-                                                {(() => {
-                                                    const Icon = subjectIcons[subject];
-                                                    return Icon ? <Icon className="text-gray-500" /> : null;
-                                                })()}
-                                                {subject}
-                                            </h4>
-                                            <div className="grid grid-cols-7 gap-1">
-                                                {examData.questions
-                                                    .filter(q => q.subject === subject)
-                                                    .map((q, idx) => {
-                                                        const globalIndex = examData.questions.findIndex(gq => gq.id === q.id);
-                                                        const isAnswered = answers[q.id];
-                                                        const isCurrent = activeSubject === 'all'
-                                                            ? currentQuestionIndex === globalIndex
-                                                            : activeSubject === subject && currentQuestionIndex === idx;
-
-                                                        return (
-                                                            <button
-                                                                key={q.id}
-                                                                onClick={() => {
-                                                                    if (activeSubject !== 'all' && activeSubject !== subject) {
-                                                                        setActiveSubject(subject);
-                                                                    }
-                                                                    const newIndex = activeSubject === 'all' || activeSubject === subject
-                                                                        ? (activeSubject === 'all' ? globalIndex : idx)
-                                                                        : idx;
-                                                                    setCurrentQuestionIndex(newIndex);
-                                                                }}
-                                                                className={`w-8 h-8 rounded text-xs font-medium transition-all ${isCurrent
-                                                                        ? 'bg-indigo-600 text-white ring-2 ring-indigo-300'
-                                                                        : isAnswered
-                                                                            ? 'bg-green-500 text-white'
-                                                                            : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                                                                    }`}
-                                                            >
-                                                                {idx + 1}
-                                                            </button>
-                                                        );
-                                                    })}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                            {/* Legend */}
+                            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
+                                <span className="flex items-center gap-1.5">
+                                    <span className="h-2.5 w-2.5 rounded-sm bg-forest" /> Answered
+                                </span>
+                                <span className="flex items-center gap-1.5">
+                                    <span className="h-2.5 w-2.5 rounded-sm border border-gray-300 bg-white" /> Unanswered
+                                </span>
                             </div>
                         </div>
-                    </div>
+
+                        {/* Candidate Reference Card */}
+                        <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-xs text-xs text-gray-600 space-y-1.5">
+                            <p className="font-bold text-gray-800">Examination Reference</p>
+                            <p><strong>Total:</strong> 60 Questions (20 Physics, 20 Chemistry, 20 Elective)</p>
+                            <p><strong>Marking:</strong> +1 mark per correct answer, 0 negative</p>
+                            <p><strong>Auto-Save:</strong> Answers are saved immediately</p>
+                        </div>
+                    </aside>
                 </main>
 
-                {/* Mobile Progress Bar */}
-                <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-600">Progress</span>
-                        <span className="text-sm font-bold text-gray-800">{progress.answered} / {progress.total}</span>
-                    </div>
-                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                            className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-300"
-                            style={{ width: `${(progress.answered / progress.total) * 100}%` }}
-                        ></div>
-                    </div>
-                </div>
-
-                {/* Submit Confirmation Modal */}
+                {/* Final Submission Confirmation Modal */}
                 {showSubmitModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-                        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fadeIn">
-                            <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-xl font-bold text-gray-800">Submit Test?</h3>
-                                <button
-                                    onClick={() => setShowSubmitModal(false)}
-                                    className="text-gray-400 hover:text-gray-600"
-                                >
-                                    <FaTimes />
-                                </button>
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+                        <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-xl animate-fadeIn">
+                            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-forest/10 text-forest">
+                                <FaQuestionCircle className="text-2xl" />
                             </div>
 
-                            <div className="space-y-4 mb-6">
-                                <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                                    <span className="text-gray-600">Total Questions</span>
-                                    <span className="font-bold text-gray-800">{progress.total}</span>
+                            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">
+                                Confirm Final Examination Submission?
+                            </h3>
+                            <p className="text-xs text-gray-500 text-center mb-4">
+                                Once submitted, you cannot change your answers. Official scores will be evaluated immediately.
+                            </p>
+
+                            {/* Summary Box in Modal */}
+                            <div className="rounded-xl border border-gray-200 bg-gray-50 p-3.5 mb-5 space-y-2 text-xs">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Total Questions:</span>
+                                    <strong className="text-gray-900">{totalQuestionsCount}</strong>
                                 </div>
-                                <div className="flex justify-between p-3 bg-green-50 rounded-lg">
-                                    <span className="text-green-700">Answered</span>
-                                    <span className="font-bold text-green-700">{progress.answered}</span>
+                                <div className="flex justify-between">
+                                    <span className="text-forest font-semibold">Answered Questions:</span>
+                                    <strong className="text-forest">{answeredCount}</strong>
                                 </div>
-                                <div className="flex justify-between p-3 bg-amber-50 rounded-lg">
-                                    <span className="text-amber-700">Not Answered</span>
-                                    <span className="font-bold text-amber-700">{progress.total - progress.answered}</span>
+                                <div className="flex justify-between">
+                                    <span className="text-amber-700 font-semibold">Unanswered Questions:</span>
+                                    <strong className="text-amber-800">{unansweredCount}</strong>
+                                </div>
+                                <div className="flex justify-between border-t border-gray-200 pt-1.5">
+                                    <span className="text-gray-600">Time Remaining:</span>
+                                    <strong className="font-mono text-gray-900">{formatTime(timeRemaining)}</strong>
                                 </div>
                             </div>
 
-                            {progress.answered < progress.total && (
-                                <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl mb-6 flex items-start gap-3">
-                                    <FaExclamationTriangle className="text-amber-600 flex-shrink-0 mt-0.5" />
-                                    <p className="text-sm text-amber-700">
-                                        You have {progress.total - progress.answered} unanswered questions.
-                                        Are you sure you want to submit?
-                                    </p>
-                                </div>
-                            )}
-
-                            <div className="flex gap-3">
+                            {/* Modal CTAs */}
+                            <div className="flex flex-col sm:flex-row gap-2.5">
                                 <button
+                                    type="button"
                                     onClick={() => setShowSubmitModal(false)}
-                                    className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-medium text-gray-700 hover:border-gray-400 transition-all"
+                                    disabled={submitting}
+                                    className="rf-btn-outline flex-1 py-2.5 text-xs font-semibold !rounded-lg"
                                 >
-                                    Continue Test
+                                    Return to Examination
                                 </button>
                                 <button
+                                    type="button"
                                     onClick={handleSubmit}
                                     disabled={submitting}
-                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-medium hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                    className="rf-btn-maroon flex-1 py-2.5 text-xs font-bold !rounded-lg flex items-center justify-center gap-1.5"
                                 >
                                     {submitting ? (
                                         <>
-                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                            Submitting...
+                                            <FaSpinner className="animate-spin text-xs" />
+                                            <span>Submitting…</span>
                                         </>
                                     ) : (
                                         <>
-                                            <FaPaperPlane />
-                                            Submit Test
+                                            <FaCheckCircle className="text-xs" />
+                                            <span>Yes, Submit Now</span>
                                         </>
                                     )}
                                 </button>
@@ -587,16 +615,6 @@ export default function ExamPage() {
                     </div>
                 )}
             </div>
-
-            <style jsx global>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.2s ease-out;
-        }
-      `}</style>
         </>
     );
 }

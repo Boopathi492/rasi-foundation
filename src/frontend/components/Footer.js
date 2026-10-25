@@ -47,7 +47,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand Section */}
           <div className="lg:col-span-1">
-            <Link href="/" className="mb-6 flex items-center gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white" aria-label="Rasi Foundation home">
+            <Link href="/" className="group mb-6 flex items-center gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white" aria-label="Rasi Foundation home">
               <Image
                 src="/rasi-logo.png"
                 alt="Rasi Foundation logo"
@@ -56,7 +56,22 @@ const Footer = () => {
                 className="h-16 w-16 rounded-full bg-white object-contain p-0.5"
               />
               <span className="leading-tight">
-                <span className="block font-heading text-xl font-bold tracking-[0.08em]">RASI FOUNDATION</span>
+                <span className="block font-heading text-xl font-bold tracking-[0.08em]">
+                  <span className="relative inline-block">
+                    {/* Graduation cap positioned directly above the 'R' in the Rasi wordmark matching reference image */}
+                    <Image
+                      src="/graduation-cap.png"
+                      alt=""
+                      aria-hidden="true"
+                      width={36}
+                      height={28}
+                      unoptimized
+                      className="pointer-events-none absolute -top-[0.56em] -left-[0.22em] w-[1.08em] h-auto max-w-none select-none drop-shadow-[0_0_1.5px_rgba(255,255,255,0.95)] transition-transform duration-200 group-hover:-translate-y-0.5"
+                    />
+                    R
+                  </span>
+                  ASI FOUNDATION
+                </span>
                 <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-white/60">Think Admission! Think RASI!!</span>
               </span>
             </Link>
@@ -129,7 +144,7 @@ const Footer = () => {
           <div>
             <h4 className="text-xl font-bold mb-6 relative">
               Contact Us
-              <span className="absolute bottom-0 left-0 w-12 h-1 bg-gold-500 -mb-2"></span>
+              <span className="absolute bottom-0 left-0 w-12 h-1 bg-gold-400 -mb-2"></span>
             </h4>
             <ul className="space-y-4">
               <li>
@@ -138,11 +153,15 @@ const Footer = () => {
                     <FaPhone className="text-gold-300" />
                   </div>
                   <div>
-                    <p className="text-gray-400 text-sm">Founder:</p>
-                    <a href="tel:+919789446100" className="text-white hover:text-gold-300 font-semibold">
-                      +91 97 89 44 61 00
+                    <p className="text-gray-400 text-xs font-medium">Founder:</p>
+                    <a
+                      href="tel:+919789446100"
+                      className="mt-0.5 inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-sm font-bold text-white transition-colors duration-200 hover:border-gold-400/50 hover:bg-white/10 hover:text-gold-300"
+                    >
+                      <FaPhone className="text-[10px] text-gold-300" aria-hidden="true" />
+                      <span>+91 97 89 44 61 00</span>
                     </a>
-                    <p className="text-gray-500 text-sm">Prof. P. Gunasekaran</p>
+                    <p className="text-gray-400 text-xs mt-0.5">Prof. P. Gunasekaran</p>
                   </div>
                 </div>
               </li>
@@ -152,22 +171,26 @@ const Footer = () => {
                     <FaPhone className="text-gold-300" />
                   </div>
                   <div>
-                    <p className="text-gray-400 text-sm">Admin Director:</p>
-                    <a href="tel:+919294969196" className="text-white hover:text-gold-300 font-semibold">
-                      +91 92 94 96 91 96
+                    <p className="text-gray-400 text-xs font-medium">Admin Director:</p>
+                    <a
+                      href="tel:+919294969196"
+                      className="mt-0.5 inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-sm font-bold text-white transition-colors duration-200 hover:border-gold-400/50 hover:bg-white/10 hover:text-gold-300"
+                    >
+                      <FaPhone className="text-[10px] text-gold-300" aria-hidden="true" />
+                      <span>+91 92 94 96 91 96</span>
                     </a>
-                    <p className="text-gray-500 text-sm">P. Yuvaraj Kumar</p>
+                    <p className="text-gray-400 text-xs mt-0.5">P. Yuvaraj Kumar</p>
                   </div>
                 </div>
               </li>
               <li>
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-gold-600/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <FaEnvelope className="text-gold-500" />
+                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <FaEnvelope className="text-gold-300" />
                   </div>
                   <div>
                     <p className="text-gray-400 text-sm">Email:</p>
-                    <a href="mailto:rasipuramrasifoundation@gmail.com" className="text-white hover:text-gold-400 text-sm break-all">
+                    <a href="mailto:rasipuramrasifoundation@gmail.com" className="text-white hover:text-gold-300 text-sm break-all transition-colors">
                       rasipuramrasifoundation@gmail.com
                     </a>
                   </div>
@@ -175,8 +198,8 @@ const Footer = () => {
               </li>
               <li>
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-blue-600/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <FaMapMarkerAlt className="text-blue-500" />
+                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <FaMapMarkerAlt className="text-gold-300" />
                   </div>
                   <div>
                     <p className="text-gray-400 text-sm">Address:</p>
@@ -184,10 +207,10 @@ const Footer = () => {
                       href="https://www.google.com/maps/place/11%C2%B024'06.6%22N+78%C2%B009'34.6%22E/@11.4018417,78.1570241,17z/data=!3m1!4b1!4m4!3m3!8m2!3d11.4018417!4d78.159599"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-white hover:text-blue-400 text-sm"
+                      className="text-white hover:text-gold-300 text-sm transition-colors"
                     >
                       Rasipuram, Tamil Nadu<br />
-                      <span className="text-[10px] uppercase tracking-widest text-blue-400 font-bold">Open in Maps</span>
+                      <span className="text-[10px] uppercase tracking-widest text-gold-300 font-bold">Open in Maps</span>
                     </a>
                   </div>
                 </div>

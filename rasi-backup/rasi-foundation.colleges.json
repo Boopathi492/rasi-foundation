@@ -1,0 +1,2155 @@
+[{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5ac"
+  },
+  "name": "K.S. Rangasamy College of Technology (KSRCT)",
+  "location": "Tiruchengode",
+  "district": "Namakkal District",
+  "tneaCode": "2607",
+  "isActive": true,
+  "order": 0,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.294Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.295Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5af"
+  },
+  "name": "Selvam College of Technology (Autonomous)",
+  "location": "Namakkal",
+  "district": "Namakkal District",
+  "tneaCode": "2625",
+  "isActive": true,
+  "order": 3,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.300Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.300Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5b2"
+  },
+  "name": "Muthayammal Engineering College",
+  "location": "Rasipuram",
+  "district": "Namakkal District",
+  "tneaCode": "2610",
+  "isActive": true,
+  "order": 6,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.302Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.302Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5b5"
+  },
+  "name": "Excel Engineering College",
+  "location": "Komarapalayam",
+  "district": "Namakkal District",
+  "tneaCode": "2634",
+  "isActive": true,
+  "order": 9,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.303Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.303Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5b6"
+  },
+  "name": "J.K.K. Nattraja College of Engineering and Technology",
+  "location": "Komarapalayam",
+  "district": "Namakkal District",
+  "tneaCode": "2647",
+  "isActive": true,
+  "order": 10,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.303Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.303Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5b7"
+  },
+  "name": "PGP College of Engineering and Technology",
+  "location": "Namakkal",
+  "district": "Namakkal District",
+  "tneaCode": "2612",
+  "isActive": true,
+  "order": 11,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.304Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.304Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5bd"
+  },
+  "name": "R. P. Sarathy Institute of Technology (RPSIT)",
+  "location": "Salem",
+  "district": "Salem District",
+  "tneaCode": "2639",
+  "isActive": true,
+  "order": 17,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.305Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.305Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5c0"
+  },
+  "name": "AVS Engineering College",
+  "location": "Salem",
+  "district": "Salem District",
+  "tneaCode": "2636",
+  "isActive": true,
+  "order": 20,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.305Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.305Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5c3"
+  },
+  "name": "Annapoorana Engineering College",
+  "location": "Salem",
+  "district": "Salem District",
+  "tneaCode": "2648",
+  "isActive": true,
+  "order": 23,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.306Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.306Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5c4"
+  },
+  "name": "Sri Shanmugha College of Engineering and Technology",
+  "location": "Salem",
+  "district": "Salem District",
+  "tneaCode": "2302",
+  "isActive": true,
+  "order": 24,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.306Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.306Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5c9"
+  },
+  "name": "Nandha College of Technology",
+  "location": "Erode",
+  "district": "Erode District",
+  "tneaCode": "2752",
+  "isActive": true,
+  "order": 29,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.307Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.307Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5cd"
+  },
+  "name": "Al-Ameen Engineering College",
+  "location": "Erode",
+  "district": "Erode District",
+  "tneaCode": "2652",
+  "isActive": true,
+  "order": 33,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.307Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.307Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5d5"
+  },
+  "name": "Sri Krishna College of Engineering and Technology (SKCET)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2718",
+  "isActive": true,
+  "order": 41,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.309Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.309Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5d7"
+  },
+  "name": "Sri Ramakrishna Institute of Technology",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2725",
+  "isActive": true,
+  "order": 43,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.310Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.310Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5da"
+  },
+  "name": "Karpagam Academy of Higher Education (KAHE – University)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "isActive": true,
+  "order": 46,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.322Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.322Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5df"
+  },
+  "name": "Dr. NGP Institute of Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2736",
+  "isActive": true,
+  "order": 51,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.331Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.331Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5e0"
+  },
+  "name": "KGISL Institute of Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2751",
+  "isActive": true,
+  "order": 52,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.331Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.331Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5e4"
+  },
+  "name": "RVS College of Engineering and Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2731",
+  "isActive": true,
+  "order": 56,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.335Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.335Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5e6"
+  },
+  "name": "Hindusthan College of Engineering and Technology",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2777",
+  "isActive": true,
+  "order": 58,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.336Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.336Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5ed"
+  },
+  "name": "Study World College of Engineering",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2770",
+  "isActive": true,
+  "order": 65,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.339Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.339Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5f2"
+  },
+  "name": "P.A. College of Engineering and Technology (Autonomous)",
+  "location": "Pollachi",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2741",
+  "isActive": true,
+  "order": 70,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.341Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.341Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5f6"
+  },
+  "name": "Asian College of Engineering and Technology",
+  "location": "Saravanampatti",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2338",
+  "isActive": true,
+  "order": 74,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.342Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.342Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5f7"
+  },
+  "name": "Vishnu Lakshmi College of Engineering and Technology",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2368",
+  "isActive": true,
+  "order": 75,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.342Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.342Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5f9"
+  },
+  "name": "VSB College of Engineering and Technical Campus",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2357",
+  "isActive": true,
+  "order": 77,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.343Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.343Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5fb"
+  },
+  "name": "Tamil Nadu College of Engineering",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2721",
+  "isActive": true,
+  "order": 79,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.343Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.343Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5fc"
+  },
+  "name": "Sri Shakthi Institute of Engineering and Technology",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2727",
+  "isActive": true,
+  "order": 80,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.343Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.343Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace600"
+  },
+  "name": "Christ the King Engineering College",
+  "location": "Karamadai",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2650",
+  "isActive": true,
+  "order": 84,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.345Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.345Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace60b"
+  },
+  "name": "Garden City University",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 95,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.349Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.349Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace611"
+  },
+  "name": "Avinashilingam University for Women",
+  "location": "Coimbatore",
+  "district": "Women Centric Colleges",
+  "isActive": true,
+  "order": 101,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.360Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.360Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace615"
+  },
+  "name": "Periyar Maniammai University",
+  "location": "Vallam",
+  "district": "Women Centric Colleges",
+  "isActive": true,
+  "order": 105,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.363Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.363Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace61e"
+  },
+  "name": "Saveetha University",
+  "location": "Thandalam, Chennai",
+  "district": "Well Connected Universities",
+  "note": "Deemed University – Direct Admission",
+  "isActive": true,
+  "order": 114,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.365Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.365Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace61f"
+  },
+  "name": "Takshashila University",
+  "location": "Tindivanam",
+  "district": "Well Connected Universities",
+  "note": "Deemed University – Direct Admission",
+  "isActive": true,
+  "order": 115,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.366Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.366Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5ae"
+  },
+  "name": "Paavai College of Technology",
+  "location": "Namakkal",
+  "district": "Namakkal District",
+  "tneaCode": "2628",
+  "isActive": true,
+  "order": 2,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.300Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.300Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5b0"
+  },
+  "name": "CMS College of Engineering",
+  "location": "Namakkal",
+  "district": "Namakkal District",
+  "tneaCode": "2635",
+  "isActive": true,
+  "order": 4,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.301Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.301Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5b3"
+  },
+  "name": "Sengunthar Engineering College (Autonomous)",
+  "location": "Tiruchengode",
+  "district": "Namakkal District",
+  "tneaCode": "2617",
+  "isActive": true,
+  "order": 7,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.302Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.302Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5b4"
+  },
+  "name": "Mahendra Engineering College",
+  "location": "Mallasamudram",
+  "district": "Namakkal District",
+  "tneaCode": "2609",
+  "isActive": true,
+  "order": 8,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.303Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.303Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5bb"
+  },
+  "name": "S.R.G. Engineering College",
+  "location": "Namakkal",
+  "district": "Namakkal District",
+  "tneaCode": "2767",
+  "isActive": true,
+  "order": 15,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.304Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.304Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5c8"
+  },
+  "name": "M. P. Nachimuthu M. Jaganathan Engineering College (MPNMJ)",
+  "location": "Chennimalai",
+  "district": "Erode District",
+  "tneaCode": "2713",
+  "isActive": true,
+  "order": 28,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.306Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.306Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5cc"
+  },
+  "name": "Sasurie College of Engineering",
+  "location": "Vijayamangalam",
+  "district": "Erode District",
+  "tneaCode": "2717",
+  "isActive": true,
+  "order": 32,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.307Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.307Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5ce"
+  },
+  "name": "Aishwarya College of Engineering and Technology",
+  "location": "Erode",
+  "district": "Erode District",
+  "tneaCode": "2332",
+  "isActive": true,
+  "order": 34,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.307Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.307Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5cf"
+  },
+  "name": "PSG College of Technology",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2006",
+  "isActive": true,
+  "order": 35,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.308Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.308Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5d0"
+  },
+  "name": "PSG Institute of Technology and Applied Research (PSG iTech)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2377",
+  "isActive": true,
+  "order": 36,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.308Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.308Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5d2"
+  },
+  "name": "Kumaraguru College of Technology (KCT)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2712",
+  "isActive": true,
+  "order": 38,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.308Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.308Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5e2"
+  },
+  "name": "Nehru Institute of Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2755",
+  "isActive": true,
+  "order": 54,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.334Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.334Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5e3"
+  },
+  "name": "Coimbatore Institute of Engineering and Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2704",
+  "isActive": true,
+  "order": 55,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.335Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.335Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5e9"
+  },
+  "name": "INFO Institute of Engineering and Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2732",
+  "isActive": true,
+  "order": 61,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.337Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.337Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5ec"
+  },
+  "name": "Sri Ranganathar Institute of Engineering and Technology (Autonomous)",
+  "location": "Athipalayam",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2342",
+  "isActive": true,
+  "order": 64,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.338Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.338Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5f8"
+  },
+  "name": "Dhaanish Ahmed Institute of Technology",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2349",
+  "isActive": true,
+  "order": 76,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.342Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.342Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace601"
+  },
+  "name": "Akash Group of Institutions",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 85,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.346Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.346Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace602"
+  },
+  "name": "East Point College",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 86,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.347Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.347Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace605"
+  },
+  "name": "SEA College of Engineering & Technology",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 89,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.347Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.347Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace608"
+  },
+  "name": "RR Institutions",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 92,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.349Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.349Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace60a"
+  },
+  "name": "Atria Institute of Technology",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 94,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.349Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.349Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace613"
+  },
+  "name": "Idhaya Engineering College for Women",
+  "location": "Villupuram",
+  "district": "Women Centric Colleges",
+  "isActive": true,
+  "order": 103,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.362Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.362Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace618"
+  },
+  "name": "Sree Balaji Institute of Science & Technology",
+  "location": "Chrompet, Chennai",
+  "district": "Well Connected Universities",
+  "note": "Deemed University – Direct Admission",
+  "isActive": true,
+  "order": 108,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.364Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.364Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace619"
+  },
+  "name": "Dhanalakshmi Srinivasan University",
+  "location": "Mamandur, Chengalpattu",
+  "district": "Well Connected Universities",
+  "note": "Deemed University – Direct Admission",
+  "isActive": true,
+  "order": 109,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.364Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.364Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace61b"
+  },
+  "name": "Kalasalingam University",
+  "location": "OMR, Chennai",
+  "district": "Well Connected Universities",
+  "note": "Deemed University – Direct Admission",
+  "isActive": true,
+  "order": 111,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.365Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.365Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace61c"
+  },
+  "name": "St. Joseph's University",
+  "location": "Tindivanam, Nallathur",
+  "district": "Well Connected Universities",
+  "note": "Deemed University – Direct Admission",
+  "isActive": true,
+  "order": 112,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.365Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.365Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5ad"
+  },
+  "name": "Paavai Engineering College",
+  "location": "Namakkal",
+  "district": "Namakkal District",
+  "tneaCode": "2611",
+  "isActive": true,
+  "order": 1,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.299Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.299Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5b1"
+  },
+  "name": "Gnanamani College of Technology",
+  "location": "Namakkal",
+  "district": "Namakkal District",
+  "tneaCode": "2624",
+  "isActive": true,
+  "order": 5,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.302Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.302Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5b8"
+  },
+  "name": "Vidhya Vikas College of Engineering and Technology",
+  "location": "Tiruchengode",
+  "district": "Namakkal District",
+  "tneaCode": "2633",
+  "isActive": true,
+  "order": 12,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.304Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.304Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5b9"
+  },
+  "name": "SSM College of Engineering",
+  "location": "Komarapalayam",
+  "district": "Namakkal District",
+  "tneaCode": "2614",
+  "isActive": true,
+  "order": 13,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.304Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.304Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5ba"
+  },
+  "name": "Annai Mathammal Sheela Engineering College",
+  "location": "Erumapatti",
+  "district": "Namakkal District",
+  "tneaCode": "2602",
+  "isActive": true,
+  "order": 14,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.304Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.304Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5bf"
+  },
+  "name": "Sri Ganesh Engineering College",
+  "location": "Salem",
+  "district": "Salem District",
+  "tneaCode": "2341",
+  "isActive": true,
+  "order": 19,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.305Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.305Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5c1"
+  },
+  "name": "AVS College of Technology",
+  "location": "Salem",
+  "district": "Salem District",
+  "tneaCode": "2347",
+  "isActive": true,
+  "order": 21,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.305Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.305Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5c2"
+  },
+  "name": "Vinayaka Missions University",
+  "location": "Salem",
+  "district": "Salem District",
+  "note": "Deemed University – Not under TNEA",
+  "isActive": true,
+  "order": 22,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.306Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.306Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5c5"
+  },
+  "name": "Shree Venkateshwara Hi-Tech Engineering College",
+  "location": "Gobichettipalayam",
+  "district": "Erode District",
+  "tneaCode": "2747",
+  "isActive": true,
+  "order": 25,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.306Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.306Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5d3"
+  },
+  "name": "Sri Eshwar College of Engineering",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2739",
+  "isActive": true,
+  "order": 39,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.308Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.308Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5dc"
+  },
+  "name": "Adithya Institute of Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2744",
+  "isActive": true,
+  "order": 48,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.328Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.328Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5e5"
+  },
+  "name": "United Institute of Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2761",
+  "isActive": true,
+  "order": 57,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.335Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.335Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5e8"
+  },
+  "name": "Akshaya College of Engineering and Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2763",
+  "isActive": true,
+  "order": 60,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.337Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.337Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5ea"
+  },
+  "name": "KIT – Kalaignar Karunanidhi Institute of Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2750",
+  "isActive": true,
+  "order": 62,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.338Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.338Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5ee"
+  },
+  "name": "EASA College of Engineering and Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2749",
+  "isActive": true,
+  "order": 66,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.339Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.339Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5ef"
+  },
+  "name": "Arjun College of Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2367",
+  "isActive": true,
+  "order": 67,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.340Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.340Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5f0"
+  },
+  "name": "JCT College of Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2762",
+  "isActive": true,
+  "order": 68,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.340Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.340Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5f1"
+  },
+  "name": "Pollachi Institute of Engineering and Technology",
+  "location": "Pollachi",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2354",
+  "isActive": true,
+  "order": 69,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.341Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.341Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5f4"
+  },
+  "name": "SNS College of Engineering (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2734",
+  "isActive": true,
+  "order": 72,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.341Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.341Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5fe"
+  },
+  "name": "Suguna College of Engineering",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2360",
+  "isActive": true,
+  "order": 82,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.344Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.344Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace603"
+  },
+  "name": "Alliance University",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 87,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.347Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.347Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace607"
+  },
+  "name": "S-VYASA University",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 91,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.348Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.348Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace609"
+  },
+  "name": "Harsha Institutions",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 93,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.349Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.349Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace60d"
+  },
+  "name": "Yenepoya University",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 97,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.350Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.350Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace60e"
+  },
+  "name": "Krupanidhi Group of Institutions",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 98,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.350Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.350Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace60f"
+  },
+  "name": "ISBR Bangalore",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 99,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.350Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.350Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace612"
+  },
+  "name": "Bharathiyar Institute of Engineering for Women",
+  "location": "Attur",
+  "district": "Women Centric Colleges",
+  "isActive": true,
+  "order": 102,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.361Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.361Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace614"
+  },
+  "name": "Mahendra Engineering College for Women",
+  "location": "Tiruchengode",
+  "district": "Women Centric Colleges",
+  "isActive": true,
+  "order": 104,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.362Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.362Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace616"
+  },
+  "name": "Sri Bharathi Engineering College for Women",
+  "location": "Alangudi",
+  "district": "Women Centric Colleges",
+  "isActive": true,
+  "order": 106,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.364Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.364Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace61d"
+  },
+  "name": "Vel Tech University",
+  "location": "Avadi, Chennai",
+  "district": "Well Connected Universities",
+  "note": "Deemed University – Direct Admission",
+  "isActive": true,
+  "order": 113,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.365Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.365Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace620"
+  },
+  "name": "Chettinad University",
+  "location": "Kelambakkam Road, OMR, Chennai",
+  "district": "Well Connected Universities",
+  "note": "Deemed University – Direct Admission",
+  "isActive": true,
+  "order": 116,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.366Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.366Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace621"
+  },
+  "name": "Dr. M.G.R University",
+  "location": "Maduravoyal, Chennai",
+  "district": "Well Connected Universities",
+  "note": "Deemed University – Direct Admission",
+  "isActive": true,
+  "order": 117,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.366Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.366Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace622"
+  },
+  "name": "Bharath University",
+  "location": "Selaiyur, Chennai",
+  "district": "Well Connected Universities",
+  "note": "Deemed University – Direct Admission",
+  "isActive": true,
+  "order": 118,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.366Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.366Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5bc"
+  },
+  "name": "Knowledge Institute of Technology (KIOT)",
+  "location": "Salem",
+  "district": "Salem District",
+  "tneaCode": "2653",
+  "isActive": true,
+  "order": 16,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.305Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.305Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5be"
+  },
+  "name": "Mahendra College of Engineering",
+  "location": "Salem",
+  "district": "Salem District",
+  "tneaCode": "2623",
+  "isActive": true,
+  "order": 18,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.305Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.305Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5c6"
+  },
+  "name": "Erode Sengunthar Engineering College (ESEC)",
+  "location": "Perundurai",
+  "district": "Erode District",
+  "tneaCode": "2708",
+  "isActive": true,
+  "order": 26,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.306Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.306Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5c7"
+  },
+  "name": "J.K.K. Munirajah College of Technology",
+  "location": "Gobichettipalayam",
+  "district": "Erode District",
+  "tneaCode": "2758",
+  "isActive": true,
+  "order": 27,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.306Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.306Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5ca"
+  },
+  "name": "Nandha Engineering College",
+  "location": "Perundurai",
+  "district": "Erode District",
+  "tneaCode": "7322",
+  "isActive": true,
+  "order": 30,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.307Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.307Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5cb"
+  },
+  "name": "Surya Engineering College",
+  "location": "Erode",
+  "district": "Erode District",
+  "tneaCode": "2748",
+  "isActive": true,
+  "order": 31,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.307Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.307Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5d1"
+  },
+  "name": "Coimbatore Institute of Technology (CIT)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "7176",
+  "isActive": true,
+  "order": 37,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.308Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.308Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5d4"
+  },
+  "name": "KPR Institute of Engineering and Technology",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2764",
+  "isActive": true,
+  "order": 40,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.308Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.308Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5d6"
+  },
+  "name": "Sri Ramakrishna Engineering College",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2719",
+  "isActive": true,
+  "order": 42,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.310Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.310Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5d8"
+  },
+  "name": "Karpagam College of Engineering (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2710",
+  "isActive": true,
+  "order": 44,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.311Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.311Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5d9"
+  },
+  "name": "Karpagam Institute of Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2735",
+  "isActive": true,
+  "order": 45,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.322Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.322Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5db"
+  },
+  "name": "Sree Sakthi Engineering College (Autonomous)",
+  "location": "Karamadai",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2673",
+  "isActive": true,
+  "order": 47,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.327Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.327Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5dd"
+  },
+  "name": "PPG Institute of Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2753",
+  "isActive": true,
+  "order": 49,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.330Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.330Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5de"
+  },
+  "name": "Rathinam Group of Institutions (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2329",
+  "note": "R-Smart / Sunstone supported",
+  "isActive": true,
+  "order": 50,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.330Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.330Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5e1"
+  },
+  "name": "Nehru Institute of Engineering and Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2729",
+  "isActive": true,
+  "order": 53,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.334Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.334Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5e7"
+  },
+  "name": "Hindustan Institute of Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2740",
+  "isActive": true,
+  "order": 59,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.336Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.336Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5eb"
+  },
+  "name": "Dhanalakshmi Srinivasan College of Engineering (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2743",
+  "isActive": true,
+  "order": 63,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.338Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.338Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5f3"
+  },
+  "name": "SNS College of Technology (Autonomous)",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2726",
+  "isActive": true,
+  "order": 71,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.341Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.341Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5f5"
+  },
+  "name": "Sri Sai Ranganathan Engineering College",
+  "location": "Thondamuthur",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2737",
+  "isActive": true,
+  "order": 73,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.342Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.342Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5fa"
+  },
+  "name": "Park College of Engineering and Technology",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2716",
+  "isActive": true,
+  "order": 78,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.343Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.343Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5fd"
+  },
+  "name": "Kathir College of Engineering",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2745",
+  "isActive": true,
+  "order": 81,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.343Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.343Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace5ff"
+  },
+  "name": "CMS College of Engineering and Technology",
+  "location": "Coimbatore",
+  "district": "Coimbatore Zone",
+  "tneaCode": "2772",
+  "isActive": true,
+  "order": 83,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.344Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.344Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace604"
+  },
+  "name": "Adithya Institute of Technology",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 88,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.347Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.347Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace606"
+  },
+  "name": "T. John Group of Institutions",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 90,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.348Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.348Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace60c"
+  },
+  "name": "Spurthy Institutions",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 96,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.350Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.350Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace610"
+  },
+  "name": "MVJ College of Engineering",
+  "location": "Bengaluru",
+  "district": "Bengaluru Zone",
+  "isActive": true,
+  "order": 100,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.351Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.351Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace617"
+  },
+  "name": "Vivekanandha College of Engineering for Women",
+  "location": "Tiruchengode",
+  "district": "Women Centric Colleges",
+  "isActive": true,
+  "order": 107,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.364Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.364Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace61a"
+  },
+  "name": "Sri Venkateswaraa Medical University",
+  "location": "Red Hills, Chennai",
+  "district": "Well Connected Universities",
+  "note": "Deemed University – Direct Admission",
+  "isActive": true,
+  "order": 110,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.364Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.364Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace623"
+  },
+  "name": "Vellore Institute of Technology (VIT)",
+  "location": "Vellore, Tamil Nadu",
+  "district": "Well Connected Universities",
+  "note": "Deemed University – NIRF Top-Ranked Private University",
+  "isActive": true,
+  "order": 119,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.367Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.367Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69917d73cf56e5fe32ace624"
+  },
+  "name": "Amrita Vishwa Vidyapeetham",
+  "location": "Coimbatore, Tamil Nadu",
+  "district": "Well Connected Universities",
+  "note": "Deemed University – NIRF #8, NAAC A++",
+  "isActive": true,
+  "order": 120,
+  "createdAt": {
+    "$date": "2026-02-15T08:01:55.367Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-15T08:01:55.367Z"
+  },
+  "__v": 0
+}]

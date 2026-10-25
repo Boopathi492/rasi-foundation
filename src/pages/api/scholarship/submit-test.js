@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         if (!testSession) {
             return res.status(404).json({
                 success: false,
-                message: 'Test session not found',
+                message: 'Examination session not found',
             });
         }
 
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
         if (testSession.status === 'completed') {
             return res.status(400).json({
                 success: false,
-                message: 'Test has already been submitted',
+                message: 'Examination has already been submitted',
             });
         }
 
@@ -41,7 +41,7 @@ export default async function handler(req, res) {
         testSession.status = 'completed';
         testSession.endTime = new Date();
 
-        // The score calculation is done in the pre-save hook
+        // Score calculation happens in pre-save hook
         await testSession.save();
 
         // Update student record
@@ -50,25 +50,26 @@ export default async function handler(req, res) {
             testEndTime: new Date(),
         });
 
-        // Prepare result summary
+        // Prepare subject scores
         const subjectScores = [];
         testSession.subjects.forEach(subject => {
             const subjectQuestions = testSession.questions.filter(q => q.subject === subject).length;
+            const correctCount = testSession.subjectWiseScore?.[subject] || 0;
             subjectScores.push({
                 subject,
-                correct: testSession.subjectWiseScore[subject] || 0,
-                total: subjectQuestions,
+                correct: correctCount,
+                total: subjectQuestions || 20,
                 percentage: subjectQuestions > 0
-                    ? Math.round((testSession.subjectWiseScore[subject] / subjectQuestions) * 100)
+                    ? Math.round((correctCount / subjectQuestions) * 100)
                     : 0,
             });
         });
 
         res.status(200).json({
             success: true,
-            message: 'Test submitted successfully!',
+            message: 'Examination submitted successfully!',
             data: {
-                totalQuestions: testSession.totalQuestions,
+                totalQuestions: testSession.totalQuestions || 60,
                 attemptedQuestions: testSession.attemptedQuestions,
                 correctAnswers: testSession.correctAnswers,
                 score: testSession.score,
@@ -90,7 +91,7 @@ export default async function handler(req, res) {
         console.error('Submit test error:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to submit test',
+            message: 'Failed to submit examination',
             error: process.env.NODE_ENV === 'development' ? error.message : undefined,
         });
     }

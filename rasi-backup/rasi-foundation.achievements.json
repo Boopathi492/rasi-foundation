@@ -1,0 +1,230 @@
+[{
+  "_id": {
+    "$oid": "6975eff28ba23c67998f3c23"
+  },
+  "type": "stat",
+  "value": "5000+",
+  "title": "Students Guided",
+  "color": "red",
+  "order": 1,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6975eff28ba23c67998f3c24"
+  },
+  "type": "stat",
+  "value": "100+",
+  "title": "Partner Colleges",
+  "color": "green",
+  "order": 2,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6975eff28ba23c67998f3c25"
+  },
+  "type": "stat",
+  "value": "15+",
+  "title": "Years of Excellence",
+  "color": "amber",
+  "order": 3,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6975eff28ba23c67998f3c26"
+  },
+  "type": "stat",
+  "value": "98%",
+  "title": "Satisfaction Rate",
+  "color": "blue",
+  "order": 4,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6975eff28ba23c67998f3c27"
+  },
+  "type": "milestone",
+  "year": "2008",
+  "title": "Foundation Established",
+  "description": "Rasi Foundation was established with a vision to guide students towards successful careers.",
+  "order": 10,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6975eff28ba23c67998f3c28"
+  },
+  "type": "milestone",
+  "year": "2012",
+  "title": "Expanded Services",
+  "description": "Extended guidance services to include Medical, Engineering, and Management courses.",
+  "order": 11,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6975eff28ba23c67998f3c29"
+  },
+  "type": "milestone",
+  "year": "2015",
+  "title": "1000+ Students Milestone",
+  "description": "Successfully guided over 1000 students to secure admissions in prestigious colleges.",
+  "order": 12,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6975eff28ba23c67998f3c2a"
+  },
+  "type": "milestone",
+  "year": "2024",
+  "title": "5000+ Students & Growing",
+  "description": "Proudly serving 5000+ students with 100+ college partnerships nationwide.",
+  "order": 13,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6975eff28ba23c67998f3c2b"
+  },
+  "type": "success_story",
+  "name": "Dr. Arun Kumar",
+  "achievement": "MBBS at Government Medical College",
+  "image": "AK",
+  "quote": "Rasi Foundation was instrumental in my journey to becoming a doctor. Their guidance through NEET preparation and college selection was invaluable.",
+  "course": "Medical",
+  "color": "red",
+  "order": 20,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6975eff28ba23c67998f3c2c"
+  },
+  "type": "success_story",
+  "name": "Priya Venkatesh",
+  "achievement": "B.Tech at NIT Trichy",
+  "image": "PV",
+  "quote": "The expert counseling helped me choose the right engineering branch. Now I am working at a top tech company!",
+  "course": "Engineering",
+  "color": "blue",
+  "order": 21,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6975eff28ba23c67998f3c2d"
+  },
+  "type": "success_story",
+  "name": "Karthik Rajan",
+  "achievement": "MBA at IIM Bangalore",
+  "image": "KR",
+  "quote": "From CAT preparation guidance to interview tips, Rasi Foundation supported me throughout my MBA journey.",
+  "course": "Management",
+  "color": "green",
+  "order": 22,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6975eff28ba23c67998f3c2e"
+  },
+  "type": "recognition",
+  "title": "Best Education Consultancy",
+  "description": "Recognized for excellence in career guidance services",
+  "color": "amber",
+  "order": 30,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6975eff28ba23c67998f3c2f"
+  },
+  "type": "recognition",
+  "title": "Student Choice Award",
+  "description": "Voted as the most trusted consultancy by students",
+  "color": "amber",
+  "order": 31,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-25T10:26:58.031Z"
+  }
+}]

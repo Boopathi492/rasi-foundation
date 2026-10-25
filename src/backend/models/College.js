@@ -32,6 +32,16 @@ const CollegeSchema = new mongoose.Schema({
     type: String,
     maxlength: [200, 'Website URL cannot be more than 200 characters'],
   },
+  type: {
+    type: String,
+    enum: ['Engineering', 'Arts & Science', 'Medical', 'Polytechnic', 'Law', 'Management', 'Education', 'Other'],
+    default: 'Engineering',
+  },
+  // Optional logo kept in private storage; served via /api/colleges/[id]/logo. Absent = default placeholder.
+  logo: {
+    storageKey: { type: String, default: '' },
+    mime: { type: String, default: '' },
+  },
   isActive: {
     type: Boolean,
     default: true,
@@ -49,6 +59,9 @@ const CollegeSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+CollegeSchema.index({ isActive: 1, district: 1, order: 1 });
+CollegeSchema.index({ name: 1, district: 1 }, { unique: true, collation: { locale: 'en', strength: 2 } });
 
 // Update the updatedAt field before saving
 CollegeSchema.pre('save', function (next) {

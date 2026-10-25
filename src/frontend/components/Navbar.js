@@ -3,68 +3,78 @@ import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import {
-  FaPhoneAlt, FaEnvelope, FaWhatsapp, FaBars, FaTimes, FaHome, FaChevronDown,
-  FaCalendarCheck, FaRegCommentDots, FaArrowRight, FaSearch,
-  FaUniversity, FaUsers, FaShieldAlt, FaChartLine,
+  FaBars, FaTimes, FaHome, FaChevronDown,
+  FaCalendarCheck, FaArrowRight, FaSearch,
+  FaUniversity, FaTrophy, FaClipboardCheck, FaAward,
 } from 'react-icons/fa';
-import { CONTACT, ROUTES, LABELS } from '@/data/siteConfig';
+import { ROUTES, LABELS } from '@/data/siteConfig';
 
 const focusRing =
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-crimson focus-visible:ring-offset-2';
-const barFocus =
-  'focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1 focus-visible:ring-offset-forest rounded';
 
-// Top information links (existing routes)
-const STRIP_LINKS = [
-  [FaUniversity, 'College Admissions', '/colleges'],
-  [FaUsers, 'Career Guidance', ROUTES.counselling],
-  [FaShieldAlt, 'Scholarship Support', '/scholarship-test'],
-  [FaChartLine, 'Brighter Futures', '/about'],
-];
-
-// Main navigation. `children` become a dropdown; every path is an existing page.
+// Main navigation (exact order required by Phase 2). `children` become a dropdown; every path is an existing page.
+// Courses links straight to /courses (no submenu). Achievements lives inside the Colleges dropdown only.
 const NAV = [
   { name: 'Home', path: '/', icon: FaHome },
-  { name: 'About Us', path: '/about' },
-  {
-    name: 'Courses',
-    path: '/courses',
-    children: [
-      { name: 'All Courses', path: '/courses' },
-      { name: 'Practice Test', path: '/practice-test' },
-    ],
-  },
+  { name: 'About', path: '/about' },
+  { name: 'Courses', path: '/courses' },
   {
     name: 'Colleges',
     path: '/colleges',
     children: [
-      { name: 'College Directory', path: '/colleges' },
-      { name: 'Announcements', path: '/announcements' },
+      { name: 'College Directory', path: '/colleges', desc: 'Browse colleges by district & zone', icon: FaUniversity },
+      { name: 'Achievements', path: '/achievements', desc: 'Milestones & student success', icon: FaTrophy },
     ],
   },
-  { name: 'Scholarships', path: '/scholarship-test' },
-  { name: 'Achievements', path: '/achievements' },
-  { name: 'Announcements', path: '/announcements', wide: true },
+  {
+    name: 'Scholarships',
+    path: '/scholarship-test',
+    children: [
+      { name: 'Scholarship Test', path: '/scholarship-test', desc: 'Register for the scholarship exam', icon: FaAward },
+      { name: 'Practice Test', path: '/practice-test', desc: 'Subject-wise practice MCQs', icon: FaClipboardCheck },
+    ],
+  },
+  { name: 'Announcements', path: '/announcements' },
   { name: 'Contact', path: '/contact' },
 ];
 
-const SEARCHABLE = NAV.flatMap((item) => [item, ...(item.children || [])]).filter(
+const MOBILE_NAV = NAV;
+
+// Search covers every navigation destination plus the Feedback and workflow pages that are not in the main bar.
+const EXTRA_SEARCHABLE = [
+  { name: 'Share Feedback', path: '/feedback' },
+  { name: 'Book Counselling', path: '/book-counselling' },
+  { name: 'Secure Your Seat', path: '/biodata' },
+];
+
+const SEARCHABLE = [
+  ...MOBILE_NAV.flatMap((item) => [item, ...(item.children || [])]),
+  ...EXTRA_SEARCHABLE,
+].filter(
   (item, i, all) => all.findIndex((o) => o.path === item.path) === i
 );
 
 function CtaButtons({ onNavigate, stacked = false }) {
-  const base = 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg motion-reduce:hover:translate-y-0';
-  const size = stacked ? 'px-5 py-3 text-sm' : 'h-9 px-3 text-[12.5px] min-[1700px]:px-4';
+  const size = stacked
+    ? 'w-full px-5 py-3 text-sm !rounded-full'
+    : 'h-9 px-3.5 text-[12px] xl:h-10 xl:px-4 xl:text-[13px] !rounded-full whitespace-nowrap';
   return (
-    <div className={stacked ? 'grid gap-3 sm:grid-cols-3' : 'flex items-center gap-1.5 min-[1700px]:gap-2'}>
-      <Link href={ROUTES.enquiry} onClick={onNavigate} className={`${base} ${size} border-2 border-forest bg-white text-forest hover:bg-forest/5 ${focusRing}`}>
-        <FaRegCommentDots className={stacked ? "" : "hidden min-[1700px]:inline"} aria-hidden="true" /> Enquiry
+    <div className={stacked ? 'grid gap-3 sm:grid-cols-2' : 'flex items-center gap-2 xl:gap-2.5'}>
+      <Link
+        href={ROUTES.counselling}
+        onClick={onNavigate}
+        className={`rf-btn-primary ${size}`}
+      >
+        <FaCalendarCheck className="text-xs xl:text-sm shrink-0" aria-hidden="true" />
+        <span>Book Counselling</span>
       </Link>
-      <Link href={ROUTES.counselling} onClick={onNavigate} className={`${base} ${size} bg-forest text-white shadow-md hover:bg-forest-dark ${focusRing}`}>
-        <FaCalendarCheck className={stacked ? "" : "hidden min-[1700px]:inline"} aria-hidden="true" /> Book Counselling
-      </Link>
-      <Link href={ROUTES.secureSeat} onClick={onNavigate} className={`${base} ${size} bg-crimson text-white shadow-md hover:bg-crimson-dark ${focusRing}`}>
-        {LABELS.secureSeat} <FaArrowRight className="text-xs" aria-hidden="true" />
+      <Link
+        href={ROUTES.secureSeat}
+        onClick={onNavigate}
+        className={`rf-btn-maroon ${size}`}
+      >
+        <span>{LABELS.secureSeat}</span>
+        <FaArrowRight className="text-[11px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true" />
       </Link>
     </div>
   );
@@ -72,23 +82,47 @@ function CtaButtons({ onNavigate, stacked = false }) {
 
 function Brand() {
   return (
-    <Link href="/" className={`flex min-w-0 shrink items-center gap-2 rounded-lg sm:gap-3 ${focusRing}`} aria-label="Rasi Foundation home">
-      <Image
-        src="/rasi-logo.png"
-        alt="Rasi Foundation logo"
-        width={160}
-        height={160}
-        priority
-        className="h-11 w-11 shrink-0 rounded-full object-contain shadow-md sm:h-12 sm:w-12"
-      />
+    <Link
+      href="/"
+      className={`group flex min-w-0 shrink-0 items-center gap-2.5 rounded-xl py-0.5 pr-1 transition-transform duration-200 hover:scale-[1.01] motion-reduce:transition-none motion-reduce:hover:scale-100 ${focusRing}`}
+      aria-label="Rasi Foundation home"
+    >
+      <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white p-0.5 shadow-[0_2px_10px_rgba(176,16,46,0.18)] ring-1 ring-crimson/15 transition-shadow duration-200 group-hover:shadow-[0_4px_14px_rgba(176,16,46,0.28)] sm:h-12 sm:w-12">
+        <Image
+          src="/rasi-logo.png"
+          alt="Rasi Foundation logo"
+          width={96}
+          height={96}
+          sizes="48px"
+          priority
+          className="h-full w-full rounded-full object-contain"
+        />
+      </span>
       <span className="leading-none">
-        <span className="block whitespace-nowrap font-display text-[18px] font-bold uppercase tracking-[0.01em] sm:text-[22px]">
-          <span className="text-crimson">Rasi</span> <span className="text-forest">Foundation</span>
+        <span className="block whitespace-nowrap font-display text-[17px] font-bold uppercase tracking-[0.02em] sm:text-[20px] xl:text-[22px]">
+          <span className="text-crimson">
+            <span className="relative inline-block">
+              {/* Graduation cap positioned directly above the 'R' in the Rasi wordmark matching reference image */}
+              <Image
+                src="/graduation-cap.png"
+                alt=""
+                aria-hidden="true"
+                width={36}
+                height={28}
+                priority
+                unoptimized
+                className="pointer-events-none absolute -top-[0.36em] -left-[0.22em] w-[1.08em] h-auto max-w-none select-none transition-transform duration-200 group-hover:-translate-y-0.5"
+              />
+              R
+            </span>
+            asi
+          </span>{' '}
+          <span className="text-forest">Foundation</span>
         </span>
-        <span className="mt-1 hidden items-center gap-1.5 whitespace-nowrap text-[10px] font-medium text-forest sm:flex">
-          <span aria-hidden="true" className="h-px w-3 bg-forest/60" />
+        <span className="mt-1 hidden items-center gap-1.5 whitespace-nowrap text-[9.5px] font-semibold tracking-wide text-forest/90 sm:flex">
+          <span aria-hidden="true" className="h-px w-2.5 bg-gold-400" />
           Think Admission ! Think RASI !!
-          <span aria-hidden="true" className="h-px w-3 bg-forest/60" />
+          <span aria-hidden="true" className="h-px w-2.5 bg-gold-400" />
         </span>
       </span>
     </Link>
@@ -161,8 +195,11 @@ const Navbar = () => {
 
   useEffect(() => () => window.clearTimeout(closeTimer.current), []);
 
-  const isActive = (path) =>
+  const isRouteActive = (path) =>
     path === '/' ? router.pathname === '/' : router.pathname === path || router.pathname.startsWith(`${path}/`);
+
+  const isItemActive = (item) =>
+    isRouteActive(item.path) || (item.children ? item.children.some((c) => isRouteActive(c.path)) : false);
 
   const closeMenu = () => setIsOpen(false);
   const query = searchText.trim().toLowerCase();
@@ -170,7 +207,7 @@ const Navbar = () => {
   const hoverOpen = (name) => { window.clearTimeout(closeTimer.current); setOpenMenu(name); };
   const hoverClose = () => {
     window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => setOpenMenu(null), 140);
+    closeTimer.current = window.setTimeout(() => setOpenMenu(null), 150);
   };
 
   const searchButton = (
@@ -179,7 +216,7 @@ const Navbar = () => {
       aria-label={searchOpen ? 'Close site search' : 'Open site search'}
       aria-expanded={searchOpen}
       onClick={() => setSearchOpen((v) => !v)}
-      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-sm text-forest shadow-[0_2px_10px_rgba(7,85,68,0.18)] transition-all hover:-translate-y-0.5 hover:bg-forest hover:text-white motion-reduce:hover:translate-y-0 ${focusRing}`}
+      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-xs text-forest transition-colors duration-150 hover:border-forest hover:bg-forest hover:text-white xl:h-9 xl:w-9 ${focusRing}`}
     >
       <FaSearch aria-hidden="true" />
     </button>
@@ -189,101 +226,52 @@ const Navbar = () => {
     <>
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-2 focus:z-[70] focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-forest"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-[80] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-forest focus:shadow-lg"
       >
         Skip to main content
       </a>
 
-      <div className="relative z-50 w-full overflow-visible">
-        {/* Row 1: contact strip with curved maroon edges */}
-        <div className="relative overflow-hidden bg-forest text-white">
-          <svg aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 h-full w-16 sm:w-20" viewBox="0 0 80 44" preserveAspectRatio="none">
-            <path d="M0 0H20C30 16 48 34 76 44H0Z" fill="#b0102e" />
-            <path d="M20 0C30 16 48 34 76 44" fill="none" stroke="#dfaa32" strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
-          </svg>
-          <div className="relative flex min-h-[34px] w-full items-center justify-between gap-x-5 py-1.5 pl-[72px] pr-4 text-[12.5px] sm:pl-20 lg:pr-6 min-[1680px]:pr-56">
-            <div className="flex items-center">
-              <a href={`tel:${CONTACT.phoneTel}`} className={`flex items-center gap-2 whitespace-nowrap hover:text-gold-300 ${barFocus}`}>
-                <FaPhoneAlt className="text-[13px]" aria-hidden="true" />
-                <span>{CONTACT.phoneDisplay}</span>
-              </a>
-              <span aria-hidden="true" className="mx-3 hidden h-4 w-px bg-white/35 min-[420px]:block min-[1700px]:mx-4" />
-              <a
-                href={`https://wa.me/${CONTACT.whatsappNumber}?text=${encodeURIComponent(CONTACT.whatsappMessage)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`hidden items-center gap-2 whitespace-nowrap hover:text-gold-300 min-[420px]:flex ${barFocus}`}
-              >
-                <FaWhatsapp className="text-lg" aria-hidden="true" />
-                <span>{CONTACT.phoneDisplay}<span className="sr-only"> WhatsApp (opens in a new tab)</span></span>
-              </a>
-              <span aria-hidden="true" className="mx-3 hidden h-4 w-px bg-white/35 md:block min-[1700px]:mx-4" />
-              <a href={`mailto:${CONTACT.email}`} className={`hidden items-center gap-2 whitespace-nowrap hover:text-gold-300 md:flex ${barFocus}`}>
-                <FaEnvelope className="text-base" aria-hidden="true" />
-                <span>{CONTACT.email}</span>
-              </a>
-            </div>
-            <ul className="hidden items-center font-medium min-[1366px]:flex">
-              {STRIP_LINKS.map(([Icon, text, href], i) => (
-                <li key={text} className="flex items-center">
-                  {i > 0 && <span aria-hidden="true" className="mx-2.5 h-4 w-px bg-white/35 min-[1700px]:mx-3.5" />}
-                  <Link href={href} className={`flex items-center gap-2 whitespace-nowrap hover:text-gold-300 ${barFocus}`}>
-                    <Icon className="text-base text-gold-300" aria-hidden="true" />{text}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 hidden w-52 min-[1680px]:block">
-            <svg className="absolute inset-0 h-full w-full" viewBox="0 0 240 44" preserveAspectRatio="none">
-              <path d="M0 0H240V44H112C70 40 26 22 0 0Z" fill="#b0102e" />
-              <path d="M0 0C26 22 70 40 112 44" fill="none" stroke="#dfaa32" strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
-            </svg>
-            <p className="absolute inset-y-0 right-5 flex flex-col items-end justify-center font-script text-[15px] font-semibold italic leading-[13px] text-white">
-              <span>Think Admission !</span>
-              <span>Think RASI !!</span>
-            </p>
-          </div>
-        </div>
+      {/* Fixed Institutional Header */}
+      <header
+        className={`rf-header-enter fixed inset-x-0 top-0 z-50 transition-shadow duration-200 ${
+          scrolled
+            ? 'border-b border-gray-200 bg-white/[0.98] shadow-[0_2px_12px_rgba(15,23,42,0.06)] backdrop-blur-md'
+            : 'border-b border-gray-200/80 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.04)]'
+        }`}
+      >
+        <nav
+          ref={navRef}
+          aria-label="Main"
+          className="mx-auto flex h-[69px] max-w-[1600px] items-center justify-between gap-2 px-3 sm:px-5 lg:h-[73.1px] lg:px-6 2xl:px-10"
+        >
+          {/* Left: Brand Identity */}
+          <Brand />
 
-        {/* Row 2: logo, navigation and actions */}
-        <header className={`relative bg-white transition-shadow duration-300 ${scrolled ? 'shadow-xl' : 'shadow-md'}`}>
-          {/* left maroon / green ribbon corner */}
-          <svg aria-hidden="true" className="pointer-events-none absolute bottom-0 left-0 hidden h-full w-20 sm:block" viewBox="0 0 80 84" preserveAspectRatio="none">
-            <path d="M0 4C16 24 32 56 58 84H0Z" fill="#075544" />
-            <path d="M0 4C16 24 32 56 58 84" fill="none" stroke="#b0102e" strokeWidth="5" vectorEffect="non-scaling-stroke" />
-            <path d="M0 10C14 28 30 58 52 84" fill="none" stroke="#dfaa32" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-          </svg>
-          <nav ref={navRef} aria-label="Main" className="relative mx-auto flex min-h-[58px] w-full items-center justify-between gap-3 py-1.5 pl-4 pr-4 sm:pl-[72px] lg:pr-6 min-[1366px]:min-h-[62px] min-[1366px]:gap-2 min-[1700px]:pr-6">
-            <div className="relative flex items-center self-stretch">
-              <Brand />
-              {/* curved maroon band closing the logo panel */}
-              <svg aria-hidden="true" className="pointer-events-none ml-2 hidden h-[calc(100%+8px)] w-6 self-end min-[1366px]:block" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M100 0C74 8 54 78 0 100V92C46 74 62 14 100 0Z" fill="#b0102e" />
-                <path d="M100 0C74 8 54 78 0 100" fill="none" stroke="#dfaa32" strokeWidth="1.2" vectorEffect="non-scaling-stroke" />
-              </svg>
-            </div>
-
-            <ul className="hidden min-w-0 flex-1 items-center justify-center min-[1366px]:flex">
+          {/* Center: Navigation Links (Desktop lg+) */}
+          <div className="hidden lg:flex lg:min-w-0 lg:flex-1 lg:items-center lg:justify-center lg:px-2">
+            <ul className="flex items-center gap-0.5 px-1 py-1 xl:gap-1 xl:px-2">
               {NAV.map((item) => {
-                const active = isActive(item.path);
-                const Icon = item.icon;
+                const active = isItemActive(item);
                 const hasMenu = Boolean(item.children);
                 const open = openMenu === item.name;
-                const linkClass = `rf-navlink relative flex items-center gap-1 whitespace-nowrap px-1 py-2 text-[13.5px] font-semibold min-[1700px]:px-2.5 ${focusRing} ${
-                  active ? 'is-active text-crimson' : 'text-forest hover:text-crimson'
-                } ${Icon ? 'flex-col !gap-0.5' : ''}`;
                 return (
                   <li
                     key={item.path}
-                    className={`relative ${item.wide ? "hidden min-[1700px]:block" : ""}`}
+                    className="relative"
                     onMouseEnter={hasMenu ? () => hoverOpen(item.name) : undefined}
                     onMouseLeave={hasMenu ? hoverClose : undefined}
                   >
                     <div className="flex items-center">
-                      <Link href={item.path} aria-current={active ? 'page' : undefined} className={`${linkClass} ${hasMenu ? '!pr-0.5 min-[1700px]:!pr-1' : ''}`}>
-                        {Icon && <Icon className="text-base" aria-hidden="true" />}
-                        {item.name}
+                      <Link
+                        href={item.path}
+                        aria-current={isRouteActive(item.path) ? 'page' : undefined}
+                        className={`rf-navlink relative flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-1.5 text-[13px] font-semibold transition-colors duration-150 xl:px-3.5 xl:text-[13.5px] ${focusRing} ${
+                          active
+                            ? 'is-active font-bold text-crimson'
+                            : 'text-forest hover:text-crimson'
+                        } ${hasMenu ? '!pr-1 xl:!pr-1.5' : ''}`}
+                      >
+                        <span>{item.name}</span>
                       </Link>
                       {hasMenu && (
                         <button
@@ -293,158 +281,225 @@ const Navbar = () => {
                           aria-haspopup="true"
                           aria-expanded={open}
                           onClick={() => setOpenMenu(open ? null : item.name)}
-                          className={`flex h-8 w-6 items-center justify-center rounded text-[11px] ${active ? 'text-crimson' : 'text-forest'} hover:text-crimson ${focusRing}`}
+                          className={`mr-0.5 flex h-7 w-5 items-center justify-center rounded-md text-[10px] transition-colors ${
+                            active ? 'text-crimson' : 'text-forest/80'
+                          } hover:bg-forest/5 hover:text-crimson ${focusRing}`}
                         >
-                          <FaChevronDown aria-hidden="true" className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+                          <FaChevronDown
+                            aria-hidden="true"
+                            className={`transition-transform duration-200 motion-reduce:transition-none ${open ? 'rotate-180 text-crimson' : ''}`}
+                          />
                         </button>
                       )}
                     </div>
+
                     {hasMenu && (
                       <ul
-                        className={`absolute left-0 top-full z-50 min-w-[200px] origin-top rounded-xl border border-gray-100 bg-white p-2 shadow-xl transition-all duration-200 motion-reduce:transition-none ${
-                          open ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-1 opacity-0'
+                        className={`absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 origin-top rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg transition-all duration-150 motion-reduce:transition-none ${
+                          open
+                            ? 'visible translate-y-0 scale-100 opacity-100'
+                            : 'pointer-events-none invisible -translate-y-1 scale-[0.98] opacity-0'
                         }`}
                       >
-                        {item.children.map((child) => (
-                          <li key={child.path}>
-                            <Link
-                              href={child.path}
-                              tabIndex={open ? 0 : -1}
-                              onClick={() => setOpenMenu(null)}
-                              className={`block whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-semibold text-forest hover:bg-forest/5 hover:text-crimson ${focusRing}`}
-                            >
-                              {child.name}
-                            </Link>
-                          </li>
-                        ))}
+                        {item.children.map((child) => {
+                          const ChildIcon = child.icon;
+                          const childActive = isRouteActive(child.path);
+                          return (
+                            <li key={child.path}>
+                              <Link
+                                href={child.path}
+                                tabIndex={open ? 0 : -1}
+                                onClick={() => setOpenMenu(null)}
+                                className={`group/item flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${focusRing} ${
+                                  childActive ? 'bg-crimson/8 text-crimson' : 'text-gray-800 hover:bg-gray-50 hover:text-forest'
+                                }`}
+                              >
+                                {ChildIcon && (
+                                  <span className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-sm transition-colors ${
+                                    childActive ? 'bg-crimson text-white' : 'bg-forest/10 text-forest group-hover/item:bg-forest group-hover/item:text-white'
+                                  }`}>
+                                    <ChildIcon aria-hidden="true" />
+                                  </span>
+                                )}
+                                <span className="min-w-0">
+                                  <span className="block text-sm font-semibold leading-tight">{child.name}</span>
+                                  {child.desc && (
+                                    <span className="mt-0.5 block text-xs text-gray-500">{child.desc}</span>
+                                  )}
+                                </span>
+                              </Link>
+                            </li>
+                          );
+                        })}
                       </ul>
                     )}
                   </li>
                 );
               })}
             </ul>
+          </div>
 
-            <div className="hidden shrink-0 items-center gap-1.5 min-[1366px]:flex min-[1700px]:gap-3">
-              <span aria-hidden="true" className="mr-1 hidden h-7 w-px bg-gold-300/70 min-[1700px]:block" />
-              {searchButton}
-              <CtaButtons />
-            </div>
+          {/* Right: Distinct CTA Group (Desktop lg+) */}
+          <div className="hidden shrink-0 items-center gap-2 lg:flex xl:gap-2.5">
+            {searchButton}
+            <CtaButtons />
+          </div>
 
-            <div className="flex items-center gap-2 min-[1366px]:hidden">
-              {searchButton}
-              <Link
-                href={ROUTES.counselling}
-                className={`hidden h-10 items-center gap-2 whitespace-nowrap rounded-full bg-forest px-4 text-[13px] font-semibold text-white hover:bg-forest-dark md:inline-flex ${focusRing}`}
-              >
-                <FaCalendarCheck aria-hidden="true" /> Book Counselling
-              </Link>
-              <button
-                ref={menuButtonRef}
-                type="button"
-                className={`inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-forest text-forest ${focusRing}`}
-                aria-label={isOpen ? 'Close menu' : 'Open menu'}
-                aria-expanded={isOpen}
-                aria-controls="mobile-menu"
-                onClick={() => setIsOpen((v) => !v)}
-              >
-                {isOpen ? <FaTimes aria-hidden="true" /> : <FaBars aria-hidden="true" />}
-              </button>
-            </div>
-          </nav>
+          {/* Tablet / Mobile Controls (< lg) */}
+          <div className="flex items-center gap-2 lg:hidden">
+            {searchButton}
+            <Link
+              href={ROUTES.counselling}
+              className="rf-btn-primary hidden h-9 px-3.5 text-xs !rounded-full md:inline-flex"
+            >
+              <FaCalendarCheck aria-hidden="true" /> Book Counselling
+            </Link>
+            <button
+              ref={menuButtonRef}
+              type="button"
+              className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-forest/25 bg-white text-forest shadow-sm transition-colors hover:bg-forest hover:text-white ${focusRing}`}
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isOpen}
+              aria-controls="mobile-menu"
+              onClick={() => setIsOpen((v) => !v)}
+            >
+              {isOpen ? <FaTimes aria-hidden="true" /> : <FaBars aria-hidden="true" />}
+            </button>
+          </div>
+        </nav>
 
-          {/* bottom ribbon under the logo panel */}
-          <span aria-hidden="true" className="rasi-ribbon pointer-events-none absolute bottom-0 left-0 hidden h-[5px] w-[44%] sm:block" />
-
-          {searchOpen && (
-            <div className="relative mx-auto w-full border-t border-gray-100 px-4 pb-3 pt-3 lg:px-6">
+        {/* Search Drawer */}
+        {searchOpen && (
+          <div className="border-t border-gray-100 bg-white/95 px-4 pb-3 pt-2.5 backdrop-blur-lg lg:px-6">
+            <div className="mx-auto max-w-4xl">
               <label className="sr-only" htmlFor="site-search">Search pages</label>
-              <div className="flex items-center gap-3 rounded-full border border-gray-200 bg-gray-50 px-4 py-2">
-                <FaSearch className="text-forest" aria-hidden="true" />
+              <div className="flex items-center gap-3 rounded-full border border-forest/25 bg-gray-50/90 px-4 py-1.5 shadow-inner focus-within:border-forest focus-within:bg-white">
+                <FaSearch className="text-forest text-sm" aria-hidden="true" />
                 <input
                   id="site-search"
                   autoFocus
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Escape') setSearchOpen(false); }}
-                  placeholder="Search courses, colleges, scholarships…"
-                  className="w-full bg-transparent py-1 text-sm outline-none"
+                  placeholder="Search courses, colleges, scholarships, announcements…"
+                  className="w-full bg-transparent py-1 text-sm text-gray-900 outline-none placeholder:text-gray-400"
                 />
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(false)}
+                  aria-label="Close search"
+                  className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                >
+                  <FaTimes className="text-xs" aria-hidden="true" />
+                </button>
               </div>
               {query && (
                 <ul className="mt-2 grid gap-1 sm:grid-cols-2 lg:grid-cols-4">
                   {SEARCHABLE.filter((item) => item.name.toLowerCase().includes(query)).map((item) => (
                     <li key={item.path}>
-                      <Link href={item.path} onClick={() => { setSearchOpen(false); setSearchText(''); }} className="block rounded-lg px-3 py-2 text-sm font-medium text-forest hover:bg-forest/5">
+                      <Link
+                        href={item.path}
+                        onClick={() => { setSearchOpen(false); setSearchText(''); }}
+                        className="block rounded-xl px-3 py-2 text-sm font-medium text-forest hover:bg-forest/5 hover:text-crimson"
+                      >
                         {item.name}
                       </Link>
                     </li>
                   ))}
                   {SEARCHABLE.filter((item) => item.name.toLowerCase().includes(query)).length === 0 && (
-                    <li className="px-3 py-2 text-sm text-gray-600">No matching pages.</li>
+                    <li className="px-3 py-2 text-sm text-gray-600">No matching pages found.</li>
                   )}
                 </ul>
               )}
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Mobile / tablet menu */}
-          {isOpen && (
-            <>
-              <button
-                type="button"
-                tabIndex={-1}
-                aria-hidden="true"
-                className="fixed inset-0 -z-10 h-screen w-full cursor-default bg-black/40 min-[1366px]:hidden"
-                onClick={closeMenu}
-              />
-              <div
-                id="mobile-menu"
-                ref={menuRef}
-                className="absolute inset-x-0 top-full max-h-[calc(100vh-7rem)] overflow-y-auto border-t-4 border-crimson bg-white shadow-xl min-[1366px]:hidden"
-              >
-                <ul className="mx-auto grid w-full gap-1 px-4 py-4 sm:grid-cols-2 lg:px-6">
-                  {NAV.filter((item) => !item.wide).map((item) => {
-                    const active = isActive(item.path);
-                    return (
-                      <li key={item.path}>
-                        <Link
-                          href={item.path}
-                          onClick={closeMenu}
-                          aria-current={active ? 'page' : undefined}
-                          className={`flex items-center rounded-lg border-l-4 px-4 py-3 text-base font-semibold ${focusRing} ${
-                            active ? 'border-crimson bg-crimson/5 text-crimson' : 'border-transparent text-forest hover:bg-gray-50'
-                          }`}
-                        >
-                          {item.name}
-                        </Link>
-                        {item.children && (
-                          <ul className="ml-6 border-l border-gray-200">
-                            {item.children.map((child) => (
-                              <li key={child.path}>
-                                <Link href={child.path} onClick={closeMenu} className={`block rounded px-4 py-2 text-sm font-medium text-gray-700 hover:text-crimson ${focusRing}`}>
-                                  {child.name}
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-                <div className="mx-auto w-full border-t border-gray-100 px-4 py-4 lg:px-6">
-                  <CtaButtons onNavigate={closeMenu} stacked />
-                </div>
+        {/* Mobile / Tablet Hamburger Drawer */}
+        {isOpen && (
+          <>
+            <button
+              type="button"
+              tabIndex={-1}
+              aria-hidden="true"
+              className="fixed inset-x-0 top-[69px] bottom-0 -z-10 h-[calc(100vh-69px)] w-full cursor-default bg-black/40 lg:hidden"
+              onClick={closeMenu}
+            />
+            <div
+              id="mobile-menu"
+              ref={menuRef}
+              className="max-h-[calc(100vh-4.5rem)] overflow-y-auto border-t border-gray-200 bg-white shadow-xl lg:hidden"
+            >
+              <ul className="mx-auto grid max-w-2xl gap-1 px-4 py-4 sm:grid-cols-2">
+                {MOBILE_NAV.map((item) => {
+                  const active = isRouteActive(item.path);
+                  return (
+                    <li key={item.path}>
+                      <Link
+                        href={item.path}
+                        onClick={closeMenu}
+                        aria-current={active ? 'page' : undefined}
+                        className={`flex items-center justify-between rounded-lg border-l-4 px-4 py-2.5 text-sm font-semibold transition-colors ${focusRing} ${
+                          active
+                            ? 'border-crimson bg-crimson/8 text-crimson'
+                            : 'border-transparent text-forest hover:bg-gray-50'
+                        }`}
+                      >
+                        <span>{item.name}</span>
+                        <FaArrowRight className="text-[10px] opacity-40" aria-hidden="true" />
+                      </Link>
+                      {item.children && (
+                        <ul className="ml-5 mt-0.5 space-y-0.5 border-l border-gray-200 pl-2">
+                          {item.children.map((child) => (
+                            <li key={child.path}>
+                              <Link
+                                href={child.path}
+                                onClick={closeMenu}
+                                className={`block rounded-md px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:text-crimson ${focusRing}`}
+                              >
+                                {child.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="mx-auto max-w-2xl border-t border-gray-100 bg-gray-50 px-4 py-4">
+                <CtaButtons onNavigate={closeMenu} stacked />
               </div>
-            </>
-          )}
-        </header>
-      </div>
+            </div>
+          </>
+        )}
+      </header>
+
+      {/* Spacer so fixed header never overlaps page content */}
+      <div aria-hidden="true" className="h-[69px] lg:h-[73.1px]" />
+
       <style jsx global>{`
-        .rasi-ribbon{background:linear-gradient(90deg,#075544 0 62%,#dfaa32 62% 65%,#b0102e 65%);clip-path:polygon(0 0,100% 0,97% 100%,0 100%)}
-        .rf-navlink::after{content:'';position:absolute;left:8px;right:8px;bottom:0;height:2px;border-radius:2px;background:#b0102e;transform:scaleX(0);transform-origin:left;transition:transform .28s ease}
-        .rf-navlink:hover::after,.rf-navlink:focus-visible::after,.rf-navlink.is-active::after{transform:scaleX(1)}
-        @media (prefers-reduced-motion:reduce){.rf-navlink::after{transition:none}}
+        .rf-navlink::after {
+          content: '';
+          position: absolute;
+          left: 10px;
+          right: 10px;
+          bottom: 3px;
+          height: 2px;
+          border-radius: 1px;
+          background: #b0102e;
+          transform: scaleX(0);
+          transform-origin: center;
+          transition: transform 0.2s ease;
+        }
+        .rf-navlink:hover::after,
+        .rf-navlink:focus-visible::after,
+        .rf-navlink.is-active::after {
+          transform: scaleX(1);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .rf-navlink::after { transition: none; }
+        }
       `}</style>
     </>
   );

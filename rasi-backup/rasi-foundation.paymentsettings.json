@@ -1,0 +1,84 @@
+[{
+  "_id": {
+    "$oid": "6a04806f8fdcaa8b2fa82690"
+  },
+  "purpose": "scholarship_test",
+  "label": "Scholarship Test Fee",
+  "amount": 200,
+  "isFixed": true,
+  "isEnabled": true,
+  "updatedAt": {
+    "$date": "2026-05-13T15:29:30.234Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a04806f8fdcaa8b2fa82693"
+  },
+  "purpose": "other",
+  "label": "Other Payment",
+  "amount": 0,
+  "isFixed": false,
+  "isEnabled": true,
+  "updatedAt": {
+    "$date": "2026-05-13T15:29:30.234Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a04806f8fdcaa8b2fa8268f"
+  },
+  "purpose": "admission",
+  "label": "Admission Assistance Fee",
+  "amount": 1000,
+  "isFixed": false,
+  "isEnabled": true,
+  "updatedAt": {
+    "$date": "2026-05-13T15:29:30.217Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a04806f8fdcaa8b2fa82691"
+  },
+  "purpose": "course_fee",
+  "label": "Course Fee",
+  "amount": 2,
+  "isFixed": false,
+  "isEnabled": true,
+  "updatedAt": {
+    "$date": "2026-05-13T15:29:30.234Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a04806f8fdcaa8b2fa82692"
+  },
+  "purpose": "donation",
+  "label": "Donation",
+  "amount": 0,
+  "isFixed": false,
+  "isEnabled": true,
+  "updatedAt": {
+    "$date": "2026-05-13T15:29:30.234Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a04806f8fdcaa8b2fa8268e"
+  },
+  "purpose": "counseling",
+  "label": "Career Counseling Fee",
+  "amount": 500,
+  "isFixed": false,
+  "isEnabled": true,
+  "updatedAt": {
+    "$date": "2026-05-13T15:29:30.234Z"
+  },
+  "__v": 0
+}]

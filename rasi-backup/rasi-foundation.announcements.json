@@ -1,0 +1,211 @@
+[{
+  "_id": {
+    "$oid": "699078fc21f0fb80d0cefcbf"
+  },
+  "title": "📋 TN HSC (12th) Board Exams 2026 – March/April",
+  "content": "Tamil Nadu HSC Board Examinations 2026 are scheduled to begin in March 2026. All +2 students should focus on final preparation. Your +2 marks are crucial for TNEA engineering counselling cutoff. Best wishes from Rasi Foundation to all students!",
+  "type": "general",
+  "isActive": true,
+  "showOnHome": true,
+  "priority": 7,
+  "expiryDate": {
+    "$date": "2026-04-30T00:00:00.000Z"
+  },
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-02-14T13:30:36.218Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-14T13:30:36.218Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "699078fc21f0fb80d0cefcc1"
+  },
+  "title": "💰 TN Government Scholarship 2026 – Apply Now",
+  "content": "Tamil Nadu Government scholarships for BC/MBC/SC/ST students are open for the academic year 2026-27. Eligible students can apply through the official portal. Rasi Foundation assists with documentation and application process. Don't miss the deadline!",
+  "type": "scholarship",
+  "isActive": true,
+  "showOnHome": true,
+  "priority": 7,
+  "expiryDate": {
+    "$date": "2026-06-30T00:00:00.000Z"
+  },
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-02-14T13:30:36.219Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-14T13:30:36.219Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "699078fc21f0fb80d0cefcbc"
+  },
+  "title": "🚨 NEET UG 2026 – Registration Open",
+  "content": "NTA has opened the registration for NEET UG 2026. The exam is expected to be held in May 2026. Students who wish to pursue MBBS, BDS, BAMS, BHMS, and other medical courses must register before the deadline. Contact Rasi Foundation for complete guidance on application, preparation tips, and college selection.",
+  "link": "https://neet.nta.nic.in/",
+  "type": "urgent",
+  "isActive": true,
+  "showOnHome": true,
+  "priority": 10,
+  "expiryDate": {
+    "$date": "2026-05-31T00:00:00.000Z"
+  },
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-02-14T13:30:36.216Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-14T13:30:36.216Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "699078fc21f0fb80d0cefcbe"
+  },
+  "title": "🎓 TNEA 2026 – Tamil Nadu Engineering Admissions",
+  "content": "TNEA 2026 online counselling for Engineering admissions in Tamil Nadu will begin after +2 results. Students who appeared for TN HSC 2026 are eligible. Rasi Foundation provides complete TNEA counselling support including college selection, branch guidance, and seat allotment assistance.",
+  "type": "admission",
+  "isActive": true,
+  "showOnHome": true,
+  "priority": 8,
+  "expiryDate": {
+    "$date": "2026-09-30T00:00:00.000Z"
+  },
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-02-14T13:30:36.218Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-14T13:30:36.218Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "699078fc21f0fb80d0cefcc0"
+  },
+  "title": "🏥 NEET PG 2026 – Registration Updates",
+  "content": "NEET PG 2026 exam notification is expected soon from NBEMS. Medical graduates pursuing MD/MS/Diploma courses should stay updated. Rasi Foundation can guide you through the entire process from registration to admission.",
+  "link": "https://natboard.edu.in/",
+  "type": "admission",
+  "isActive": true,
+  "showOnHome": true,
+  "priority": 6,
+  "expiryDate": {
+    "$date": "2026-08-31T00:00:00.000Z"
+  },
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-02-14T13:30:36.219Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-14T13:30:36.219Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "699078fc21f0fb80d0cefcc4"
+  },
+  "title": "🏫 Management Quota Admissions 2026 – Open",
+  "content": "Management quota admissions for Engineering and Medical colleges are now open for the 2026-27 academic year. Rasi Foundation has direct tie-ups with well-connected universities for hassle-free admission. Contact us for transparent fee structure and ethical counselling.",
+  "type": "admission",
+  "isActive": true,
+  "showOnHome": true,
+  "priority": 8,
+  "expiryDate": {
+    "$date": "2026-10-31T00:00:00.000Z"
+  },
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-02-14T13:30:36.219Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-14T13:30:36.219Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "699078fc21f0fb80d0cefcc5"
+  },
+  "title": "✅ Free Career Counselling – Rasi Foundation",
+  "content": "Confused about which course or college to choose after 12th? Rasi Foundation offers FREE career counselling for students and parents. Get personalized guidance based on your marks, interests, and career goals. Visit our office in Rasipuram or call us today!",
+  "type": "general",
+  "isActive": true,
+  "showOnHome": true,
+  "priority": 6,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-02-14T13:30:36.219Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-14T13:30:36.219Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "699078fc21f0fb80d0cefcbd"
+  },
+  "title": "📝 JEE Main 2026 – Session 2 Registration",
+  "content": "JEE Main 2026 Session 2 registration is now open. Session 2 exam is scheduled for April 2026. This is a crucial exam for BTech/BE admissions across NITs, IIITs, and other centrally funded institutions. Get expert counselling from Rasi Foundation for rank analysis and college prediction.",
+  "link": "https://jeemain.nta.ac.in/",
+  "type": "admission",
+  "isActive": true,
+  "showOnHome": true,
+  "priority": 9,
+  "expiryDate": {
+    "$date": "2026-04-30T00:00:00.000Z"
+  },
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-02-14T13:30:36.218Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-14T13:30:36.218Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "699078fc21f0fb80d0cefcc2"
+  },
+  "title": "🎯 COMEDK UGET 2026 – Karnataka Engineering Entrance",
+  "content": "COMEDK UGET 2026 registration for engineering admissions in Karnataka private colleges is expected to open soon. This is an important exam for students looking at top colleges in Bengaluru. Contact Rasi Foundation for guidance on Bengaluru college admissions.",
+  "type": "admission",
+  "isActive": true,
+  "showOnHome": true,
+  "priority": 5,
+  "expiryDate": {
+    "$date": "2026-07-31T00:00:00.000Z"
+  },
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-02-14T13:30:36.219Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-14T13:30:36.219Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "699078fc21f0fb80d0cefcc3"
+  },
+  "title": "📚 JEE Advanced 2026 – For IIT Admissions",
+  "content": "JEE Advanced 2026 for IIT admissions will be conducted after JEE Main results. Only top 2,50,000 JEE Main qualifiers are eligible. Exam is expected in June 2026. Rasi Foundation provides comprehensive guidance for IIT aspirants.",
+  "link": "https://jeeadv.ac.in/",
+  "type": "general",
+  "isActive": true,
+  "showOnHome": true,
+  "priority": 5,
+  "expiryDate": {
+    "$date": "2026-07-31T00:00:00.000Z"
+  },
+  "__v": 0,
+  "createdAt": {
+    "$date": "2026-02-14T13:30:36.219Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-14T13:30:36.219Z"
+  }
+}]

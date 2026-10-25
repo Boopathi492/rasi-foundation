@@ -122,10 +122,48 @@ export default function Contact() {
   const submitting = status === 'submitting';
 
   const details = [
-    { Icon: FaPhoneAlt, label: 'Phone', node: <a href={`tel:${CONTACT.phoneTel}`} className="font-semibold text-gray-900 hover:text-brand-700">{CONTACT.phoneDisplay}</a> },
-    { Icon: FaWhatsapp, label: 'WhatsApp', node: <a href={`https://wa.me/${CONTACT_PAGE_WHATSAPP}`} target="_blank" rel="noopener noreferrer" className="font-semibold text-gray-900 hover:text-brand-700">Chat on WhatsApp<span className="sr-only"> (opens in a new tab)</span></a> },
-    { Icon: FaEnvelope, label: 'Email', node: <a href={`mailto:${CONTACT.email}`} className="break-all font-semibold text-gray-900 hover:text-brand-700">{CONTACT.email}</a> },
-    { Icon: FaMapMarkerAlt, label: 'Office', node: (<><p className="font-semibold text-gray-900">Rasipuram, Tamil Nadu 637408</p><a href={OFFICE_MAP_URL} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-brand-700 underline">Get directions<span className="sr-only"> (opens in a new tab)</span></a></>) },
+    {
+      Icon: FaPhoneAlt,
+      label: 'Phone',
+      node: (
+        <a href={`tel:${CONTACT.phoneTel}`} className="rf-phone-link">
+          <FaPhoneAlt className="text-forest text-[10px]" aria-hidden="true" />
+          <span>{CONTACT.phoneDisplay}</span>
+        </a>
+      ),
+    },
+    {
+      Icon: FaWhatsapp,
+      label: 'WhatsApp',
+      node: (
+        <a href={`https://wa.me/${CONTACT_PAGE_WHATSAPP}`} target="_blank" rel="noopener noreferrer" className="rf-phone-link">
+          <FaWhatsapp className="text-forest text-xs" aria-hidden="true" />
+          <span>Chat on WhatsApp</span>
+          <span className="sr-only"> (opens in a new tab)</span>
+        </a>
+      ),
+    },
+    {
+      Icon: FaEnvelope,
+      label: 'Email',
+      node: (
+        <a href={`mailto:${CONTACT.email}`} className="break-all font-semibold text-gray-900 transition-colors hover:text-brand-700">
+          {CONTACT.email}
+        </a>
+      ),
+    },
+    {
+      Icon: FaMapMarkerAlt,
+      label: 'Office',
+      node: (
+        <>
+          <p className="font-semibold text-gray-900">Rasipuram, Tamil Nadu 637408</p>
+          <a href={OFFICE_MAP_URL} target="_blank" rel="noopener noreferrer" className="inline-block mt-1 text-xs font-bold text-forest underline hover:text-crimson">
+            Get directions<span className="sr-only"> (opens in a new tab)</span>
+          </a>
+        </>
+      ),
+    },
     { Icon: FaClock, label: 'Working hours', node: <p className="font-semibold text-gray-900">Monday to Saturday, 9:00 am to 6:00 pm</p> },
   ];
 

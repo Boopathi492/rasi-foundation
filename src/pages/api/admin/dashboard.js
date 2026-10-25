@@ -1,9 +1,17 @@
 import dbConnect from '@/backend/lib/mongodb';
 import { withAuth } from '@/backend/lib/auth';
+import BioData from '@/backend/models/BioData';
 import Contact from '@/backend/models/Contact';
 import Enquiry from '@/backend/models/Enquiry';
-import Question from '@/backend/models/Question';
 import College from '@/backend/models/College';
+import Course from '@/backend/models/Course';
+import Banner from '@/backend/models/Banner';
+import Feedback from '@/backend/models/Feedback';
+import CounsellingRecord from '@/backend/models/CounsellingRecord';
+import StudentDocument from '@/backend/models/StudentDocument';
+import ApplicationErrorLog from '@/backend/models/ApplicationErrorLog';
+import AdminAuditLog from '@/backend/models/AdminAuditLog';
+import ScholarshipStudent from '@/backend/models/ScholarshipStudent';
 
 async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -12,49 +20,112 @@ async function handler(req, res) {
 
   try {
     await dbConnect();
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-    // Get counts
+    // Run parallel counts across all core collections
     const [
+      totalStudents,
+      newStudents30d,
+      pendingStudents,
+      totalScholarships,
       totalContacts,
       newContacts,
       totalEnquiries,
       pendingEnquiries,
-      totalQuestions,
-      unansweredQuestions,
       totalColleges,
-      activeColleges
+      activeColleges,
+      totalCourses,
+      activeCourses,
+      activeBanners,
+      totalFeedback,
+      pendingFeedback,
+      approvedFeedback,
+      totalCounselling,
+      scheduledCounselling,
+      pendingDocuments,
+      unresolvedErrors,
     ] = await Promise.all([
+      BioData.countDocuments(),
+      BioData.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
+      BioData.countDocuments({ status: 'pending' }),
+      ScholarshipStudent ? ScholarshipStudent.countDocuments().catch(() => 0) : 0,
       Contact.countDocuments(),
       Contact.countDocuments({ status: 'new' }),
       Enquiry.countDocuments(),
       Enquiry.countDocuments({ status: 'pending' }),
-      Question.countDocuments(),
-      Question.countDocuments({ isAnswered: false }),
       College.countDocuments(),
-      College.countDocuments({ isActive: true })
+      College.countDocuments({ isActive: true }),
+      Course.countDocuments(),
+      Course.countDocuments({ isActive: true }),
+      Banner.countDocuments({ isActive: true, archived: { $ne: true } }),
+      Feedback.countDocuments(),
+      Feedback.countDocuments({ status: 'pending' }),
+      Feedback.countDocuments({ status: 'approved' }),
+      CounsellingRecord.countDocuments(),
+      CounsellingRecord.countDocuments({ status: 'scheduled' }),
+      StudentDocument.countDocuments({ verificationStatus: 'pending', uploadStatus: 'uploaded' }),
+      ApplicationErrorLog.countDocuments({ resolved: false }),
     ]);
 
-    // Get recent items
-    const [recentContacts, recentEnquiries] = await Promise.all([
-      Contact.find().sort({ createdAt: -1 }).limit(5).lean(),
-      Enquiry.find().sort({ createdAt: -1 }).limit(5).lean()
+    // Top districts by student count (real MongoDB aggregation)
+    const districtDist = await BioData.aggregate([
+      { $match: { district: { $exists: true, $ne: '' } } },
+      { $group: { _id: '$district', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 8 },
     ]);
 
-    res.status(200).json({
+    // Enquiry status distribution
+    const enquiryDist = await Enquiry.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } },
+    ]);
+
+    // Recent administrative audit trail
+    const recentActivity = await AdminAuditLog.find()
+      .sort({ createdAt: -1 })
+      .limit(6)
+      .lean();
+
+    // Recent enquiries
+    const recentEnquiries = await Enquiry.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .lean();
+
+    // Recent contacts
+    const recentContacts = await Contact.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .lean();
+
+    return res.status(200).json({
+      success: true,
       stats: {
+        students: { total: totalStudents, new30d: newStudents30d, pending: pendingStudents },
+        scholarships: { total: totalScholarships },
         contacts: { total: totalContacts, new: newContacts },
         enquiries: { total: totalEnquiries, pending: pendingEnquiries },
-        questions: { total: totalQuestions, unanswered: unansweredQuestions },
-        colleges: { total: totalColleges, active: activeColleges }
+        colleges: { total: totalColleges, active: activeColleges },
+        courses: { total: totalCourses, active: activeCourses },
+        banners: { active: activeBanners },
+        feedback: { total: totalFeedback, pending: pendingFeedback, approved: approvedFeedback },
+        counselling: { total: totalCounselling, scheduled: scheduledCounselling },
+        documents: { pendingVerification: pendingDocuments },
+        monitoring: { unresolvedErrors },
+      },
+      distributions: {
+        districts: districtDist.map((d) => ({ name: d._id, count: d.count })),
+        enquiryStatuses: enquiryDist.map((e) => ({ status: e._id, count: e.count })),
       },
       recent: {
+        activity: recentActivity,
+        enquiries: recentEnquiries,
         contacts: recentContacts,
-        enquiries: recentEnquiries
-      }
+      },
     });
   } catch (error) {
     console.error('Dashboard error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 }
 

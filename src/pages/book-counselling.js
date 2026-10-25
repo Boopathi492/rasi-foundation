@@ -1,7 +1,16 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { FaCalendarCheck, FaCheckCircle, FaExclamationCircle, FaSpinner } from 'react-icons/fa';
+import {
+  FaCalendarCheck, FaCheckCircle, FaSpinner, FaUser, FaGraduationCap, FaCommentDots, FaClipboardCheck,
+  FaChevronRight, FaChevronLeft, FaPhoneAlt, FaRegLightbulb, FaUniversity, FaRoute, FaPaperPlane, FaHeadset,
+} from 'react-icons/fa';
 import Layout from '@/frontend/components/Layout';
+import Reveal from '@/frontend/components/home/Reveal';
+import Stepper from '@/frontend/components/forms/Stepper';
+import StepPanel from '@/frontend/components/forms/StepPanel';
+import ReviewSection from '@/frontend/components/forms/ReviewSection';
+import FormAlert from '@/frontend/components/forms/FormAlert';
+import { Field, ChoiceGroup, CheckboxField, inputClass } from '@/frontend/components/forms/Field';
 import { CONTACT, TN_DISTRICTS } from '@/data/siteConfig';
 
 // Course categories already used on the home page / courses page.
@@ -16,14 +25,24 @@ const COURSE_OPTIONS = [
   'Not sure yet',
 ];
 const QUALIFICATIONS = ['10th (SSLC)', '11th / 12th (Plus Two)', 'Diploma', 'Undergraduate (UG)', 'Postgraduate (PG)', 'Other'];
+const CONTACT_TIMES = ['Morning (9 AM – 12 PM)', 'Afternoon (12 PM – 4 PM)', 'Evening (4 PM – 8 PM)', 'Any time'];
+const CONTACT_METHODS = [
+  { value: 'Phone call', label: 'Phone call' },
+  { value: 'WhatsApp', label: 'WhatsApp' },
+  { value: 'Either', label: 'Either is fine' },
+];
+
+const STEPS = [
+  { id: 'student', label: 'Student details', fields: ['name', 'phone', 'email'] },
+  { id: 'interests', label: 'Academic interests', fields: ['qualification', 'course', 'district', 'college'] },
+  { id: 'preferences', label: 'Preferences', fields: ['contactMethod', 'contactTime', 'message'] },
+  { id: 'review', label: 'Review & submit', fields: ['consent'] },
+];
 
 const EMPTY = {
   name: '', phone: '', email: '', qualification: '', course: '',
-  district: '', college: '', preferredTime: '', message: '', consent: false,
+  district: '', college: '', contactMethod: '', contactTime: '', message: '', consent: false,
 };
-
-const inputClass =
-  'w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder-gray-400 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/30 aria-[invalid=true]:border-red-600';
 
 function validate(f) {
   const errors = {};
@@ -36,62 +55,102 @@ function validate(f) {
   if (!f.qualification) errors.qualification = 'Select the current qualification.';
   if (!f.course) errors.course = 'Select the course you are interested in.';
   if (!f.district) errors.district = 'Select a preferred district.';
+  if (f.college.trim().length > 150) errors.college = 'College name must be 150 characters or fewer.';
+  if (f.message.trim().length > 500) errors.message = 'Please keep the message within 500 characters.';
   if (!f.consent) errors.consent = 'Please agree so we can contact you.';
   return { errors, phone: digits };
 }
 
-function Field({ id, label, required, hint, error, children }) {
-  return (
-    <div>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-semibold text-gray-800">
-        {label} {required ? <span className="text-red-700" aria-hidden="true">*</span> : <span className="font-normal text-gray-500">(optional)</span>}
-      </label>
-      {children}
-      {hint && !error && <p id={`${id}-hint`} className="mt-1 text-xs text-gray-500">{hint}</p>}
-      {error && <p id={`${id}-error`} role="alert" className="mt-1 text-sm text-red-700">{error}</p>}
-    </div>
-  );
-}
+const PROCESS = [
+  { icon: FaUser, title: 'Share the student details', text: 'Name, mobile number and email so we know who to contact.' },
+  { icon: FaGraduationCap, title: 'Tell us what interests you', text: 'Current level, course interest and preferred district.' },
+  { icon: FaClipboardCheck, title: 'Review and submit', text: 'Check everything, edit if needed, then send your request.' },
+  { icon: FaHeadset, title: 'We get in touch', text: 'Our team contacts you on the mobile number you provide.' },
+];
 
 export default function BookCounselling() {
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
+  const [step, setStep] = useState(0);
+  const [maxReached, setMaxReached] = useState(0);
+  const [interacted, setInteracted] = useState(false);
   const [status, setStatus] = useState('idle'); // idle | submitting | success | error
   const [serverError, setServerError] = useState('');
+  const [reference, setReference] = useState('');
+  const [colleges, setColleges] = useState([]);
+  const submitLock = useRef(false);
+  const formTop = useRef(null);
+
+  // Verified college records (active colleges from the database) are offered as suggestions only.
+  useEffect(() => {
+    if (step !== 1 || colleges.length > 0) return undefined;
+    let cancelled = false;
+    fetch('/api/colleges')
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => { if (!cancelled && Array.isArray(data)) setColleges(data); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [step, colleges.length]);
+
+  const collegeSuggestions = useMemo(() => {
+    const wanted = form.district.trim().toLowerCase();
+    const groups = wanted ? colleges.filter((g) => String(g.district).toLowerCase() === wanted) : colleges;
+    const list = groups.length ? groups : colleges;
+    return list.flatMap((g) => (g.colleges || []).map((c) => c.name)).slice(0, 300);
+  }, [colleges, form.district]);
 
   const set = (e) => {
     const { name, value, type, checked } = e.target;
     setForm((f) => ({ ...f, [name]: type === 'checkbox' ? checked : value }));
+    setErrors((prev) => (prev[name] ? { ...prev, [name]: undefined } : prev));
   };
 
-  const a11y = (id) => ({
-    id,
-    name: id,
-    value: form[id],
-    onChange: set,
-    'aria-invalid': errors[id] ? 'true' : 'false',
-    'aria-describedby': errors[id] ? `${id}-error` : undefined,
-  });
+  const focusField = (id) => {
+    if (typeof window === 'undefined') return;
+    window.requestAnimationFrame(() => document.getElementById(id)?.focus());
+  };
+
+  const goTo = useCallback((i) => {
+    setInteracted(true);
+    setStep(i);
+    setMaxReached((m) => Math.max(m, i));
+    formTop.current?.scrollIntoView({ block: 'start', behavior: 'auto' });
+  }, []);
+
+  const next = () => {
+    const { errors: found } = validate(form);
+    const stepErrors = Object.fromEntries(STEPS[step].fields.filter((k) => found[k]).map((k) => [k, found[k]]));
+    setErrors((prev) => ({ ...prev, ...stepErrors }));
+    const first = Object.keys(stepErrors)[0];
+    if (first) { focusField(first); return; }
+    goTo(step + 1);
+  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    if (submitLock.current || status === 'submitting') return; // duplicate-submit guard
     const { errors: found, phone } = validate(form);
     setErrors(found);
-    if (Object.keys(found).length > 0) {
-      document.getElementById(Object.keys(found)[0])?.focus();
+    const firstKey = Object.keys(found)[0];
+    if (firstKey) {
+      const target = STEPS.findIndex((s) => s.fields.includes(firstKey));
+      if (target !== step) goTo(target);
+      focusField(firstKey);
       return;
     }
 
+    submitLock.current = true;
     setStatus('submitting');
     setServerError('');
 
-    // Counselling bookings reuse POST /api/enquiry (no dedicated model exists). They are tagged
+    // Counselling requests reuse POST /api/enquiry (no dedicated model exists). They are tagged
     // with "[Counselling Booking]" so staff can tell them apart from general enquiries.
     const details = [
       '[Counselling Booking]',
       `Preferred district: ${form.district}`,
       form.college.trim() && `Preferred college: ${form.college.trim()}`,
-      form.preferredTime && `Preferred date/time: ${form.preferredTime.replace('T', ' ')}`,
+      form.contactMethod && `Preferred contact method: ${form.contactMethod}`,
+      form.contactTime && `Best time to contact: ${form.contactTime}`,
       form.message.trim() && `Message: ${form.message.trim()}`,
     ].filter(Boolean).join('\n');
 
@@ -112,133 +171,258 @@ export default function BookCounselling() {
       if (!res.ok || !json.success) {
         throw new Error(json.error || `Request failed (${res.status})`);
       }
+      setReference(json.data?._id ? String(json.data._id).slice(-8).toUpperCase() : '');
       setStatus('success');
       setForm(EMPTY);
+      setStep(0);
+      setMaxReached(0);
     } catch (err) {
-      console.error('Counselling booking failed', err);
+      console.error('Counselling request failed', err);
       setServerError('We could not save your request. Please try again, or call us.');
       setStatus('error');
+    } finally {
+      submitLock.current = false;
     }
   };
+
+  const a11y = (id) => ({ name: id, value: form[id], onChange: set });
+  const submitting = status === 'submitting';
 
   return (
     <Layout
       title="Book Counselling"
-      description="Book a career counselling session with Rasi Foundation for course and college guidance in Tamil Nadu."
+      description="Request a career counselling session with Rasi Foundation for course and college guidance in Tamil Nadu."
     >
-      <section className="bg-brand-900 py-10 text-white">
-        <div className="container mx-auto px-4">
-          <h1 className="font-heading text-3xl font-bold md:text-4xl">Book Counselling</h1>
-          <p className="mt-2 max-w-2xl text-white/80">
-            Tell us a little about the student and we will get back to you. For a general question, use the{' '}
-            <Link href="/contact" className="font-semibold underline">Enquiry form</Link> instead.
-          </p>
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-rasi-900 via-rasi-700 to-brand-900 text-white">
+        <span aria-hidden="true" className="pointer-events-none absolute -left-20 -top-24 h-72 w-72 rounded-full bg-white/5" />
+        <span aria-hidden="true" className="pointer-events-none absolute -bottom-32 right-1/4 h-80 w-80 rounded-full border border-white/10" />
+        <span aria-hidden="true" className="pointer-events-none absolute -right-16 top-10 h-56 w-56 rounded-full bg-brand-700/40" />
+        <div className="container relative mx-auto grid items-center gap-10 px-4 py-12 md:py-16 lg:grid-cols-[1.2fr_1fr]">
+          <div>
+            <p className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-gold-300">
+              <FaRegLightbulb aria-hidden="true" /> Student counselling request
+            </p>
+            <h1 className="mt-3 font-heading text-4xl font-bold leading-tight md:text-5xl">
+              Talk through your course and college options
+            </h1>
+            <div aria-hidden="true" className="mt-4 flex items-center gap-2">
+              <span className="h-0.5 w-12 rounded-full bg-gold-400" />
+              <span className="h-1.5 w-1.5 rounded-full bg-gold-400" />
+            </div>
+            <p className="mt-4 max-w-xl text-lg text-white/85">
+              Send us a few details and our team will get in touch to discuss your academic interests and the next steps
+              in the admission process.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a href="#counselling-form" className="rf-btn-gold !rounded-full px-6 py-3">
+                <FaCalendarCheck aria-hidden="true" /> Start the request
+              </a>
+              <a href={`tel:${CONTACT.phoneTel}`} className="rf-btn-light !rounded-full px-6 py-3">
+                <FaPhoneAlt aria-hidden="true" /> {CONTACT.phoneDisplay}
+              </a>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur-sm">
+            <h2 className="font-heading text-lg font-bold">What a counselling session covers</h2>
+            <ul className="mt-4 space-y-3 text-sm text-white/90">
+              <li className="flex gap-3"><FaGraduationCap aria-hidden="true" className="mt-0.5 shrink-0 text-gold-300" /> Understanding the course options that suit your interests.</li>
+              <li className="flex gap-3"><FaUniversity aria-hidden="true" className="mt-0.5 shrink-0 text-gold-300" /> Discussing college options in your preferred districts.</li>
+              <li className="flex gap-3"><FaRoute aria-hidden="true" className="mt-0.5 shrink-0 text-gold-300" /> Clarifying admission-related next steps and documents.</li>
+            </ul>
+          </div>
         </div>
       </section>
 
-      <section className="bg-white py-10">
-        <div className="container mx-auto max-w-3xl px-4">
-          {status === 'success' ? (
-            <div role="status" className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center">
-              <FaCheckCircle className="mx-auto mb-3 text-4xl text-green-700" aria-hidden="true" />
-              <h2 className="font-heading text-2xl font-bold text-gray-900">Request received</h2>
-              <p className="mt-2 text-gray-700">
-                Your counselling request has been saved. Our team will contact you on the mobile number you gave.
-                Preferred date/time, if given, is a request and not a confirmed slot.
-              </p>
-              <button type="button" onClick={() => setStatus('idle')} className="mt-5 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 hover:border-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600">
-                Submit another request
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={onSubmit} noValidate className="space-y-5" aria-describedby={status === 'error' ? 'form-error' : undefined}>
-              {status === 'error' && (
-                <div id="form-error" role="alert" className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-                  <FaExclamationCircle className="mt-0.5 shrink-0" aria-hidden="true" />
-                  <p>{serverError} Call <a href={`tel:${CONTACT.phoneTel}`} className="font-semibold underline">{CONTACT.phoneDisplay}</a>.</p>
+      {/* Process */}
+      <section aria-labelledby="process-heading" className="border-b border-gray-200 bg-white py-10">
+        <div className="container mx-auto px-4">
+          <h2 id="process-heading" className="text-center font-heading text-2xl font-bold text-gray-900">How the request works</h2>
+          <ol className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {PROCESS.map((p, i) => (
+              <Reveal as="li" key={p.title} delay={i * 0.06} className="rf-card p-5">
+                <span aria-hidden="true" className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-b from-[#0b6b55] to-[#054235] text-white">
+                  <p.icon />
+                </span>
+                <p className="mt-3 text-xs font-bold uppercase tracking-wide text-rasi-700">Step {i + 1}</p>
+                <h3 className="mt-0.5 font-heading text-base font-bold text-gray-900">{p.title}</h3>
+                <p className="mt-1 text-sm text-gray-600">{p.text}</p>
+              </Reveal>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* Form + aside */}
+      <section id="counselling-form" ref={formTop} className="scroll-mt-24 bg-gradient-to-b from-brand-50/60 to-white py-10 md:py-14">
+        <div className="container mx-auto grid gap-8 px-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <div className="rf-card p-5 sm:p-8">
+            {status === 'success' ? (
+              <div role="status" className="py-4 text-center">
+                <FaCheckCircle aria-hidden="true" className="mx-auto mb-3 text-5xl text-brand-700" />
+                <h2 className="font-heading text-2xl font-bold text-gray-900">Request received</h2>
+                <p className="mx-auto mt-2 max-w-lg text-gray-700">
+                  Your counselling request has been saved. Our team will contact you on the mobile number you provided.
+                </p>
+                {reference && <p className="mt-2 text-sm text-gray-600">Reference: <span className="font-mono font-semibold">{reference}</span></p>}
+                <p className="mx-auto mt-3 max-w-lg rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+                  This is a request only. No appointment date or time has been fixed yet, and it will be arranged when our team contacts you.
+                </p>
+                <div className="mt-6 flex flex-wrap justify-center gap-3">
+                  <button type="button" onClick={() => { setStatus('idle'); setInteracted(false); }} className="rf-btn-outline">Submit another request</button>
+                  <Link href="/" className="rf-btn-primary">Back to home</Link>
                 </div>
-              )}
-
-              <div className="grid gap-5 sm:grid-cols-2">
-                <Field id="name" label="Student name" required error={errors.name}>
-                  <input type="text" autoComplete="name" maxLength={100} {...a11y('name')} className={inputClass} />
-                </Field>
-                <Field id="phone" label="Mobile number" required error={errors.phone} hint="10-digit Indian mobile number">
-                  <input type="tel" inputMode="numeric" autoComplete="tel" {...a11y('phone')} className={inputClass} />
-                </Field>
               </div>
+            ) : (
+              <form onSubmit={onSubmit} noValidate aria-busy={submitting}>
+                <Stepper steps={STEPS} current={step} maxReached={maxReached} onStepClick={goTo} label="Counselling request progress" />
 
-              <Field id="email" label="Email" required error={errors.email} hint="Required by our enquiry system.">
-                <input type="email" autoComplete="email" {...a11y('email')} className={inputClass} />
-              </Field>
+                <div className="mt-8">
+                  {status === 'error' && (
+                    <div className="mb-5">
+                      <FormAlert kind="error" id="form-error" title="Request not sent">
+                        {serverError} Call <a href={`tel:${CONTACT.phoneTel}`} className="font-semibold underline">{CONTACT.phoneDisplay}</a>.
+                      </FormAlert>
+                    </div>
+                  )}
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                <Field id="qualification" label="Current qualification / study level" required error={errors.qualification}>
-                  <select {...a11y('qualification')} className={inputClass}>
-                    <option value="">Select</option>
-                    {QUALIFICATIONS.map((q) => <option key={q} value={q}>{q}</option>)}
-                  </select>
-                </Field>
-                <Field id="course" label="Interested course" required error={errors.course}>
-                  <select {...a11y('course')} className={inputClass}>
-                    <option value="">Select</option>
-                    {COURSE_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </Field>
-              </div>
+                  {step === 0 && (
+                    <StepPanel key="student" focusHeading={interacted} icon={FaUser} title="Student details"
+                      description="Tell us who the counselling is for and how we can reach you.">
+                      <div className="grid gap-5 sm:grid-cols-2">
+                        <Field id="name" label="Student name" required error={errors.name} hint="As the student would like to be addressed." className="sm:col-span-2">
+                          <input type="text" autoComplete="name" maxLength={100} {...a11y('name')} className={inputClass} />
+                        </Field>
+                        <Field id="phone" label="Mobile number" required error={errors.phone} hint="10-digit Indian mobile number. We will contact you on this number.">
+                          <input type="tel" inputMode="numeric" autoComplete="tel" {...a11y('phone')} className={inputClass} />
+                        </Field>
+                        <Field id="email" label="Email" required error={errors.email} hint="Required by our enquiry system.">
+                          <input type="email" autoComplete="email" {...a11y('email')} className={inputClass} />
+                        </Field>
+                      </div>
+                    </StepPanel>
+                  )}
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                <Field id="district" label="Preferred district" required error={errors.district}>
-                  <select {...a11y('district')} className={inputClass}>
-                    <option value="">Select</option>
-                    {TN_DISTRICTS.map((d) => <option key={d} value={d}>{d}</option>)}
-                    <option value="Outside Tamil Nadu">Outside Tamil Nadu</option>
-                  </select>
-                </Field>
-                <Field id="college" label="Preferred college" error={errors.college}>
-                  <input type="text" maxLength={150} {...a11y('college')} className={inputClass} />
-                </Field>
-              </div>
+                  {step === 1 && (
+                    <StepPanel key="interests" focusHeading={interacted} icon={FaGraduationCap} title="Academic interests"
+                      description="This helps us prepare for the conversation. You can still change your mind during counselling.">
+                      <div className="grid gap-5 sm:grid-cols-2">
+                        <Field id="qualification" label="Current qualification / study level" required error={errors.qualification}>
+                          <select {...a11y('qualification')} className={inputClass}>
+                            <option value="">Select</option>
+                            {QUALIFICATIONS.map((q) => <option key={q} value={q}>{q}</option>)}
+                          </select>
+                        </Field>
+                        <Field id="course" label="Interested course" required error={errors.course} hint="Choose “Not sure yet” if you want help deciding.">
+                          <select {...a11y('course')} className={inputClass}>
+                            <option value="">Select</option>
+                            {COURSE_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        </Field>
+                        <Field id="district" label="Preferred district" required error={errors.district}>
+                          <select {...a11y('district')} className={inputClass}>
+                            <option value="">Select</option>
+                            {TN_DISTRICTS.map((d) => <option key={d} value={d}>{d}</option>)}
+                            <option value="Outside Tamil Nadu">Outside Tamil Nadu</option>
+                          </select>
+                        </Field>
+                        <Field id="college" label="Preferred college" error={errors.college}
+                          hint={collegeSuggestions.length ? 'Pick from our listed colleges or type any college name.' : 'Type a college name if you have one in mind.'}>
+                          <input type="text" list="college-suggestions" autoComplete="off" maxLength={150} {...a11y('college')} className={inputClass} />
+                        </Field>
+                        <datalist id="college-suggestions">
+                          {collegeSuggestions.map((n) => <option key={n} value={n} />)}
+                        </datalist>
+                      </div>
+                    </StepPanel>
+                  )}
 
-              <Field id="preferredTime" label="Preferred counselling date/time" hint="A request only; we will confirm the slot with you.">
-                <input type="datetime-local" {...a11y('preferredTime')} className={inputClass} />
-              </Field>
+                  {step === 2 && (
+                    <StepPanel key="preferences" focusHeading={interacted} icon={FaCommentDots} title="Counselling preferences"
+                      description="All optional. These are preferences only and help our team plan the call; they are not a booked slot.">
+                      <div className="space-y-5">
+                        <ChoiceGroup id="contactMethod" name="contactMethod" legend="Preferred contact method" options={CONTACT_METHODS}
+                          value={form.contactMethod} onChange={(v) => setForm((f) => ({ ...f, contactMethod: f.contactMethod === v ? '' : v }))} />
+                        <Field id="contactTime" label="Best time to contact you" hint="We will try to reach you around this time, but cannot guarantee it.">
+                          <select {...a11y('contactTime')} className={inputClass}>
+                            <option value="">No preference</option>
+                            {CONTACT_TIMES.map((t) => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                        </Field>
+                        <Field id="message" label="Your questions" error={errors.message}
+                          hint={`Briefly describe what you would like to discuss. ${form.message.length}/500`}>
+                          <textarea rows={4} maxLength={500} {...a11y('message')} className={inputClass} />
+                        </Field>
+                      </div>
+                    </StepPanel>
+                  )}
 
-              <Field id="message" label="Additional message">
-                <textarea rows={4} maxLength={500} {...a11y('message')} className={inputClass} />
-              </Field>
+                  {step === 3 && (
+                    <StepPanel key="review" focusHeading={interacted} icon={FaClipboardCheck} title="Review and submit"
+                      description="Check your details. Use Edit to correct anything before sending.">
+                      <div className="space-y-4">
+                        <ReviewSection title="Student details" onEdit={() => goTo(0)} items={[
+                          ['Student name', form.name], ['Mobile number', form.phone], ['Email', form.email, true],
+                        ]} />
+                        <ReviewSection title="Academic interests" onEdit={() => goTo(1)} items={[
+                          ['Qualification', form.qualification], ['Interested course', form.course],
+                          ['Preferred district', form.district], ['Preferred college', form.college],
+                        ]} />
+                        <ReviewSection title="Preferences" onEdit={() => goTo(2)} items={[
+                          ['Contact method', form.contactMethod], ['Best time', form.contactTime], ['Questions', form.message, true],
+                        ]} />
+                        <CheckboxField id="consent" name="consent" checked={form.consent} onChange={set} error={errors.consent}>
+                          I agree that Rasi Foundation may contact me about counselling using the details I have provided.
+                          These details are used only to respond to this request.
+                        </CheckboxField>
+                      </div>
+                    </StepPanel>
+                  )}
+                </div>
 
-              <div>
-                <label className="flex items-start gap-3 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
-                    name="consent"
-                    id="consent"
-                    checked={form.consent}
-                    onChange={set}
-                    aria-invalid={errors.consent ? 'true' : 'false'}
-                    aria-describedby={errors.consent ? 'consent-error' : undefined}
-                    className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-700 focus:ring-brand-600"
-                  />
-                  <span>
-                    I agree that Rasi Foundation may contact me about counselling using the details I have provided.
-                    These details are used only to respond to this request.
-                  </span>
-                </label>
-                {errors.consent && <p id="consent-error" role="alert" className="mt-1 text-sm text-red-700">{errors.consent}</p>}
-              </div>
+                <div className="mt-8 flex flex-col-reverse gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                  {step > 0 ? (
+                    <button type="button" onClick={() => goTo(step - 1)} disabled={submitting} className="rf-btn-outline">
+                      <FaChevronLeft aria-hidden="true" className="text-xs" /> Back
+                    </button>
+                  ) : <span />}
+                  {step < STEPS.length - 1 ? (
+                    <button type="button" onClick={next} className="rf-btn-primary px-7 py-3 text-base">
+                      Continue <FaChevronRight aria-hidden="true" className="text-xs" />
+                    </button>
+                  ) : (
+                    <button type="submit" disabled={submitting} className="rf-btn-maroon px-7 py-3 text-base">
+                      {submitting
+                        ? (<><FaSpinner aria-hidden="true" className="animate-spin motion-reduce:animate-none" /> Sending request…</>)
+                        : (<><FaPaperPlane aria-hidden="true" /> Submit counselling request</>)}
+                    </button>
+                  )}
+                </div>
+                <p className="sr-only" role="status" aria-live="polite">{submitting ? 'Sending your request' : ''}</p>
+              </form>
+            )}
+          </div>
 
-              <button
-                type="submit"
-                disabled={status === 'submitting'}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-700 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-brand-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
-              >
-                {status === 'submitting'
-                  ? (<><FaSpinner className="animate-spin" aria-hidden="true" /> Submitting…</>)
-                  : (<><FaCalendarCheck aria-hidden="true" /> Book Counselling</>)}
-              </button>
-            </form>
-          )}
+          <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start" aria-label="About counselling">
+            <div className="rf-card p-5">
+              <h2 className="font-heading text-lg font-bold text-gray-900">About counselling</h2>
+              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-gray-700">
+                <li>Counselling helps students understand course and college options.</li>
+                <li>You can discuss academic interests and admission-related next steps.</li>
+                <li>Recommendations depend on the student&apos;s preferences and the information available.</li>
+              </ul>
+            </div>
+            <FormAlert kind="info" title="Please note">
+              Counselling does not guarantee admission, a scholarship or any particular outcome. Submitting this form sends
+              a request; it does not book a confirmed appointment.
+            </FormAlert>
+            <div className="rf-card p-5 text-sm text-gray-700">
+              <p className="font-semibold text-gray-900">Prefer to talk now?</p>
+              <p className="mt-1">Call <a href={`tel:${CONTACT.phoneTel}`} className="font-semibold text-brand-800 underline">{CONTACT.phoneDisplay}</a>.</p>
+              <p className="mt-2">For a general question, use the <Link href="/contact" className="font-semibold text-brand-800 underline">enquiry form</Link>.</p>
+            </div>
+          </aside>
         </div>
       </section>
     </Layout>

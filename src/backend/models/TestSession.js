@@ -50,6 +50,20 @@ const TestSessionSchema = new mongoose.Schema({
         },
     },
 
+    // Question language for this test session
+    language: {
+        type: String,
+        enum: ['English', 'Tamil'],
+        default: 'English',
+    },
+
+    // Configurable pagination setting (5 or 10 questions per page)
+    pageSize: {
+        type: Number,
+        default: 5,
+        enum: [5, 10],
+    },
+
     // Questions assigned to this session (randomized per student)
     questions: {
         type: [{
@@ -74,13 +88,13 @@ const TestSessionSchema = new mongoose.Schema({
     },
     duration: {
         type: Number, // in minutes
-        default: 90, // 90 minutes default
+        default: 90, // 90 minutes official duration
     },
 
     // Scoring
     totalQuestions: {
         type: Number,
-        default: 0,
+        default: 60,
     },
     attemptedQuestions: {
         type: Number,
@@ -127,7 +141,7 @@ const TestSessionSchema = new mongoose.Schema({
 // Calculate score before saving
 TestSessionSchema.pre('save', function (next) {
     if (this.answers && this.answers.length > 0) {
-        this.attemptedQuestions = this.answers.filter(a => a.selectedAnswer !== null).length;
+        this.attemptedQuestions = this.answers.filter(a => a.selectedAnswer !== null && a.selectedAnswer !== '').length;
         this.correctAnswers = this.answers.filter(a => a.isCorrect).length;
         this.score = this.correctAnswers; // 1 mark per correct answer
 
@@ -143,7 +157,9 @@ TestSessionSchema.pre('save', function (next) {
         });
 
         Object.keys(subjectScores).forEach(subject => {
-            this.subjectWiseScore[subject] = subjectScores[subject];
+            if (this.subjectWiseScore && this.subjectWiseScore[subject] !== undefined) {
+                this.subjectWiseScore[subject] = subjectScores[subject];
+            }
         });
     }
 

@@ -1,0 +1,45 @@
+[{
+  "_id": {
+    "$oid": "695b607f0217a564ca26f43f"
+  },
+  "studentId": {
+    "$oid": "695b60680217a564ca26f432"
+  },
+  "registrationToken": "RASI-MK0T3NZ7-N9H4XQ",
+  "subjects": [
+    "Physics",
+    "Chemistry",
+    "Mathematics"
+  ],
+  "questions": [],
+  "startTime": {
+    "$date": "2026-01-05T06:55:59.916Z"
+  },
+  "duration": 90,
+  "totalQuestions": 0,
+  "attemptedQuestions": 0,
+  "correctAnswers": 0,
+  "score": 0,
+  "subjectWiseScore": {
+    "Physics": 0,
+    "Chemistry": 0,
+    "Mathematics": 0,
+    "Botany": 0,
+    "Zoology": 0,
+    "Biology": 0
+  },
+  "status": "completed",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+  "ipAddress": "103.196.28.179",
+  "answers": [],
+  "createdAt": {
+    "$date": "2026-01-05T06:55:59.919Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-05T06:56:36.186Z"
+  },
+  "__v": 0,
+  "endTime": {
+    "$date": "2026-01-05T06:56:36.185Z"
+  }
+}]

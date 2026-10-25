@@ -86,16 +86,18 @@ module.exports = {
         },
       },
       boxShadow: {
-        card: '0 1px 2px rgba(15, 58, 35, 0.06), 0 4px 14px rgba(15, 58, 35, 0.06)',
-        'card-hover': '0 2px 4px rgba(15, 58, 35, 0.08), 0 12px 28px rgba(15, 58, 35, 0.12)',
+        card: '0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03)',
+        'card-hover': '0 6px 16px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04)',
       },
       fontFamily: {
-        heading: ['"Playfair Display"', 'Georgia', 'serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Oswald', '"Arial Narrow"', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        heading: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        body: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        display: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif: ['"Playfair Display"', 'Georgia', 'serif'],
         script: ['Caveat', 'cursive'],
       },
     },
   },
   plugins: [],
-}
+};

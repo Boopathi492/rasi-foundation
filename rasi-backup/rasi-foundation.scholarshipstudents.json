@@ -1,0 +1,73 @@
+[{
+  "_id": {
+    "$oid": "695b60680217a564ca26f432"
+  },
+  "name": "Bhuvankumar",
+  "dateOfBirth": {
+    "$date": "2002-08-17T00:00:00.000Z"
+  },
+  "fatherName": "V",
+  "community": "BC",
+  "address": "namakkal",
+  "studentEmail": "bhuvan@gmail.com",
+  "studentMobile": "8073774591",
+  "fatherMobile": "9600560373",
+  "motherMobile": "",
+  "admissionCourse": "MCA",
+  "collegeName": "kongu engineering college",
+  "plus2Group": "Academic",
+  "plus2ExamNumber": "4556014",
+  "expectedCutOff": 160,
+  "lastStudiedSchool": "rasi ,rasipuram",
+  "studiedInGovtSchool": false,
+  "firstGenerationGraduate": false,
+  "testStatus": "completed",
+  "createdAt": {
+    "$date": "2026-01-05T06:55:36.734Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-05T06:55:59.888Z"
+  },
+  "registrationToken": "RASI-MK0T3NZ7-N9H4XQ",
+  "__v": 0,
+  "testStartTime": {
+    "$date": "2026-01-05T06:55:59.887Z"
+  },
+  "thirdSubject": "Mathematics",
+  "testEndTime": {
+    "$date": "2026-01-05T06:56:36.194Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6976e8a4b7c3543fbaf3dc95"
+  },
+  "name": "bhuvan",
+  "dateOfBirth": {
+    "$date": "2002-08-17T00:00:00.000Z"
+  },
+  "fatherName": "venkateshwaran",
+  "community": "BC",
+  "address": "rasipuram",
+  "studentEmail": "bhuvankumar@gmail.com",
+  "studentMobile": "8888888888",
+  "fatherMobile": "9600560373",
+  "motherMobile": "",
+  "admissionCourse": "MCA",
+  "collegeName": "kec",
+  "plus2Group": "Academic",
+  "plus2ExamNumber": "2545592",
+  "expectedCutOff": 170,
+  "lastStudiedSchool": "rasi",
+  "studiedInGovtSchool": false,
+  "firstGenerationGraduate": true,
+  "testStatus": "registered",
+  "createdAt": {
+    "$date": "2026-01-26T04:08:04.939Z"
+  },
+  "updatedAt": {
+    "$date": "2026-01-26T04:08:04.953Z"
+  },
+  "registrationToken": "RASI-MKUND3YX-X6FASL",
+  "__v": 0
+}]

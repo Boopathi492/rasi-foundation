@@ -1,8 +1,8 @@
+import { useRouter } from 'next/router';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import SEO from './SEO';
 import FloatingButtons from './FloatingButtons';
-import NotificationBar from './NotificationBar';
 
 const Layout = ({
   children,
@@ -14,6 +14,9 @@ const Layout = ({
   noIndex = false,
   structuredData = null
 }) => {
+  const router = useRouter();
+  const isHome = router.pathname === '/';
+
   return (
     <>
       <SEO
@@ -27,7 +30,6 @@ const Layout = ({
       />
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <NotificationBar />
         <main id="main-content" className="flex-grow">{children}</main>
         <Footer />
         <FloatingButtons />

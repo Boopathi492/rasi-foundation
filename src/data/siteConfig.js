@@ -95,3 +95,19 @@ export const TESTIMONIALS = {
   students: [],
   colleges: [],
 };
+
+// Google rating / reviews for the About page. DISABLED until the organisation supplies verified data:
+// no Google Business Profile, Places API or review link exists in this repository (the only Google URL, in
+// pages/contact.js, is a map location pin, not a review page). Never put estimated numbers here.
+// To enable: set enabled to true and fill rating (0-5), reviewCount, profileUrl (official Google
+// Business Profile / Maps link) and optionally writeReviewUrl, lastVerified (e.g. '2026-01-15'), and
+// reviews as [{ author, rating, text, date }] copied exactly from Google.
+export const GOOGLE_REVIEWS = {
+  enabled: false,
+  rating: null,
+  reviewCount: null,
+  profileUrl: '',
+  writeReviewUrl: '',
+  lastVerified: '',
+  reviews: [],
+};

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '@/frontend/components/AdminLayout';
+import Modal from '@/frontend/components/admin/Modal';
+import ConfirmDialog from '@/frontend/components/admin/ConfirmDialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaSearch,
@@ -44,6 +46,8 @@ export default function AdminColleges() {
   const [districtFilter, setDistrictFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [editingCollege, setEditingCollege] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const [seeding, setSeeding] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [formData, setFormData] = useState({

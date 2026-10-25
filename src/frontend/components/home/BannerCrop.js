@@ -5,7 +5,15 @@ import Image from 'next/image';
 // aspect ratio unless `fill` is set (then the parent decides the size and the region must match its ratio).
 const GRID_W = 2000;
 
-export default function BannerCrop({ src, alt, region, fill = false, sizes = '(min-width: 1024px) 40vw, 90vw', className = '', priority = false }) {
+export default function BannerCrop({
+  src,
+  alt,
+  region,
+  fill = false,
+  sizes = '(min-width: 1024px) 40vw, 90vw',
+  className = '',
+  priority = false,
+}) {
   const { x, y, w, h } = region;
   return (
     <div
@@ -19,6 +27,8 @@ export default function BannerCrop({ src, alt, region, fill = false, sizes = '(m
         height={768}
         sizes={sizes}
         priority={priority}
+        loading={priority ? undefined : 'lazy'}
+        quality={82}
         className="absolute max-w-none"
         style={{
           width: `${(GRID_W / w) * 100}%`,

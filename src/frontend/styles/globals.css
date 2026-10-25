@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&family=Oswald:wght@500;600;700&family=Caveat:wght@500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -25,33 +25,32 @@
   box-sizing: border-box;
 }
 
-
-
 html {
   max-width: 100vw;
   overflow-x: hidden;
   scroll-behavior: smooth;
 }
 
-.font-reduce {
-  font-size: 90% !important;
-}
-
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  scroll-behavior: smooth;
-  font-family: 'Inter', system-ui, sans-serif;
-  background: #fbfaf6;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #ffffff;
   color: #1f2937;
+  -webkit-font-smoothing: antialiased;
 }
 
-
+input,
+button,
+select,
+textarea {
+  font-family: inherit;
+}
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.01em;
 }
-
 
 @layer components {
   /*
@@ -62,7 +61,7 @@ h1, h2, h3, h4, h5, h6 {
    */
   .container {
     width: 90%;
-    max-width: 1440px;
+    max-width: 1320px;
     margin-inline: auto;
   }
 
@@ -72,17 +71,46 @@ h1, h2, h3, h4, h5, h6 {
     }
   }
 
-  /* Rasi design tokens: buttons (green primary, outline, gold highlight) and cards */
+  /* Institutional button & surface tokens using official Rasi Foundation colors */
   .rf-btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors duration-200
-           focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold
+           transition-colors duration-150 ease-out
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2
+           disabled:cursor-not-allowed disabled:opacity-65;
   }
-  .rf-btn-primary { @apply rf-btn bg-brand-700 text-white shadow-sm hover:bg-brand-800 active:bg-brand-900; }
-  .rf-btn-outline { @apply rf-btn border border-brand-600 bg-white text-brand-800 hover:bg-brand-50 active:bg-brand-100; }
-  .rf-btn-gold { @apply rf-btn bg-gold-400 text-brand-900 shadow-sm hover:bg-gold-300 active:bg-gold-500; }
-  .rf-btn-light { @apply rf-btn bg-white text-brand-800 hover:bg-brand-50; }
-  .rf-card { @apply rounded-2xl border border-gray-200 bg-white shadow-card; }
-  .rf-eyebrow { @apply text-sm font-semibold uppercase tracking-[0.16em] text-rasi-700; }
+  .rf-btn-primary {
+    @apply rf-btn border border-[#075544] bg-[#075544] text-white shadow-sm
+           hover:border-[#054235] hover:bg-[#054235];
+  }
+  .rf-btn-maroon {
+    @apply rf-btn border border-[#b0102e] bg-[#b0102e] text-white shadow-sm
+           hover:border-[#8f0b24] hover:bg-[#8f0b24]
+           focus-visible:ring-crimson;
+  }
+  .rf-btn-outline {
+    @apply rf-btn border border-[#075544]/35 bg-white text-[#075544] shadow-sm
+           hover:border-[#075544] hover:bg-[#f3f8f5] hover:text-[#054235];
+  }
+  .rf-btn-gold {
+    @apply rf-btn border border-[#c8921f]/40 bg-[#dfaa32] text-[#182c23] shadow-sm
+           hover:bg-[#d29d26];
+  }
+  .rf-btn-light {
+    @apply rf-btn border border-gray-200 bg-white text-brand-900 shadow-sm
+           hover:bg-gray-50;
+  }
+  .rf-phone-link {
+    @apply inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-[#f8faf9] px-3 py-1.5 text-xs font-semibold text-forest
+           transition-colors duration-150 hover:border-forest/40 hover:bg-forest/5 hover:text-crimson
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-1;
+  }
+  .rf-phone-link-maroon {
+    @apply inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-[#fdf8f9] px-3 py-1.5 text-xs font-semibold text-crimson
+           transition-colors duration-150 hover:border-crimson/40 hover:bg-crimson/5 hover:text-forest
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-crimson focus-visible:ring-offset-1;
+  }
+  .rf-card { @apply rounded-xl border border-gray-200 bg-white shadow-card; }
+  .rf-eyebrow { @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-forest; }
   .premium-section {
     @apply bg-white/90 rounded-2xl shadow-xl p-6 md:p-10 mb-10 border border-gray-100;
   }
@@ -94,16 +122,13 @@ h1, h2, h3, h4, h5, h6 {
     @apply bg-brand-700 text-white px-7 py-3 rounded-xl font-semibold tracking-wide shadow-md hover:bg-brand-800 transition-colors duration-200 border-0;
   }
 
-
   .btn-secondary {
     @apply bg-gold-400 text-brand-900 px-7 py-3 rounded-xl font-semibold tracking-wide shadow-md hover:bg-gold-300 transition-colors duration-200 border-0;
   }
 
-
   .btn-outline {
     @apply border-2 border-brand-700 text-brand-800 px-7 py-3 rounded-xl font-semibold tracking-wide bg-white hover:bg-brand-700 hover:text-white transition-colors duration-200;
   }
-
 
   .card {
     @apply bg-white rounded-2xl shadow-card border border-gray-200 overflow-hidden p-6 md:p-8;
@@ -113,11 +138,9 @@ h1, h2, h3, h4, h5, h6 {
     @apply transform hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300;
   }
 
-
   .section-title {
     @apply text-4xl md:text-5xl font-extrabold text-gray-800 mb-4 tracking-tight drop-shadow-sm;
   }
-
 
   .section-subtitle {
     @apply text-lg md:text-xl text-gray-600 max-w-2xl mx-auto font-medium;
@@ -241,10 +264,10 @@ h1, h2, h3, h4, h5, h6 {
   animation: slideIn 0.4s ease-out forwards;
 }
 
-
 @media (prefers-reduced-motion: reduce) {
   .animate-float,
-  .animate-pulse-glow {
+  .animate-pulse-glow,
+  .animate-bounce-slow {
     animation: none !important;
   }
 }

@@ -1,106 +1,147 @@
-import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { FaEye, FaBullseye, FaPause, FaPlay, FaChevronLeft, FaChevronRight, FaArrowRight } from 'react-icons/fa';
+import { FaEye, FaBullseye, FaArrowRight, FaCompass, FaAward } from 'react-icons/fa';
 import BannerCrop from './BannerCrop';
 import Reveal from './Reveal';
-import { usePrefersReducedMotion } from './Marquee';
 
-// Square crops of the supplied banner photography (2000 x 750 grid), chosen to avoid baked-in banner text.
-const SLIDES = [
-  { src: '/images/banners/hero-5-students-today-leaders-tomorrow.png', alt: 'Students walking together on a college campus', region: { x: 900, y: 100, w: 580, h: 580 } },
-  { src: '/images/banners/hero-4-step-into-brighter-future.png', alt: 'Students walking along a campus path', region: { x: 1120, y: 320, w: 380, h: 380 } },
-  { src: '/images/banners/hero-2-right-guidance.png', alt: 'A smiling student holding books on campus', region: { x: 880, y: 60, w: 420, h: 420 } },
+const CARDS = [
+  {
+    tag: '01 • Future Outlook',
+    title: 'Our Vision',
+    Icon: FaEye,
+    BadgeIcon: FaCompass,
+    badgeLabel: 'Trusted Career Guidance',
+    text: 'To be the most trusted and preferred education consultancy, recognised for transforming lives through quality guidance and creating successful professionals who contribute to society.',
+    image: {
+      src: '/images/banners/hero-5-students-today-leaders-tomorrow.png',
+      alt: 'Students walking together on a college campus',
+      region: { x: 860, y: 70, w: 720, h: 360 },
+    },
+    accentBorder: 'border-t-4 border-t-forest',
+    iconClass: 'bg-forest/10 text-forest',
+    tagClass: 'bg-forest text-white',
+    linkClass: 'text-forest hover:text-crimson',
+  },
+  {
+    tag: '02 • Core Commitment',
+    title: 'Our Mission',
+    Icon: FaBullseye,
+    BadgeIcon: FaAward,
+    badgeLabel: 'Student-First Support',
+    text: 'To empower students with the knowledge, guidance and support they need to make informed career decisions and secure admissions in institutions that align with their aspirations and potential.',
+    image: {
+      src: '/images/banners/hero-2-right-guidance.png',
+      alt: 'A smiling student holding books on campus',
+      region: { x: 820, y: 30, w: 680, h: 340 },
+    },
+    accentBorder: 'border-t-4 border-t-crimson',
+    iconClass: 'bg-crimson/10 text-crimson',
+    tagClass: 'bg-crimson text-white',
+    linkClass: 'text-crimson hover:text-forest',
+  },
 ];
 
-const INTERVAL_MS = 5000;
-
-function PurposeCard({ icon: Icon, title, shape, className, children }) {
-  return (
-    <article className={`relative flex flex-col justify-center overflow-hidden px-7 py-8 text-white shadow-[0_18px_40px_rgba(15,40,30,0.22)] sm:px-8 lg:min-h-[300px] lg:py-10 ${shape} ${className}`}>
-      <span aria-hidden="true" className="absolute -right-12 -top-14 h-44 w-44 rounded-full border border-white/20" />
-      <span aria-hidden="true" className="absolute -bottom-16 -left-10 h-40 w-40 rounded-full border border-gold-300/30" />
-      <span className="relative mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-white/40 bg-white/10 text-xl text-white">
-        <Icon aria-hidden="true" />
-      </span>
-      <h3 className="relative font-heading text-2xl font-bold">{title}</h3>
-      <p className="relative mt-3 text-sm leading-relaxed text-white/90">{children}</p>
-    </article>
-  );
-}
-
 export default function VisionMission() {
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [hover, setHover] = useState(false);
-  const reduced = usePrefersReducedMotion();
-  const count = SLIDES.length;
-  const go = useCallback((i) => setIndex(((i % count) + count) % count), [count]);
-
-  useEffect(() => {
-    if (reduced || paused || hover) return undefined;
-    const timer = setInterval(() => setIndex((current) => (current + 1) % count), INTERVAL_MS);
-    return () => clearInterval(timer);
-  }, [reduced, paused, hover, count]);
-
-  const ctrl = 'flex h-8 w-8 items-center justify-center rounded-full border border-white/80 bg-white/90 text-xs text-brand-900 shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700';
-
   return (
-    <section aria-labelledby="vm-heading" className="relative overflow-hidden bg-gradient-to-br from-[#fff7f5] via-[#fffdfa] to-[#fdf6e4] py-14 md:py-20">
-      <span aria-hidden="true" className="pointer-events-none absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-gold-200/40 blur-2xl" />
-      <span aria-hidden="true" className="pointer-events-none absolute -right-24 top-0 h-72 w-72 rounded-full bg-rasi-100/60 blur-2xl" />
-      <div className="container relative mx-auto grid items-center gap-10 xl:grid-cols-[0.55fr_2fr] xl:gap-6">
-        <Reveal>
-          <p className="rf-eyebrow">Our Purpose</p>
-          <h2 id="vm-heading" className="mt-2 font-heading text-3xl font-bold leading-tight text-gray-900 md:text-4xl">Vision and Mission</h2>
-          <span aria-hidden="true" className="mt-4 block h-1 w-16 rounded-full bg-rasi-700" />
-          <p className="mt-5 max-w-md text-sm leading-relaxed text-gray-600">
-            To empower students with the guidance and opportunities to make informed education and career decisions.
-          </p>
-          <Link href="/about" className="mt-6 inline-flex items-center gap-2 rounded-full border border-rasi-600 bg-white px-5 py-2.5 text-xs font-semibold text-rasi-700 transition-colors hover:bg-rasi-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-rasi-700 focus-visible:ring-offset-2">
-            Know More About Us <FaArrowRight aria-hidden="true" />
-          </Link>
-        </Reveal>
-
-        <div className="flex flex-col items-stretch gap-5 lg:flex-row lg:items-center lg:gap-0">
-          <Reveal className="lg:z-0 lg:-mr-12 lg:flex-1">
-            <PurposeCard icon={FaEye} title="Our Vision" shape="rounded-[2rem] lg:rounded-[2rem_3.5rem_3.5rem_2rem]" className="bg-gradient-to-br from-[#0a6a52] to-[#054534] lg:pr-16">
-              To be the most trusted and preferred education consultancy, recognised for transforming lives through quality guidance and creating successful professionals who contribute to society.
-            </PurposeCard>
+    <section
+      aria-labelledby="vm-heading"
+      className="relative overflow-hidden border-b border-gray-200/80 bg-[#f8faf9] py-16 md:py-20"
+    >
+      <div className="container relative mx-auto px-4">
+        {/* Section Header */}
+        <div className="mb-10 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+          <Reveal className="max-w-2xl">
+            <p className="rf-eyebrow">
+              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-crimson" />
+              Our Purpose
+            </p>
+            <h2 id="vm-heading" className="mt-2 font-heading text-3xl font-bold leading-tight text-gray-900 md:text-4xl">
+              Vision and <span className="text-crimson">Mission</span>
+            </h2>
+            <div aria-hidden="true" className="mt-3 h-0.5 w-12 bg-forest" />
+            <p className="mt-4 text-sm leading-relaxed text-gray-600 sm:text-base">
+              To empower students with the guidance and opportunities to make informed education and career decisions.
+            </p>
           </Reveal>
 
-          <Reveal delay={0.06} className="relative z-10 mx-auto w-full max-w-[300px] shrink-0 lg:w-[300px]">
-            <div
-              className="relative aspect-square overflow-hidden rounded-full border-[10px] border-white bg-brand-100 shadow-[0_20px_50px_rgba(20,60,50,.28)] ring-1 ring-gold-300"
-              onMouseEnter={() => setHover(true)}
-              onMouseLeave={() => setHover(false)}
-              onFocus={() => setHover(true)}
-              onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setHover(false); }}
+          <Reveal delay={0.06}>
+            <Link
+              href="/about"
+              className="rf-btn-outline px-5 py-2.5 text-xs sm:text-sm"
             >
-              {SLIDES.map((slide, i) => (
-                <div key={slide.src} aria-hidden={i !== index} className={`absolute inset-0 transition-opacity duration-700 motion-reduce:transition-none ${i === index ? 'opacity-100' : 'opacity-0'}`}>
-                  <BannerCrop src={slide.src} alt={i === index ? slide.alt : ''} region={slide.region} fill sizes="300px" className="h-full w-full" />
-                </div>
-              ))}
-              <div className="absolute inset-x-0 bottom-3 z-10 flex items-center justify-center gap-2">
-                <button type="button" onClick={() => go(index - 1)} aria-label="Previous image" className={ctrl}><FaChevronLeft aria-hidden="true" /></button>
-                <button type="button" disabled={reduced} onClick={() => setPaused((value) => !value)} aria-label={reduced ? 'Automatic slideshow disabled by reduced-motion preference' : paused ? 'Play image slideshow' : 'Pause image slideshow'} className={`${ctrl} disabled:cursor-default disabled:opacity-70`}>
-                  {paused || reduced ? <FaPlay aria-hidden="true" /> : <FaPause aria-hidden="true" />}
-                </button>
-                <button type="button" onClick={() => go(index + 1)} aria-label="Next image" className={ctrl}><FaChevronRight aria-hidden="true" /></button>
-              </div>
-            </div>
-            <div className="mt-3 flex justify-center gap-2" role="group" aria-label="Choose campus image">
-              {SLIDES.map((slide, i) => (
-                <button key={slide.src} type="button" onClick={() => go(i)} aria-label={`Show image ${i + 1} of ${count}`} aria-current={i === index} className={`h-2 rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 ${i === index ? 'w-6 bg-rasi-700' : 'w-2 bg-gray-300'}`} />
-              ))}
-            </div>
+              <span>Know More About Us</span>
+              <FaArrowRight aria-hidden="true" />
+            </Link>
           </Reveal>
+        </div>
 
-          <Reveal delay={0.12} className="lg:z-0 lg:-ml-12 lg:flex-1">
-            <PurposeCard icon={FaBullseye} title="Our Mission" shape="rounded-[2rem] lg:rounded-[3.5rem_2rem_2rem_3.5rem]" className="bg-gradient-to-br from-[#a8112c] to-[#7d0a1f] lg:pl-16">
-              To empower students with the knowledge, guidance and support they need to make informed career decisions and secure admissions in institutions that align with their aspirations and potential.
-            </PurposeCard>
-          </Reveal>
+        {/* Two Balanced Institutional Cards */}
+        <div className="grid gap-8 lg:grid-cols-2">
+          {CARDS.map((card, idx) => {
+            const { tag, title, Icon, BadgeIcon, badgeLabel, text, image, accentBorder, iconClass, tagClass, linkClass } = card;
+            return (
+              <Reveal key={title} delay={idx * 0.08} className="h-full">
+                <article
+                  className={`group flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-card transition-shadow duration-200 hover:shadow-card-hover ${accentBorder}`}
+                >
+                  {/* Visual Campus Image Header */}
+                  <div className="relative aspect-[2/1] w-full overflow-hidden bg-gray-100">
+                    <BannerCrop
+                      src={image.src}
+                      alt={image.alt}
+                      region={image.region}
+                      fill
+                      sizes="(min-width: 1024px) 560px, 95vw"
+                      className="h-full w-full"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent"
+                    />
+
+                    {/* Top-left tag pill */}
+                    <span className={`absolute left-4 top-4 inline-flex items-center rounded-md px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider shadow-sm ${tagClass}`}>
+                      {tag}
+                    </span>
+
+                    {/* Bottom-right visual badge */}
+                    <span className="absolute bottom-3 right-4 inline-flex items-center gap-1.5 rounded-md bg-white/95 px-2.5 py-1 text-xs font-semibold text-gray-800 shadow-sm">
+                      <BadgeIcon className="text-forest" aria-hidden="true" />
+                      <span>{badgeLabel}</span>
+                    </span>
+                  </div>
+
+                  {/* Card Content Body */}
+                  <div className="flex flex-1 flex-col justify-between p-6 sm:p-8">
+                    <div>
+                      <div className="flex items-center gap-3">
+                        <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-lg ${iconClass}`}>
+                          <Icon aria-hidden="true" />
+                        </span>
+                        <h3 className="font-heading text-2xl font-bold text-gray-900">
+                          {title}
+                        </h3>
+                      </div>
+
+                      <p className="mt-4 text-sm leading-relaxed text-gray-600 sm:text-base">
+                        {text}
+                      </p>
+                    </div>
+
+                    <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-4 text-xs font-medium text-gray-500">
+                      <span>Rasi Foundation • Rasipuram, Tamil Nadu</span>
+                      <Link
+                        href="/about"
+                        className={`inline-flex items-center gap-1.5 font-semibold focus:outline-none focus-visible:underline ${linkClass}`}
+                      >
+                        <span>Learn more</span>
+                        <FaArrowRight className="text-[10px]" aria-hidden="true" />
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>

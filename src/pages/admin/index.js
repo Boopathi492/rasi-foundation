@@ -4,40 +4,51 @@ import Link from 'next/link';
 import {
   FaEnvelope,
   FaUserGraduate,
-  FaQuestionCircle,
   FaUniversity,
-  FaArrowRight,
   FaSpinner,
   FaClock,
   FaCheckCircle,
   FaExclamationCircle,
   FaTrophy,
   FaAward,
-  FaCreditCard,
-  FaChartLine,
-  FaPlusCircle
+  FaIdCard,
+  FaComments,
+  FaImages,
+  FaBook,
+  FaFileAlt,
+  FaShieldAlt,
+  FaServer,
+  FaArrowRight,
+  FaPlus,
 } from 'react-icons/fa';
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState(null);
-  const [recentItems, setRecentItems] = useState(null);
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
+    const stored = localStorage.getItem('adminUser');
+    if (stored) {
+      try {
+        setUser(JSON.parse(stored));
+      } catch {
+        // Ignore
+      }
+    }
   }, []);
 
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('adminToken');
       const response = await fetch('/api/admin/dashboard', {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setStats(data.stats);
-        setRecentItems(data.recent);
+        const json = await response.json();
+        setData(json);
       }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
@@ -46,248 +57,316 @@ export default function AdminDashboard() {
     }
   };
 
-  const statCards = [
-    {
-      title: 'Total Contacts',
-      value: stats?.contacts?.total || 0,
-      new: stats?.contacts?.new || 0,
-      icon: FaEnvelope,
-      color: 'blue',
-      href: '/admin/contacts'
-    },
-    {
-      title: 'Total Enquiries',
-      value: stats?.enquiries?.total || 0,
-      new: stats?.enquiries?.pending || 0,
-      icon: FaUserGraduate,
-      color: 'green',
-      href: '/admin/enquiries'
-    },
-    {
-      title: 'Total Questions',
-      value: stats?.questions?.total || 0,
-      new: stats?.questions?.unanswered || 0,
-      icon: FaQuestionCircle,
-      color: 'purple',
-      href: '/admin/questions'
-    },
-    {
-      title: 'Partner Colleges',
-      value: stats?.colleges?.total || 0,
-      new: stats?.colleges?.active || 0,
-      newLabel: 'active',
-      icon: FaUniversity,
-      color: 'orange',
-      href: '/admin/colleges'
-    }
-  ];
-
-  const colorClasses = {
-    blue: {
-      bg: 'bg-blue-50',
-      icon: 'bg-blue-500',
-      text: 'text-blue-600',
-      badge: 'bg-blue-100 text-blue-700'
-    },
-    green: {
-      bg: 'bg-green-50',
-      icon: 'bg-green-500',
-      text: 'text-green-600',
-      badge: 'bg-green-100 text-green-700'
-    },
-    purple: {
-      bg: 'bg-purple-50',
-      icon: 'bg-purple-500',
-      text: 'text-purple-600',
-      badge: 'bg-purple-100 text-purple-700'
-    },
-    orange: {
-      bg: 'bg-orange-50',
-      icon: 'bg-orange-500',
-      text: 'text-orange-600',
-      badge: 'bg-orange-100 text-orange-700'
-    }
-  };
-
   if (loading) {
     return (
-      <AdminLayout title="Dashboard">
-        <div className="flex items-center justify-center h-64">
-          <FaSpinner className="animate-spin text-4xl text-red-600" />
+      <AdminLayout title="System Control Center">
+        <div className="flex flex-col items-center justify-center h-80 gap-3">
+          <FaSpinner className="animate-spin text-3xl text-blue-600" />
+          <p className="text-xs text-slate-500 font-medium">Loading real-time analytics...</p>
         </div>
       </AdminLayout>
     );
   }
 
+  const stats = data?.stats || {};
+  const distributions = data?.distributions || {};
+  const recent = data?.recent || {};
+
+  const kpis = [
+    {
+      title: 'Student BioData',
+      value: stats.students?.total || 0,
+      subValue: `+${stats.students?.new30d || 0} this month`,
+      subColor: 'text-emerald-600 font-semibold',
+      icon: FaIdCard,
+      color: 'blue',
+      href: '/admin/biodata',
+    },
+    {
+      title: 'Enquiries Received',
+      value: stats.enquiries?.total || 0,
+      subValue: `${stats.enquiries?.pending || 0} pending action`,
+      subColor: stats.enquiries?.pending > 0 ? 'text-amber-600 font-semibold' : 'text-slate-500',
+      icon: FaUserGraduate,
+      color: 'amber',
+      href: '/admin/enquiries',
+    },
+    {
+      title: 'Counselling Sessions',
+      value: stats.counselling?.total || 0,
+      subValue: `${stats.counselling?.scheduled || 0} scheduled upcoming`,
+      subColor: 'text-blue-600 font-semibold',
+      icon: FaComments,
+      color: 'teal',
+      href: '/admin/counselling',
+    },
+    {
+      title: 'Feedback & Reviews',
+      value: stats.feedback?.total || 0,
+      subValue: `${stats.feedback?.pending || 0} pending approval`,
+      subColor: stats.feedback?.pending > 0 ? 'text-rose-600 font-semibold' : 'text-emerald-600',
+      icon: FaCheckCircle,
+      color: 'rose',
+      href: '/admin/feedback',
+    },
+    {
+      title: 'Partner Colleges',
+      value: stats.colleges?.total || 0,
+      subValue: `${stats.colleges?.active || 0} active in catalogue`,
+      subColor: 'text-slate-500',
+      icon: FaUniversity,
+      color: 'indigo',
+      href: '/admin/colleges',
+    },
+    {
+      title: 'Degree Courses',
+      value: stats.courses?.total || 0,
+      subValue: `${stats.courses?.active || 0} active branches`,
+      subColor: 'text-slate-500',
+      icon: FaBook,
+      color: 'cyan',
+      href: '/admin/courses',
+    },
+    {
+      title: 'Active Banners',
+      value: stats.banners?.active || 0,
+      subValue: 'Dynamic home & pages',
+      subColor: 'text-slate-500',
+      icon: FaImages,
+      color: 'purple',
+      href: '/admin/banners',
+    },
+    {
+      title: 'System Health',
+      value: stats.monitoring?.unresolvedErrors === 0 ? 'Optimal' : `${stats.monitoring?.unresolvedErrors} Issues`,
+      subValue: stats.monitoring?.unresolvedErrors === 0 ? '0 unresolved errors' : 'Requires admin attention',
+      subColor: stats.monitoring?.unresolvedErrors === 0 ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold',
+      icon: FaServer,
+      color: stats.monitoring?.unresolvedErrors === 0 ? 'emerald' : 'rose',
+      href: '/admin/logs',
+    },
+  ];
+
+  const colorStyles = {
+    blue: { bg: 'bg-emerald-50/60', icon: 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-emerald-500/25', border: 'border-emerald-100 hover:border-emerald-300' },
+    amber: { bg: 'bg-amber-50/60', icon: 'bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-amber-500/25', border: 'border-amber-100 hover:border-amber-300' },
+    teal: { bg: 'bg-teal-50/60', icon: 'bg-gradient-to-br from-teal-600 to-cyan-700 text-white shadow-teal-500/25', border: 'border-teal-100 hover:border-teal-300' },
+    rose: { bg: 'bg-rose-50/60', icon: 'bg-gradient-to-br from-red-600 to-rose-700 text-white shadow-rose-500/25', border: 'border-rose-100 hover:border-rose-300' },
+    indigo: { bg: 'bg-indigo-50/60', icon: 'bg-gradient-to-br from-indigo-600 to-blue-700 text-white shadow-indigo-500/25', border: 'border-indigo-100 hover:border-indigo-300' },
+    cyan: { bg: 'bg-cyan-50/60', icon: 'bg-gradient-to-br from-cyan-600 to-teal-700 text-white shadow-cyan-500/25', border: 'border-cyan-100 hover:border-cyan-300' },
+    purple: { bg: 'bg-purple-50/60', icon: 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-purple-500/25', border: 'border-purple-100 hover:border-purple-300' },
+    emerald: { bg: 'bg-emerald-50/60', icon: 'bg-gradient-to-br from-emerald-600 to-green-700 text-white shadow-emerald-500/25', border: 'border-emerald-100 hover:border-emerald-300' },
+  };
+
   return (
-    <AdminLayout title="System Overview">
-      {/* Welcome & Time Banner */}
-      <div className="relative overflow-hidden bg-[#0f172a] rounded-[2rem] p-8 mb-8 text-white shadow-2xl">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+    <AdminLayout title="Operational Control Center">
+      {/* Welcome Hero Banner with 3D Depth & Brand Styling */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#075544] via-[#0b1329] to-[#0a101f] rounded-3xl p-6 lg:p-9 mb-8 text-white shadow-xl border border-emerald-900/40 relative">
+        {/* Subtle background ambient glow */}
+        <div
+          aria-hidden="true"
+          className="absolute -top-24 -right-24 w-80 h-80 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute -bottom-24 -left-24 w-80 h-80 bg-red-600/10 rounded-full blur-3xl pointer-events-none"
+        />
+
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h2 className="text-3xl font-black mb-2 tracking-tight">System Control Center</h2>
-            <p className="text-slate-400 font-medium">Monitoring RASI Foundation digital infrastructure and student success metrics.</p>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold mb-3 border border-emerald-500/30 backdrop-blur-md">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              Rasi Trust Management Suite • Live Active
+            </div>
+            <h2 className="text-2xl lg:text-3xl font-extrabold tracking-tight mb-2 text-white">
+              Welcome back, {user?.name || user?.username || 'Administrator'}
+            </h2>
+            <p className="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
+              Monitoring real-time student registrations, admissions counselling, affiliated institutions, and website engagement.
+            </p>
           </div>
-          <div className="flex items-center gap-4 bg-white/5 backdrop-blur-xl px-6 py-3 rounded-2xl border border-white/10">
-            <FaClock className="text-red-500" />
-            <span className="font-mono text-sm font-bold">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <Link
+              href="/admin/reports"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white text-xs font-bold shadow-lg shadow-emerald-950/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <FaFileAlt />
+              <span>Export Reports</span>
+            </Link>
+            <div className="flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-slate-700/80 text-xs text-slate-300">
+              <FaClock className="text-amber-400" />
+              <span className="font-mono">
+                {new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Premium Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        {statCards.map((stat) => (
-          <Link key={stat.title} href={stat.href}>
-            <div className="group bg-white rounded-[2rem] p-8 border border-slate-100 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all duration-500 cursor-pointer relative overflow-hidden">
-              <div className={`absolute top-0 right-0 w-24 h-24 bg-${stat.color}-500/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700`}></div>
-              <div className="relative z-10">
-                <div className={`w-14 h-14 ${colorClasses[stat.color].icon} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:rotate-6 transition-transform duration-500 text-white text-2xl`}>
-                  <stat.icon />
+      {/* KPI Cards Grid with 3D Depth and Elevated Shadows */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {kpis.map((kpi) => {
+          const style = colorStyles[kpi.color] || colorStyles.blue;
+          return (
+            <Link key={kpi.title} href={kpi.href}>
+              <div className={`p-5 rounded-2xl bg-white border ${style.border} hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group cursor-pointer relative overflow-hidden shadow-xs`}>
+                <div className="flex items-start justify-between mb-3.5">
+                  <div className={`w-11 h-11 rounded-2xl ${style.icon} flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform`}>
+                    <kpi.icon />
+                  </div>
+                  <FaArrowRight className="text-slate-300 group-hover:text-emerald-700 group-hover:translate-x-1 transition-all text-xs mt-1" />
                 </div>
-                <p className="text-slate-500 text-xs font-black uppercase tracking-widest mb-1">{stat.title}</p>
-                <div className="flex items-baseline gap-3">
-                  <p className="text-4xl font-black text-slate-900 tracking-tighter">{stat.value}</p>
-                  {stat.new > 0 && (
-                    <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-lg ${colorClasses[stat.color].badge}`}>
-                      +{stat.new} {stat.newLabel || 'New'}
-                    </span>
-                  )}
-                </div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">{kpi.title}</p>
+                <p className="text-2xl font-black text-slate-900 tracking-tight mb-1">{kpi.value}</p>
+                <p className={`text-xs ${kpi.subColor}`}>{kpi.subValue}</p>
               </div>
-            </div>
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Quick Actions Strip */}
+      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs mb-8">
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick Administrative Actions</p>
+        <div className="flex flex-wrap gap-2.5">
+          <Link
+            href="/admin/banners"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 text-xs font-semibold transition-all hover:scale-[1.02]"
+          >
+            <FaPlus className="text-[10px] text-emerald-600" />
+            <span>Add Banner</span>
           </Link>
-        ))}
-      </div>
-
-      {/* Quick Actions & Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-        {/* Quick Actions */}
-        <div className="lg:col-span-1 bg-[#0f172a] rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden">
-          <div className="absolute bottom-0 right-0 w-32 h-32 bg-red-600/10 rounded-full blur-3xl"></div>
-          <h3 className="text-xl font-black mb-8 tracking-tight flex items-center gap-3">
-            <FaPlusCircle className="text-red-500" />
-            Quick Entry
-          </h3>
-          <div className="space-y-4">
-            {[
-              { label: 'Add Scholarship Question', icon: FaQuestionCircle, href: '/admin/questions' },
-              { label: 'Register Partner College', icon: FaUniversity, href: '/admin/colleges' },
-              { label: 'Post Achievement', icon: FaAward, href: '/admin/achievements' },
-              { label: 'Check Payments', icon: FaCreditCard, href: '/admin/payments' }
-            ].map((action, i) => (
-              <Link key={i} href={action.href} className="flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 transition-all group">
-                <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
-                  <action.icon />
-                </div>
-                <span className="font-bold text-sm tracking-tight">{action.label}</span>
-                <FaArrowRight className="ml-auto text-xs opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Performance Snapshot */}
-        <div className="lg:col-span-2 bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h3 className="text-xl font-black text-slate-900 tracking-tight">Scholarship Pulse</h3>
-              <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Test Completion Metrics</p>
-            </div>
-            <FaChartLine className="text-slate-200 text-4xl" />
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-            {[
-              { label: 'Completion Rate', value: '84%', color: 'from-blue-500 to-indigo-600' },
-              { label: 'Avg. Score', value: '68/100', color: 'from-purple-500 to-pink-600' },
-              { label: 'Active Sessions', value: '12', color: 'from-orange-500 to-amber-600' },
-              { label: 'Pending Verification', value: '28', color: 'from-red-500 to-rose-600' }
-            ].map((metric, i) => (
-              <div key={i} className="text-center">
-                <div className={`w-full aspect-square rounded-[2rem] bg-gradient-to-br ${metric.color} flex items-center justify-center mb-4 shadow-lg`}>
-                  <span className="text-white font-black text-xl">{metric.value}</span>
-                </div>
-                <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{metric.label}</p>
-              </div>
-            ))}
-          </div>
+          <Link
+            href="/admin/feedback"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 text-xs font-semibold transition-all hover:scale-[1.02]"
+          >
+            <FaCheckCircle className="text-[10px] text-emerald-600" />
+            <span>Moderate Testimonials</span>
+          </Link>
+          <Link
+            href="/admin/counselling"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 text-xs font-semibold transition-all hover:scale-[1.02]"
+          >
+            <FaComments className="text-[10px] text-teal-600" />
+            <span>Schedule Counselling</span>
+          </Link>
+          <Link
+            href="/admin/colleges"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 text-xs font-semibold transition-all hover:scale-[1.02]"
+          >
+            <FaUniversity className="text-[10px] text-indigo-600" />
+            <span>Manage Colleges</span>
+          </Link>
+          <Link
+            href="/admin/courses"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 text-xs font-semibold transition-all hover:scale-[1.02]"
+          >
+            <FaBook className="text-[10px] text-cyan-600" />
+            <span>Manage Courses</span>
+          </Link>
+          <Link
+            href="/admin/reports"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-xs font-bold transition-all hover:scale-[1.02]"
+          >
+            <FaFileAlt className="text-[10px] text-emerald-600" />
+            <span>Download Excel / PDF Report</span>
+          </Link>
         </div>
       </div>
 
-      {/* Interaction Logs */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Contacts */}
-        <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
+      {/* Analytics Breakdown & Recent Feeds */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* District Distribution (Real DB aggregation) */}
+        <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs lg:col-span-1">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-xl font-black text-slate-900 tracking-tight">Direct Communications</h3>
-              <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Recent Portal Messages</p>
+              <h3 className="text-sm font-bold text-slate-800">Student District Distribution</h3>
+              <p className="text-[11px] text-slate-400">Top registrations by Tamil Nadu district</p>
             </div>
-            <Link href="/admin/contacts" className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
-              <FaArrowRight className="text-xs" />
+            <Link href="/admin/biodata" className="text-xs text-emerald-700 hover:underline font-semibold">
+              View all
             </Link>
           </div>
-          <div className="space-y-4">
-            {recentItems?.contacts?.length > 0 ? (
-              recentItems.contacts.map((contact) => (
-                <div key={contact._id} className="p-5 flex items-center gap-4 rounded-2xl bg-slate-50/50 hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100 group">
-                  <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center font-black text-slate-900 shadow-sm group-hover:scale-110 transition-transform">
-                    {contact.name.charAt(0)}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start mb-1">
-                      <p className="font-bold text-slate-900">{contact.name}</p>
-                      <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${contact.status === 'new' ? 'bg-red-100 text-red-700' : 'bg-slate-200 text-slate-600'
-                        }`}>
-                        {contact.status}
+
+          <div className="space-y-3">
+            {distributions.districts && distributions.districts.length > 0 ? (
+              distributions.districts.map((dist, idx) => {
+                const totalStudents = stats.students?.total || 1;
+                const pct = Math.min(100, Math.round((dist.count / totalStudents) * 100));
+                return (
+                  <div key={dist.name || idx} className="space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-medium text-slate-700">{dist.name || 'Unspecified'}</span>
+                      <span className="text-slate-500 font-mono text-[11px]">
+                        {dist.count} ({pct}%)
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 font-medium truncate max-w-[200px]">{contact.subject}</p>
+                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-emerald-600 to-teal-500 rounded-full transition-all duration-500"
+                        style={{ width: `${Math.max(8, pct)}%` }}
+                      />
+                    </div>
                   </div>
-                  <p className="text-[10px] text-slate-300 font-mono">{new Date(contact.createdAt).toLocaleDateString()}</p>
-                </div>
-              ))
+                );
+              })
             ) : (
-              <div className="py-20 text-center text-slate-300 font-bold italic tracking-tight">Digital silence... No recent logs.</div>
+              <p className="text-xs text-slate-400 text-center py-8">No district records yet</p>
             )}
           </div>
         </div>
 
-        {/* Recent Enquiries */}
-        <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
+        {/* Recent Administrative Audit Trail */}
+        <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs lg:col-span-2">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-xl font-black text-slate-900 tracking-tight">Prospect Pipeline</h3>
-              <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Live Admission Enquiries</p>
+              <h3 className="text-sm font-bold text-slate-800">Administrative Audit Trail</h3>
+              <p className="text-[11px] text-slate-400">Tamper-resistant audit log of recent staff actions</p>
             </div>
-            <Link href="/admin/enquiries" className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
-              <FaArrowRight className="text-xs" />
+            <Link href="/admin/audit" className="text-xs text-blue-600 hover:underline font-medium">
+              Full log →
             </Link>
           </div>
-          <div className="space-y-4">
-            {recentItems?.enquiries?.length > 0 ? (
-              recentItems.enquiries.map((enquiry) => (
-                <div key={enquiry._id} className="p-5 flex items-center gap-4 rounded-2xl bg-slate-50/50 hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100 group">
-                  <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-indigo-600 shadow-sm group-hover:scale-110 transition-transform">
-                    <FaUserGraduate />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start mb-1">
-                      <p className="font-bold text-slate-900">{enquiry.name}</p>
-                      <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${enquiry.status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'
-                        }`}>
-                        {enquiry.status}
-                      </span>
+
+          <div className="divide-y divide-slate-100">
+            {recent.activity && recent.activity.length > 0 ? (
+              recent.activity.map((act) => (
+                <div key={act._id} className="py-3 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 text-xs shrink-0 font-bold">
+                      {(act.actorName || 'A')[0].toUpperCase()}
                     </div>
-                    <p className="text-xs text-slate-500 font-medium">{enquiry.course}</p>
+                    <div>
+                      <p className="font-semibold text-slate-800">
+                        {act.actorName || 'System'} <span className="text-slate-400 font-normal">performed</span>{' '}
+                        <code className="text-[11px] px-1 py-0.5 bg-slate-100 text-slate-700 rounded font-mono">
+                          {act.action}
+                        </code>
+                      </p>
+                      <p className="text-[11px] text-slate-400">
+                        Resource: {act.resourceType || 'general'} • IP: {act.ip || 'local'}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-[10px] text-slate-300 font-mono">{new Date(enquiry.createdAt).toLocaleDateString()}</p>
+                  <div className="text-right shrink-0">
+                    <span
+                      className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                        act.outcome === 'success'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          : 'bg-rose-50 text-rose-700 border border-rose-200'
+                      }`}
+                    >
+                      {act.outcome}
+                    </span>
+                    <p className="text-[10px] text-slate-400 mt-0.5">
+                      {act.createdAt ? new Date(act.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                    </p>
+                  </div>
                 </div>
               ))
             ) : (
-              <div className="py-20 text-center text-slate-300 font-bold italic tracking-tight">Awaiting new prospects...</div>
+              <p className="text-xs text-slate-400 text-center py-8">No audit actions logged yet</p>
             )}
           </div>
         </div>
@@ -295,6 +374,3 @@ export default function AdminDashboard() {
     </AdminLayout>
   );
 }
-
-
-

@@ -1,0 +1,72 @@
+[{
+  "_id": {
+    "$oid": "6a056dcb5fae52b791b2c34c"
+  },
+  "studentName": "bhuvan",
+  "dateOfBirth": "2026-05-14",
+  "courseApplied": "B.E. Mechanical Engineering",
+  "collegeName": "kec",
+  "quota": "GQ",
+  "fatherName": "venkateshwaran",
+  "community": "BC",
+  "address": "namakkal",
+  "studentMobile": "8073774591",
+  "studentEmail": "bhuvan@gmail.com",
+  "aadhaarNumber": "123456789014",
+  "fatherMobile": "8073774591",
+  "motherMobile": "8073774591",
+  "plusTwoGroup": "cs-maths",
+  "plusTwoExamNumber": "4045594",
+  "expectedCutOff": "170",
+  "lastSchoolAndPlace": "rasi,rasipuram",
+  "isGovtSchool": false,
+  "isFirstGraduate": true,
+  "documents": [
+    "10th Mark Sheet",
+    "12th Mark Sheet",
+    "Aadhaar Card (Xerox)",
+    "Community Certificate"
+  ],
+  "status": "pending",
+  "adminNotes": "",
+  "createdAt": {
+    "$date": "2026-05-14T06:38:03.704Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a06933635c3ef723eb91776"
+  },
+  "studentName": "MADHU BALAN CN",
+  "dateOfBirth": "2003-08-10",
+  "courseApplied": "B.E. Computer Science Engineering",
+  "collegeName": "KONGU ENGEERING COLLEGE ",
+  "quota": "MQ",
+  "fatherName": "NALLASIVAM",
+  "community": "MBC",
+  "address": "DOOR NO 22 SPB COLONY ",
+  "studentMobile": "9345787942",
+  "studentEmail": "madhubalnm023@gmail.com",
+  "aadhaarNumber": "702975399006",
+  "fatherMobile": "9965214872",
+  "motherMobile": "6374289982",
+  "plusTwoGroup": "BIOMATHS",
+  "plusTwoExamNumber": "2047",
+  "expectedCutOff": "324",
+  "lastSchoolAndPlace": "VIDHYA VIKAS",
+  "isGovtSchool": false,
+  "isFirstGraduate": false,
+  "documents": [
+    "10th Mark Sheet",
+    "12th Mark Sheet",
+    "Aadhaar Card (Xerox)",
+    "Community Certificate"
+  ],
+  "status": "pending",
+  "adminNotes": "",
+  "createdAt": {
+    "$date": "2026-05-15T03:29:58.574Z"
+  },
+  "__v": 0
+}]

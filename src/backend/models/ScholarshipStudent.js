@@ -7,6 +7,10 @@ const ScholarshipStudentSchema = new mongoose.Schema({
         required: [true, 'Please provide student name'],
         maxlength: [100, 'Name cannot be more than 100 characters'],
     },
+    gender: {
+        type: String,
+        enum: ['Male', 'Female', 'Other'],
+    },
     dateOfBirth: {
         type: Date,
         required: [true, 'Please provide date of birth'],
@@ -25,6 +29,11 @@ const ScholarshipStudentSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please provide full address'],
         maxlength: [500, 'Address cannot be more than 500 characters'],
+    },
+    // Optional Aadhaar number with privacy-preserving format
+    aadhaarNumber: {
+        type: String,
+        trim: true,
     },
 
     // Contact Details
@@ -56,6 +65,18 @@ const ScholarshipStudentSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please provide college name'],
     },
+    board: {
+        type: String,
+        default: 'Tamil Nadu State Board',
+    },
+    currentClass: {
+        type: String,
+        default: '+2 / 12th Standard',
+    },
+    academicYear: {
+        type: String,
+        default: '2025-2026',
+    },
     plus2Group: {
         type: String,
         required: [true, 'Please select +2 group'],
@@ -86,10 +107,51 @@ const ScholarshipStudentSchema = new mongoose.Schema({
         default: false,
     },
 
-    // Test Details
+    // Candidate Preferences
+    preferredDistrict: {
+        type: String,
+    },
+    preferredCourse: {
+        type: String,
+    },
+    preferredColleges: [{
+        collegeId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'College',
+        },
+        collegeName: {
+            type: String,
+            required: true,
+        },
+        courseId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Course',
+        },
+        courseName: {
+            type: String,
+        },
+        district: {
+            type: String,
+        },
+        priority: {
+            type: Number,
+            default: 1,
+        },
+    }],
+
+    // Test & Language Details
     thirdSubject: {
         type: String,
         enum: ['Mathematics', 'Botany', 'Zoology', 'Biology'],
+    },
+    selectedElective: {
+        type: String,
+        enum: ['Mathematics', 'Biology', 'Botany', 'Zoology'],
+    },
+    examLanguage: {
+        type: String,
+        enum: ['English', 'Tamil'],
+        default: 'English',
     },
     testStatus: {
         type: String,
@@ -118,6 +180,14 @@ const ScholarshipStudentSchema = new mongoose.Schema({
         default: Date.now,
     },
 });
+
+// Helper to mask Aadhaar for lists, logs, exports
+ScholarshipStudentSchema.methods.getMaskedAadhaar = function() {
+    if (!this.aadhaarNumber) return '';
+    const clean = String(this.aadhaarNumber).replace(/\D/g, '');
+    if (clean.length < 4) return 'XXXX';
+    return `XXXX-XXXX-${clean.slice(-4)}`;
+};
 
 // Generate unique registration token before saving
 ScholarshipStudentSchema.pre('save', function (next) {

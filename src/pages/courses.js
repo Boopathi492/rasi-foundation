@@ -6,6 +6,7 @@ import PageBanner from '@/frontend/components/PageBanner';
 import Faq from '@/frontend/components/Faq';
 import Reveal from '@/frontend/components/home/Reveal';
 import BannerCrop from '@/frontend/components/home/BannerCrop';
+import CourseGuidance from '@/frontend/components/courses/CourseGuidance';
 import { CONTACT, ROUTES } from '@/data/siteConfig';
 
 // Course records (unchanged from the previous page).
@@ -937,6 +938,9 @@ export default function Courses() {
           </ul>
         </div>
       </section>
+
+      {/* Academic Streams Guidance & Preparation */}
+      <CourseGuidance />
 
       {/* 5. FAQs */}
       <section aria-labelledby="course-faq-heading" className="bg-white py-14 md:py-16">

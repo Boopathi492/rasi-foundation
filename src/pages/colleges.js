@@ -6,6 +6,7 @@ import {
 import Layout from '@/frontend/components/Layout';
 import PageBanner from '@/frontend/components/PageBanner';
 import BengaluruColleges from '@/frontend/components/BengaluruColleges';
+import CollegeGuidance from '@/frontend/components/colleges/CollegeGuidance';
 import BannerCrop from '@/frontend/components/home/BannerCrop';
 import Reveal from '@/frontend/components/home/Reveal';
 import Marquee from '@/frontend/components/home/Marquee';
@@ -883,6 +884,15 @@ export default function Colleges({ collegesData }) {
           </div>
         </div>
       </section>
+
+      {/* College Selection & Regional Guidance */}
+      <CollegeGuidance
+        zones={zones}
+        onSelectZone={(z) => {
+          setZone(z);
+          directoryRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }}
+      />
 
       {/* Bengaluru College Tie-Ups (existing component) */}
       <BengaluruColleges />
