@@ -421,10 +421,6 @@ export default function BookCounselling() {
                   <li>Recommendations depend on the student&apos;s preferences and the information available.</li>
                 </ul>
               </div>
-              <FormAlert kind="info" title="Please note">
-                Counselling does not guarantee admission, a scholarship or any particular outcome. Submitting this form sends
-                a request; it does not book a confirmed appointment.
-              </FormAlert>
               <div className="rf-card p-5 text-sm text-gray-700">
                 <p className="font-semibold text-gray-900">Prefer to talk now?</p>
                 <p className="mt-1">Call <a href={`tel:${CONTACT.phoneTel}`} className="font-semibold text-brand-800 underline">{CONTACT.phoneDisplay}</a>.</p>
