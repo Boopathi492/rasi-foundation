@@ -8,6 +8,7 @@ import Layout from '@/frontend/components/Layout';
 import PageHero from '@/frontend/components/PageHero';
 import Testimonials from '@/frontend/components/home/Testimonials';
 import Reveal from '@/frontend/components/home/Reveal';
+import ThankYouConfirmation from '@/frontend/components/common/ThankYouConfirmation';
 import { CONTACT, ROUTES, TN_DISTRICTS, LABELS } from '@/data/siteConfig';
 
 // The WhatsApp number used on this page before the redesign. It differs from CONTACT.whatsappNumber
@@ -73,6 +74,8 @@ export default function Contact() {
   const [values, setValues] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); // idle | submitting | success | error
+  const [reference, setReference] = useState('');
+  const [lastSubmitted, setLastSubmitted] = useState(null);
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -107,6 +110,14 @@ export default function Contact() {
       });
       const json = await res.json().catch(() => ({}));
       if (res.ok && json.success) {
+        const refId = json.data?._id;
+        setReference(refId ? `REF-${String(refId).slice(-8).toUpperCase()}` : '');
+        setLastSubmitted({
+          name: values.name.trim(),
+          type: values.type,
+          course: values.course,
+          district: values.district,
+        });
         setStatus('success');
         setValues(EMPTY);
       } else {
@@ -185,29 +196,40 @@ export default function Contact() {
               <h2 className="font-heading text-2xl font-bold text-gray-900">Send an enquiry</h2>
               <p className="mt-1 text-gray-600">Fields marked * are required.</p>
 
-              {status === 'success' && (
-                <div role="status" className="mt-6 flex gap-4 rounded-xl border border-brand-200 bg-brand-50 p-5">
-                  <FaCheckCircle className="mt-1 shrink-0 text-2xl text-brand-700" aria-hidden="true" />
-                  <div>
-                    <p className="font-semibold text-brand-900">Thank you. Your enquiry has been received.</p>
-                    <p className="mt-1 text-sm text-gray-700">Our team will contact you on the phone number or email you gave us.</p>
-                    <a href={`https://wa.me/${CONTACT_PAGE_WHATSAPP}`} target="_blank" rel="noopener noreferrer" className="rf-btn-primary mt-3 px-4 py-2">
-                      <FaWhatsapp aria-hidden="true" /> Chat on WhatsApp<span className="sr-only"> (opens in a new tab)</span>
-                    </a>
-                  </div>
+              {status === 'success' ? (
+                <div className="mt-6">
+                  <ThankYouConfirmation
+                    title="Enquiry Received"
+                    subtitle="Thank you for reaching out to Rasi Foundation. Your message has been received and saved."
+                    reference={reference}
+                    details={[
+                      ...(lastSubmitted?.name ? [{ label: 'Name', value: lastSubmitted.name }] : []),
+                      ...(lastSubmitted?.type ? [{ label: 'Enquiry Type', value: lastSubmitted.type }] : []),
+                      ...(lastSubmitted?.course ? [{ label: 'Course Interest', value: lastSubmitted.course }] : []),
+                      ...(lastSubmitted?.district ? [{ label: 'District', value: lastSubmitted.district }] : []),
+                    ]}
+                    nextSteps="Our educational counselling team will review your enquiry and contact you on the phone number or email you provided."
+                    onReset={() => {
+                      setStatus('idle');
+                      setLastSubmitted(null);
+                    }}
+                    resetLabel="Send Another Enquiry"
+                    homeHref="/"
+                  />
                 </div>
-              )}
-              {status === 'error' && (
-                <div role="alert" className="mt-6 flex gap-4 rounded-xl border border-red-200 bg-red-50 p-5">
-                  <FaExclamationCircle className="mt-1 shrink-0 text-2xl text-red-700" aria-hidden="true" />
-                  <div>
-                    <p className="font-semibold text-red-900">We could not send your enquiry.</p>
-                    <p className="mt-1 text-sm text-gray-700">Please check your details and try again, or call us on {CONTACT.phoneDisplay}.</p>
-                  </div>
-                </div>
-              )}
+              ) : (
+                <>
+                  {status === 'error' && (
+                    <div role="alert" className="mt-6 flex gap-4 rounded-xl border border-red-200 bg-red-50 p-5">
+                      <FaExclamationCircle className="mt-1 shrink-0 text-2xl text-red-700" aria-hidden="true" />
+                      <div>
+                        <p className="font-semibold text-red-900">We could not send your enquiry.</p>
+                        <p className="mt-1 text-sm text-gray-700">Please check your details and try again, or call us on {CONTACT.phoneDisplay}.</p>
+                      </div>
+                    </div>
+                  )}
 
-              <form onSubmit={onSubmit} noValidate className="mt-6 grid gap-5 sm:grid-cols-2">
+                  <form onSubmit={onSubmit} noValidate className="mt-6 grid gap-5 sm:grid-cols-2">
                 <Field id="name" label="Full name" required error={errors.name}>
                   <input id="name" name="name" type="text" autoComplete="name" value={values.name} onChange={onChange}
                     aria-invalid={!!errors.name} aria-describedby={describe('name')} className={fieldClass(errors.name)} placeholder="Your full name" />
@@ -254,6 +276,8 @@ export default function Contact() {
                   </button>
                 </div>
               </form>
+            </>
+          )}
             </div>
           </Reveal>
 

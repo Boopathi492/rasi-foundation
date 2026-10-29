@@ -7,6 +7,7 @@ import {
   FaCheckCircle, FaChevronRight, FaChevronLeft, FaShieldAlt,
   FaUser, FaPhoneAlt, FaGraduationCap, FaFileAlt, FaLock,
   FaPaperPlane, FaSpinner, FaInfoCircle, FaUniversity,
+  FaFileUpload, FaTrashAlt,
 } from 'react-icons/fa';
 import Layout from '@/frontend/components/Layout';
 import Reveal from '@/frontend/components/home/Reveal';
@@ -54,14 +55,52 @@ const PG_COURSES = [
 
 const COMMUNITIES = ['OC', 'BC', 'BCM', 'MBC', 'SC', 'ST', 'SCA'];
 
-const DOCUMENTS = [
-  '10th Mark Sheet',
-  '12th Mark Sheet',
-  'Aadhaar Card (Xerox)',
-  'Community Certificate',
-  'Transfer Certificate (TC)',
-  'First Graduate Certificate (if applicable)',
+export const DOCUMENT_OPTIONS = [
+  {
+    id: 'marksheet_10',
+    name: '10th Mark Sheet',
+    uploadLabel: 'Upload 10th Mark Sheet',
+    accept: '.pdf,.jpg,.jpeg,.png',
+    hint: 'PDF, JPG, JPEG, or PNG (Max 5 MB)',
+  },
+  {
+    id: 'marksheet_12',
+    name: '12th Mark Sheet',
+    uploadLabel: 'Upload 12th Mark Sheet',
+    accept: '.pdf,.jpg,.jpeg,.png',
+    hint: 'PDF, JPG, JPEG, or PNG (Max 5 MB)',
+  },
+  {
+    id: 'aadhaar',
+    name: 'Aadhaar Card (Xerox)',
+    uploadLabel: 'Upload Aadhaar Card (Xerox)',
+    accept: '.pdf,.jpg,.jpeg,.png',
+    hint: 'PDF, JPG, JPEG, or PNG (Max 5 MB)',
+  },
+  {
+    id: 'community_certificate',
+    name: 'Community Certificate',
+    uploadLabel: 'Upload Community Certificate',
+    accept: '.pdf,.jpg,.jpeg,.png',
+    hint: 'PDF, JPG, JPEG, or PNG (Max 5 MB)',
+  },
+  {
+    id: 'transfer_certificate',
+    name: 'Transfer Certificate (TC)',
+    uploadLabel: 'Upload Transfer Certificate (TC)',
+    accept: '.pdf,.jpg,.jpeg,.png',
+    hint: 'PDF, JPG, JPEG, or PNG (Max 5 MB)',
+  },
+  {
+    id: 'first_graduate',
+    name: 'First Graduate Certificate (if applicable)',
+    uploadLabel: 'Upload First Graduate Certificate',
+    accept: '.pdf,.jpg,.jpeg,.png',
+    hint: 'PDF, JPG, JPEG, or PNG (Max 5 MB)',
+  },
 ];
+
+const DOCUMENTS = DOCUMENT_OPTIONS.map((d) => d.name);
 
 const STEPS = [
   { id: 'personal', label: 'Personal & Family' },
@@ -84,6 +123,7 @@ const INITIAL = {
 export default function BioDataPage() {
   const router = useRouter();
   const [form, setForm] = useState(INITIAL);
+  const [selectedFiles, setSelectedFiles] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -96,13 +136,72 @@ export default function BioDataPage() {
     setError('');
   };
 
-  const toggleDoc = (doc) => {
-    setForm((prev) => ({
+  const handleFileChange = (docId, file) => {
+    if (!file) return;
+
+    // Size limit: 5 MB
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      setError(`"${file.name}" is too large. Maximum file size is 5 MB.`);
+      return;
+    }
+
+    // Type validation
+    const ext = file.name.split('.').pop().toLowerCase();
+    const allowedExts = ['pdf', 'jpg', 'jpeg', 'png'];
+    const allowedMimes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedExts.includes(ext) || (file.type && !allowedMimes.includes(file.type))) {
+      setError(`"${file.name}" is not an accepted file format. Allowed: PDF, JPG, JPEG, PNG.`);
+      return;
+    }
+
+    const formattedSize =
+      file.size >= 1024 * 1024
+        ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+        : `${Math.round(file.size / 1024)} KB`;
+
+    setSelectedFiles((prev) => ({
       ...prev,
-      documents: prev.documents.includes(doc)
-        ? prev.documents.filter((d) => d !== doc)
-        : [...prev.documents, doc],
+      [docId]: {
+        file,
+        name: file.name,
+        size: file.size,
+        formattedSize,
+        type: file.type,
+      },
     }));
+    setError('');
+  };
+
+  const handleRemoveFile = (docId) => {
+    setSelectedFiles((prev) => {
+      const copy = { ...prev };
+      delete copy[docId];
+      return copy;
+    });
+  };
+
+  const toggleDoc = (docName) => {
+    const opt = DOCUMENT_OPTIONS.find((o) => o.name === docName);
+    const docId = opt ? opt.id : null;
+
+    setForm((prev) => {
+      const isChecked = prev.documents.includes(docName);
+      if (isChecked) {
+        // Uncheck: clear file selection and remove from list
+        if (docId) handleRemoveFile(docId);
+        return {
+          ...prev,
+          documents: prev.documents.filter((d) => d !== docName),
+        };
+      }
+      // Check: reveal upload control & make mandatory
+      return {
+        ...prev,
+        documents: [...prev.documents, docName],
+      };
+    });
+    setError('');
   };
 
   const validateStep = (stepIdx) => {
@@ -131,8 +230,28 @@ export default function BioDataPage() {
     } else if (stepIdx === 3) {
       if (!form.courseApplied) return 'Please select the preferred course or branch';
       if (!form.collegeName.trim()) return 'Please enter preferred college name';
+
+      // Mandatory Document File Checks
+      for (const doc of DOCUMENT_OPTIONS) {
+        if (form.documents.includes(doc.name)) {
+          const fileEntry = selectedFiles[doc.id];
+          if (!fileEntry || !fileEntry.file) {
+            return `Please attach a file for "${doc.name}" before continuing.`;
+          }
+        }
+      }
     } else if (stepIdx === 4) {
       if (!consent) return 'Please agree to the declaration before submitting your application';
+
+      // Re-verify documents before final submission
+      for (const doc of DOCUMENT_OPTIONS) {
+        if (form.documents.includes(doc.name)) {
+          const fileEntry = selectedFiles[doc.id];
+          if (!fileEntry || !fileEntry.file) {
+            return `Required document "${doc.name}" is missing an uploaded file.`;
+          }
+        }
+      }
     }
     return null;
   };
@@ -175,10 +294,30 @@ export default function BioDataPage() {
         motherMobile: form.motherMobile.replace(/[\s-]/g, '').replace(/^(\+91|91|0)(?=\d{10}$)/, ''),
       };
 
+      const formData = new FormData();
+      for (const [key, value] of Object.entries(payload)) {
+        if (key === 'documents') {
+          for (const doc of value) {
+            formData.append('documents', doc);
+          }
+        } else {
+          formData.append(key, value);
+        }
+      }
+
+      // Attach all selected mandatory document files
+      for (const doc of DOCUMENT_OPTIONS) {
+        if (form.documents.includes(doc.name)) {
+          const fileEntry = selectedFiles[doc.id];
+          if (fileEntry && fileEntry.file) {
+            formData.append(`file_${doc.id}`, fileEntry.file, fileEntry.name);
+          }
+        }
+      }
+
       const res = await fetch('/api/biodata/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       const data = await res.json();
@@ -650,29 +789,143 @@ export default function BioDataPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-800 mb-2">
-                      Documents Available to Submit:
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {DOCUMENTS.map((doc) => {
-                        const checked = form.documents.includes(doc);
+                    <div className="mb-3">
+                      <label className="block text-xs font-bold text-gray-800">
+                        Certificates & Documents Ready to Submit:
+                      </label>
+                      <p className="text-[11px] text-gray-500 mt-0.5">
+                        Select each document available. Attaching the document file is mandatory for every checked item (PDF, JPG, JPEG, or PNG up to 5 MB).
+                      </p>
+                    </div>
+
+                    <div className="space-y-3.5">
+                      {DOCUMENT_OPTIONS.map((doc) => {
+                        const checked = form.documents.includes(doc.name);
+                        const fileEntry = selectedFiles[doc.id];
+                        const hasFile = Boolean(fileEntry?.file);
+
                         return (
-                          <label
-                            key={doc}
-                            className={`flex items-center gap-3 p-3 rounded-2xl border text-xs font-medium cursor-pointer transition-all ${
+                          <div
+                            key={doc.id}
+                            className={`rounded-2xl border transition-all ${
                               checked
-                                ? 'border-forest/40 bg-emerald-50/60 text-forest'
-                                : 'border-gray-200 bg-gray-50/60 text-gray-700 hover:border-gray-300'
+                                ? 'border-emerald-300 bg-emerald-50/30 shadow-xs'
+                                : 'border-gray-200 bg-gray-50/60 hover:border-gray-300'
                             }`}
                           >
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={() => toggleDoc(doc)}
-                              className="accent-forest h-4 w-4 rounded"
-                            />
-                            <span>{doc}</span>
-                          </label>
+                            {/* Checkbox Header */}
+                            <div className="flex items-center justify-between p-3.5 sm:p-4">
+                              <label className="flex items-center gap-3 cursor-pointer select-none">
+                                <input
+                                  type="checkbox"
+                                  checked={checked}
+                                  onChange={() => toggleDoc(doc.name)}
+                                  className="accent-forest h-4 w-4 rounded text-forest focus:ring-forest/30"
+                                />
+                                <span className="text-xs sm:text-sm font-semibold text-gray-800">
+                                  {doc.name}
+                                </span>
+                              </label>
+
+                              {checked && (
+                                <span
+                                  className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
+                                    hasFile
+                                      ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                      : 'bg-amber-100 text-amber-800 border border-amber-300 animate-pulse'
+                                  }`}
+                                >
+                                  {hasFile ? 'File Attached' : 'Upload Required *'}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Upload Control Area (Mandatory when checked) */}
+                            {checked && (
+                              <div className="px-3.5 pb-3.5 sm:px-4 sm:pb-4 border-t border-emerald-100/80 pt-3">
+                                {!hasFile ? (
+                                  <div className="rounded-xl border-2 border-dashed border-emerald-300/80 bg-white p-4 sm:p-5 text-center">
+                                    <input
+                                      type="file"
+                                      id={`input_${doc.id}`}
+                                      accept={doc.accept}
+                                      onChange={(e) => handleFileChange(doc.id, e.target.files?.[0])}
+                                      className="hidden"
+                                    />
+                                    <div className="flex flex-col items-center justify-center gap-1.5">
+                                      <div className="w-10 h-10 rounded-full bg-emerald-100 text-forest flex items-center justify-center text-base mb-1">
+                                        <FaFileUpload />
+                                      </div>
+                                      <label
+                                        htmlFor={`input_${doc.id}`}
+                                        className="cursor-pointer text-xs sm:text-sm font-bold text-forest hover:text-emerald-700 underline underline-offset-2"
+                                      >
+                                        {doc.uploadLabel} <span className="text-crimson">*</span>
+                                      </label>
+                                      <p className="text-[11px] text-gray-500 font-medium">
+                                        {doc.hint}
+                                      </p>
+                                      <button
+                                        type="button"
+                                        onClick={() => document.getElementById(`input_${doc.id}`)?.click()}
+                                        className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors"
+                                      >
+                                        <FaFileUpload className="text-[10px]" />
+                                        <span>Choose File</span>
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="rounded-xl border border-emerald-200 bg-white p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                      <div className="w-9 h-9 rounded-lg bg-emerald-50 text-forest flex items-center justify-center text-sm shrink-0 border border-emerald-100">
+                                        <FaFileAlt />
+                                      </div>
+                                      <div className="min-w-0">
+                                        <p className="text-xs font-bold text-gray-800 truncate" title={fileEntry.name}>
+                                          {fileEntry.name}
+                                        </p>
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                          <span className="text-[10px] text-gray-500 font-mono">
+                                            {fileEntry.formattedSize}
+                                          </span>
+                                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800">
+                                            Ready for upload
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Action Buttons: Replace & Remove */}
+                                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                                      <input
+                                        type="file"
+                                        id={`replace_${doc.id}`}
+                                        accept={doc.accept}
+                                        onChange={(e) => handleFileChange(doc.id, e.target.files?.[0])}
+                                        className="hidden"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => document.getElementById(`replace_${doc.id}`)?.click()}
+                                        className="px-2.5 py-1 text-[11px] font-semibold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg transition-colors border border-emerald-200"
+                                      >
+                                        Replace
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleRemoveFile(doc.id)}
+                                        className="px-2.5 py-1 text-[11px] font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors border border-rose-200 flex items-center gap-1"
+                                      >
+                                        <FaTrashAlt className="text-[9px]" />
+                                        <span>Remove</span>
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         );
                       })}
                     </div>
@@ -737,7 +990,18 @@ export default function BioDataPage() {
                         ['Quota', form.quota === 'GQ' ? 'Government Quota' : 'Management Quota'],
                         ['Applied Course', form.courseApplied],
                         ['Preferred College', form.collegeName],
-                        ['Documents Attached', form.documents.join(', ') || 'None selected'],
+                        [
+                          'Documents Attached',
+                          form.documents.length === 0
+                            ? 'None selected'
+                            : form.documents
+                                .map((d) => {
+                                  const opt = DOCUMENT_OPTIONS.find((o) => o.name === d);
+                                  const file = opt ? selectedFiles[opt.id] : null;
+                                  return file ? `${d} (${file.name} • ${file.formattedSize})` : d;
+                                })
+                                .join(' | '),
+                        ],
                       ]}
                     />
 

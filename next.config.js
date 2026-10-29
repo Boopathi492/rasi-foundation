@@ -4,6 +4,7 @@ const nextConfig = {
   // running dev server is using (and the dev server must not mutate production output).
   distDir: process.env.NEXT_DIST_DIR || (process.env.NODE_ENV === 'development' ? '.next-dev' : '.next'),
   reactStrictMode: true,
+  staticPageGenerationTimeout: 180,
   
   // Enable compression
   compress: true,

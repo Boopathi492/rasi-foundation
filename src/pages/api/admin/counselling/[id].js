@@ -4,6 +4,7 @@ import { can } from '@/backend/lib/rbac';
 import { recordAudit } from '@/backend/lib/apiHandler';
 import { summarizeChanges } from '@/backend/lib/redact';
 import CounsellingRecord from '@/backend/models/CounsellingRecord';
+import { validateCounsellorAssignment } from '@/backend/lib/counsellors';
 
 async function handler(req, res) {
   await dbConnect();
@@ -50,7 +51,13 @@ async function handler(req, res) {
     if (studentName !== undefined) record.studentName = studentName.trim();
     if (studentPhone !== undefined) record.studentPhone = studentPhone.trim();
     if (scheduledAt !== undefined) record.scheduledAt = new Date(scheduledAt);
-    if (counsellor !== undefined) record.counsellor = counsellor.trim();
+    if (counsellor !== undefined) {
+      const counsellorCheck = await validateCounsellorAssignment(counsellor);
+      if (!counsellorCheck.valid) {
+        return res.status(400).json({ success: false, message: counsellorCheck.error });
+      }
+      record.counsellor = counsellorCheck.assignedName;
+    }
     if (type !== undefined) record.type = type;
     if (preferredCollege !== undefined) record.preferredCollege = preferredCollege.trim();
     if (interestedCourse !== undefined) record.interestedCourse = interestedCourse.trim();

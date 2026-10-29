@@ -1,6 +1,5 @@
 import dbConnect from '@/backend/lib/mongodb';
 import Enquiry from '@/backend/models/Enquiry';
-import CounsellingRecord from '@/backend/models/CounsellingRecord';
 
 // Public endpoint: submit only. Listing/reading enquiries is admin-only via /api/admin/enquiries.
 export default async function handler(req, res) {
@@ -59,25 +58,6 @@ export default async function handler(req, res) {
       qualification,
       message,
     });
-
-    // If this enquiry is a counselling booking, also record in CounsellingRecord collection
-    if (message && message.includes('[Counselling Booking]')) {
-      try {
-        await CounsellingRecord.create({
-          studentRef: { kind: 'enquiry', id: enquiry._id },
-          studentName: name,
-          studentPhone: phoneDigits,
-          scheduledAt: new Date(Date.now() + 24 * 3600 * 1000), // default to next day
-          interestedCourse: course,
-          type: 'phone',
-          notes: message,
-          status: 'scheduled',
-          createdBy: 'website_booking',
-        });
-      } catch (counsellErr) {
-        console.error('[Counselling Auto-Record Error]', counsellErr?.message || counsellErr);
-      }
-    }
 
     return res.status(201).json({ success: true, data: { _id: enquiry._id } });
   } catch (error) {

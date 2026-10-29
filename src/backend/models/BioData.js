@@ -40,8 +40,27 @@ const BioDataSchema = new mongoose.Schema(
     reference: { type: String, default: '' },
 
     documents: [{ type: String }],
+    uploadedDocuments: [
+      {
+        documentType: { type: String, required: true },
+        originalName: { type: String, required: true, trim: true },
+        storageKey: { type: String, required: true },
+        mime: { type: String, required: true },
+        size: { type: Number, required: true },
+        uploadStatus: { type: String, default: 'uploaded' },
+        uploadedAt: { type: Date, default: Date.now },
+        documentId: { type: mongoose.Schema.Types.ObjectId, ref: 'StudentDocument', default: null },
+      },
+    ],
     status: { type: String, enum: ['pending', 'reviewed', 'contacted'], default: 'pending', index: true },
     adminNotes: { type: String, default: '' },
+
+    // Payment Integration Fields
+    paymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment', default: null },
+    isPaid: { type: Boolean, default: false, index: true },
+    paidAmount: { type: Number, default: 0 },
+    paidAt: { type: Date, default: null },
+
     createdAt: { type: Date, default: Date.now, index: true },
   },
   { collection: 'biodatas', timestamps: true }

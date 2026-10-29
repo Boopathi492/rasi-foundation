@@ -20,10 +20,10 @@ export const ROLE_LABELS = {
 export const RESOURCES = [
   'dashboard', 'students', 'documents', 'aadhaar', 'enquiries', 'contacts', 'feedback', 'counselling',
   'colleges', 'courses', 'banners', 'scholarship_practice', 'scholarship_exam', 'reports',
-  'logs', 'audit', 'settings', 'notifications', 'users', 'announcements', 'achievements',
+  'logs', 'audit', 'settings', 'notifications', 'users', 'announcements', 'achievements', 'payments',
 ];
 
-const ALL = ['view', 'create', 'edit', 'approve', 'export', 'manage'];
+const ALL = ['view', 'create', 'edit', 'approve', 'export', 'manage', 'refund'];
 
 const grant = (resources, actions = ALL) => resources.flatMap((r) => actions.map((a) => `${r}:${a}`));
 
@@ -40,6 +40,7 @@ const ROLE_PERMISSIONS = {
     ...grant(['logs'], ['view']),
     ...grant(['settings'], ['view', 'manage']),
     ...grant(['scholarship_exam'], ['view']),
+    ...grant(['payments'], ['view', 'manage', 'export', 'refund']),
     ...grant(['audit'], ['view']),
   ]),
 

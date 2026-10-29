@@ -15,20 +15,52 @@ async function handler(req, res) {
     }
   } else if (req.method === 'POST') {
     try {
-      const { name, location, district, tneaCode, note, isActive, order } = req.body;
+      const {
+        name,
+        location,
+        district,
+        tneaCode,
+        tneaStatus,
+        tneaSourceYear,
+        note,
+        isActive,
+        order,
+        type,
+        specialization,
+        institutionType,
+        courses,
+        sourceUrl,
+        verificationStatus,
+        departments,
+        website
+      } = req.body;
 
       if (!name || !location || !district) {
         return res.status(400).json({ message: 'Name, location, and district are required' });
       }
 
       const college = await College.create({
-        name,
-        location,
-        district,
-        tneaCode: tneaCode || '',
-        note: note || '',
-        isActive: isActive !== undefined ? isActive : true,
-        order: order || 0,
+        name: name.trim(),
+        location: location.trim(),
+        district: district.trim(),
+        type: type || 'Engineering',
+        specialization: specialization ? String(specialization).trim() : '',
+        institutionType: institutionType ? String(institutionType).trim() : '',
+        courses: Array.isArray(courses) ? courses : [],
+        sourceUrl: sourceUrl ? String(sourceUrl).trim() : '',
+        verificationStatus: verificationStatus ? String(verificationStatus).trim() : 'directory_listed',
+        tneaCode: tneaCode ? String(tneaCode).trim() : '',
+        tneaStatus: tneaStatus ? String(tneaStatus).trim() : 'not_applicable',
+        tneaSourceYear: tneaSourceYear ? String(tneaSourceYear).trim() : '',
+        note: note ? String(note).trim() : '',
+        departments: Array.isArray(departments)
+          ? departments.map(d => String(d).trim()).filter(Boolean)
+          : (typeof departments === 'string' && departments.trim()
+              ? departments.split(/[\n,]+/).map(d => d.trim()).filter(Boolean)
+              : []),
+        website: website ? String(website).trim() : '',
+        isActive: isActive !== undefined ? Boolean(isActive) : true,
+        order: order ? parseInt(order, 10) || 0 : 0,
       });
 
       res.status(201).json(college);

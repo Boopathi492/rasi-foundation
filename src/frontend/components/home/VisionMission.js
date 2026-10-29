@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaEye, FaBullseye, FaArrowRight, FaCompass, FaAward } from 'react-icons/fa';
 import BannerCrop from './BannerCrop';
@@ -41,6 +42,30 @@ const CARDS = [
 ];
 
 export default function VisionMission() {
+  const [cards, setCards] = useState(CARDS);
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/site-settings')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!active || !data?.settings) return;
+        const s = data.settings;
+        if (s.vision_text || s.mission_text) {
+          setCards((prev) =>
+            prev.map((c, i) => {
+              if (i === 0 && s.vision_text) return { ...c, text: s.vision_text, title: s.vision_title || c.title };
+              if (i === 1 && s.mission_text) return { ...c, text: s.mission_text, title: s.mission_title || c.title };
+              return c;
+            })
+          );
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
   return (
     <section
       aria-labelledby="vm-heading"
@@ -76,7 +101,7 @@ export default function VisionMission() {
 
         {/* Two Balanced Institutional Cards */}
         <div className="grid gap-8 lg:grid-cols-2">
-          {CARDS.map((card, idx) => {
+          {cards.map((card, idx) => {
             const { tag, title, Icon, BadgeIcon, badgeLabel, text, image, accentBorder, iconClass, tagClass, linkClass } = card;
             return (
               <Reveal key={title} delay={idx * 0.08} className="h-full">

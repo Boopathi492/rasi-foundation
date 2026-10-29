@@ -56,6 +56,7 @@ const SLIDE_META = {
 };
 
 export default function HeroCarousel({ slides = HERO_SLIDES }) {
+  const [carouselSlides, setCarouselSlides] = useState(slides);
   const [index, setIndex] = useState(0);
   // Load only the first slide on initial render; preload the next slide after mount
   const [seen, setSeen] = useState(() => new Set([0]));
@@ -63,7 +64,44 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
   const [focused, setFocused] = useState(false);
   const reduced = usePrefersReducedMotion();
   const touchStartX = useRef(null);
-  const count = slides.length;
+  const count = carouselSlides.length;
+
+  // Dynamically load active MongoDB-managed banners from /api/banners
+  useEffect(() => {
+    let active = true;
+    fetch('/api/banners?placement=home_hero')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!active || !data || !Array.isArray(data.banners) || data.banners.length === 0) return;
+        const valid = data.banners.filter((b) => b.desktopImageUrl || b.mobileImageUrl);
+        if (valid.length > 0) {
+          const dynamicList = valid.map((b, i) => ({
+            id: String(b.id || `banner-${i}`),
+            src: b.desktopImageUrl || b.mobileImageUrl,
+            mobileSrc: b.mobileImageUrl || b.desktopImageUrl,
+            alt: b.altText || b.title || 'Rasi Foundation banner',
+            title: b.title,
+            description: b.description || '',
+            cta: {
+              label: b.ctaText || 'Learn More',
+              href: b.ctaUrl || '/book-counselling',
+              box: { left: 4.1, top: 78.67, width: 29.25, height: 10.93 },
+            },
+            isDynamic: true,
+          }));
+          setCarouselSlides(dynamicList);
+          setIndex(0);
+          setSeen(new Set([0]));
+        }
+      })
+      .catch(() => {
+        // Retain fallback to static HERO_SLIDES
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Preload the second slide gently after initial hydration so first paint prioritises slide 0
   useEffect(() => {
@@ -100,8 +138,18 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
     if (e.key === 'ArrowRight') go(index + 1);
   };
 
-  const activeSlide = slides[index];
-  const activeMeta = SLIDE_META[activeSlide.id] || SLIDE_META['tamil-guidance'];
+  const activeSlide = carouselSlides[index] || carouselSlides[0] || {};
+  const activeMeta = SLIDE_META[activeSlide.id] || {
+    badge: activeSlide.description || 'College Admissions • Career Guidance • Scholarships',
+    title: activeSlide.title || 'Step Into Your Brighter Future',
+    subtitle: activeSlide.description || 'Personalised career guidance and college admissions support.',
+    pills: [
+      { icon: FaGraduationCap, label: 'College Directory', href: '/colleges' },
+      { icon: FaUserTie, label: 'Career Counselling', href: '/book-counselling' },
+      { icon: FaAward, label: 'Scholarship Support', href: '/scholarship-test' },
+      { icon: FaFileSignature, label: 'Admission Assistance', href: '/contact' },
+    ],
+  };
 
   const navBtn =
     'flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white/95 text-gray-800 shadow-md transition-colors duration-150 hover:border-forest hover:bg-forest hover:text-white md:h-11 md:w-11 ' +
@@ -152,7 +200,7 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
           )}
 
           <div aria-live={autoPlay ? 'off' : 'polite'} className="relative h-full w-full">
-            {slides.map((slide, i) => {
+            {carouselSlides.map((slide, i) => {
               const active = i === index;
               return (
                 <div
@@ -171,6 +219,7 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
                         src={slide.src}
                         alt={slide.alt}
                         fill
+                        unoptimized={Boolean(slide.isDynamic)}
                         priority={i === 0}
                         sizes="100vw"
                         className="object-cover"
@@ -178,22 +227,22 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
                     )}
                     {/* Interactive CTA overlay aligned over the artwork button */}
                     <Link
-                      href={slide.cta.href}
+                      href={slide.cta?.href || '/book-counselling'}
                       tabIndex={active ? 0 : -1}
-                      aria-label={slide.cta.label}
+                      aria-label={slide.cta?.label || 'Learn More'}
                       className="group/cta absolute rounded-full transition-shadow duration-200 hover:ring-2 hover:ring-white/90 focus:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-800"
                       style={{
-                        left: `${slide.cta.box.left}%`,
-                        top: `${slide.cta.box.top}%`,
-                        width: `${slide.cta.box.width}%`,
-                        height: `${slide.cta.box.height}%`,
+                        left: `${slide.cta?.box?.left ?? 4.1}%`,
+                        top: `${slide.cta?.box?.top ?? 78.67}%`,
+                        width: `${slide.cta?.box?.width ?? 29.25}%`,
+                        height: `${slide.cta?.box?.height ?? 10.93}%`,
                       }}
                     >
                       <span
                         aria-hidden="true"
                         className="block h-full w-full rounded-full bg-white/10 opacity-0 transition-opacity duration-200 group-hover/cta:opacity-100"
                       />
-                      <span className="sr-only">{slide.cta.label}</span>
+                      <span className="sr-only">{slide.cta?.label || 'Learn More'}</span>
                     </Link>
                   </div>
                 </div>
@@ -205,7 +254,7 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
           {count > 1 && (
             <div className="pointer-events-none absolute inset-x-0 bottom-3 z-20 flex items-center justify-center px-6">
               <div className="pointer-events-auto inline-flex items-center gap-2 rounded-full border border-gray-200/80 bg-white/90 px-3 py-1.5 shadow-sm backdrop-blur-sm">
-                {slides.map((s, i) => (
+                {carouselSlides.map((s, i) => (
                   <button
                     key={s.id}
                     type="button"
@@ -236,15 +285,27 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
                   transition={reduced ? { duration: 0 } : { duration: 0.35, ease: 'easeOut' }}
                   className="h-full w-full"
                 >
-                  <BannerCrop
-                    src={activeSlide.src}
-                    alt={activeSlide.alt}
-                    region={activeMeta.region}
-                    fill
-                    priority={index === 0}
-                    sizes="100vw"
-                    className="h-full w-full"
-                  />
+                  {activeMeta?.region && !activeSlide.isDynamic ? (
+                    <BannerCrop
+                      src={activeSlide.src}
+                      alt={activeSlide.alt}
+                      region={activeMeta.region}
+                      fill
+                      priority={index === 0}
+                      sizes="100vw"
+                      className="h-full w-full"
+                    />
+                  ) : (
+                    <Image
+                      src={activeSlide.mobileSrc || activeSlide.src}
+                      alt={activeSlide.alt}
+                      fill
+                      unoptimized={Boolean(activeSlide.isDynamic)}
+                      priority={index === 0}
+                      sizes="100vw"
+                      className="h-full w-full object-cover"
+                    />
+                  )}
                 </motion.div>
               </AnimatePresence>
 
@@ -311,10 +372,10 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
                 {/* Primary Mobile CTA */}
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <Link
-                    href={activeSlide.cta.href}
+                    href={activeSlide.cta?.href || '/book-counselling'}
                     className="rf-btn-maroon flex-1 py-2.5 text-sm tracking-normal"
                   >
-                    <span>{activeSlide.cta.label}</span>
+                    <span>{activeSlide.cta?.label || 'Learn More'}</span>
                     <FaArrowRight className="text-[11px]" aria-hidden="true" />
                   </Link>
                 </div>
@@ -322,7 +383,7 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
                 {/* Mobile Pagination Dots */}
                 {count > 1 && (
                   <div className="mt-3.5 flex items-center justify-center gap-2">
-                    {slides.map((s, i) => (
+                    {carouselSlides.map((s, i) => (
                       <button
                         key={s.id}
                         type="button"

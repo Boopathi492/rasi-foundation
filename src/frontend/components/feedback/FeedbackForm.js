@@ -32,6 +32,7 @@ export default function FeedbackForm({ onSuccess, isModal = false, onCloseModal 
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); // 'idle' | 'submitting' | 'success' | 'error'
   const [serverMsg, setServerMsg] = useState('');
+  const [reference, setReference] = useState('');
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -122,6 +123,8 @@ export default function FeedbackForm({ onSuccess, isModal = false, onCloseModal 
         throw new Error(json.error || `Server responded with status ${res.status}`);
       }
 
+      const refId = json.data?._id;
+      if (refId) setReference('REF-' + String(refId).slice(-8).toUpperCase());
       setStatus('success');
       setServerMsg(json.message || 'Thank you! Your feedback has been submitted for review.');
       setForm(INITIAL);
@@ -144,6 +147,11 @@ export default function FeedbackForm({ onSuccess, isModal = false, onCloseModal 
         <h3 className="mt-4 font-heading text-2xl font-bold text-gray-900">
           Thank You for Your Feedback!
         </h3>
+        {reference && (
+          <div className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-white/80 px-3 py-1 font-mono text-xs font-semibold text-emerald-900">
+            <span>Feedback Reference:</span> <span>{reference}</span>
+          </div>
+        )}
         <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
           {serverMsg}
         </p>

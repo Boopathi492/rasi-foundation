@@ -3,6 +3,7 @@ import { withAuth } from '@/backend/lib/auth';
 import { can } from '@/backend/lib/rbac';
 import { recordAudit } from '@/backend/lib/apiHandler';
 import CounsellingRecord from '@/backend/models/CounsellingRecord';
+import { getVerifiedCounsellors, validateCounsellorAssignment } from '@/backend/lib/counsellors';
 
 async function handler(req, res) {
   await dbConnect();
@@ -20,7 +21,11 @@ async function handler(req, res) {
       query.status = status;
     }
     if (counsellor && counsellor !== 'all') {
-      query.counsellor = counsellor;
+      if (counsellor === 'unassigned') {
+        query.$or = [{ counsellor: '' }, { counsellor: null }, { counsellor: { $exists: false } }];
+      } else {
+        query.counsellor = counsellor;
+      }
     }
     if (search) {
       query.$or = [
@@ -35,7 +40,7 @@ async function handler(req, res) {
     const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 50));
     const skip = (pageNum - 1) * limitNum;
 
-    const [records, totalMatching, total, scheduled, completed, followUp, cancelled] = await Promise.all([
+    const [records, totalMatching, total, scheduled, completed, followUp, cancelled, verifiedCounsellors] = await Promise.all([
       CounsellingRecord.find(query).sort({ scheduledAt: -1 }).skip(skip).limit(limitNum).lean(),
       CounsellingRecord.countDocuments(query),
       CounsellingRecord.countDocuments(),
@@ -43,11 +48,13 @@ async function handler(req, res) {
       CounsellingRecord.countDocuments({ status: 'completed' }),
       CounsellingRecord.countDocuments({ status: 'follow_up_required' }),
       CounsellingRecord.countDocuments({ status: 'cancelled' }),
+      getVerifiedCounsellors(),
     ]);
 
     return res.status(200).json({
       success: true,
       records,
+      counsellors: verifiedCounsellors,
       stats: { total, scheduled, completed, followUp, cancelled },
       pagination: {
         page: pageNum,
@@ -89,11 +96,16 @@ async function handler(req, res) {
       return res.status(400).json({ success: false, message: 'Scheduled date and time is required' });
     }
 
+    const counsellorCheck = await validateCounsellorAssignment(counsellor);
+    if (!counsellorCheck.valid) {
+      return res.status(400).json({ success: false, message: counsellorCheck.error });
+    }
+
     const created = await CounsellingRecord.create({
       studentName: studentName.trim(),
       studentPhone: studentPhone.trim(),
       scheduledAt: new Date(scheduledAt),
-      counsellor: counsellor.trim(),
+      counsellor: counsellorCheck.assignedName,
       type,
       preferredCollege: preferredCollege.trim(),
       interestedCourse: interestedCourse.trim(),

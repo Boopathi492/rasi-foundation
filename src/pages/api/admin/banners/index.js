@@ -21,6 +21,16 @@ export const config = {
   },
 };
 
+function parseScheduleDate(dateStr, isEnd = false) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return null;
+  if (isEnd && typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr.trim())) {
+    d.setUTCHours(23, 59, 59, 999);
+  }
+  return d;
+}
+
 async function handler(req, res) {
   await dbConnect();
 
@@ -126,8 +136,8 @@ async function handler(req, res) {
       order: parseInt(order, 10) || 0,
       transitionMs: Math.max(800, Math.min(15000, parseInt(transitionMs, 10) || 5000)),
       isActive: Boolean(isActive),
-      startsAt: startsAt ? new Date(startsAt) : null,
-      endsAt: endsAt ? new Date(endsAt) : null,
+      startsAt: parseScheduleDate(startsAt, false),
+      endsAt: parseScheduleDate(endsAt, true),
       createdBy: req.user?.username || req.user?.name || 'admin',
     };
 

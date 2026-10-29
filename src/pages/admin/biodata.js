@@ -205,13 +205,34 @@ export default function AdminBioData() {
                         </span>
                       </td>
                       <td className="px-5 py-4">
-                        <span
-                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold capitalize ${
-                            STATUS_STYLES[sub.status] || 'bg-slate-100 text-slate-700'
-                          }`}
-                        >
-                          {sub.status}
-                        </span>
+                        <div className="flex flex-col gap-1 items-start">
+                          <span
+                            className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold capitalize ${
+                              STATUS_STYLES[sub.status] || 'bg-slate-100 text-slate-700'
+                            }`}
+                          >
+                            {sub.status}
+                          </span>
+                          {sub.isPaid ? (
+                            <span className="inline-block px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                              Paid: ₹{sub.paidAmount || 0}
+                            </span>
+                          ) : (
+                            <span className="inline-block px-2 py-0.5 rounded-full text-[9px] font-medium bg-slate-100 text-slate-500">
+                              Unpaid
+                            </span>
+                          )}
+                          <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+                            <FaFileAlt className="text-[8px] text-slate-400" />
+                            <span>
+                              {sub.uploadedDocuments?.length
+                                ? `${sub.uploadedDocuments.length} docs uploaded`
+                                : sub.documents?.length
+                                ? `${sub.documents.length} docs listed`
+                                : '0 docs'}
+                            </span>
+                          </span>
+                        </div>
                       </td>
                       <td className="px-5 py-4 text-right">
                         <button
@@ -402,15 +423,26 @@ export default function AdminBioData() {
                         </div>
 
                         <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 text-xs">
-                          <a
-                            href={`/api/admin/documents/${doc._id}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-emerald-700 hover:underline font-semibold inline-flex items-center gap-1"
-                          >
-                            <FaEye className="text-[10px]" />
-                            <span>View File</span>
-                          </a>
+                          <div className="flex items-center gap-3">
+                            <a
+                              href={`/api/admin/documents/${doc._id}?token=${typeof window !== 'undefined' ? localStorage.getItem('adminToken') : ''}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-emerald-700 hover:underline font-semibold inline-flex items-center gap-1"
+                            >
+                              <FaEye className="text-[10px]" />
+                              <span>View</span>
+                            </a>
+                            <a
+                              href={`/api/admin/documents/${doc._id}?download=true&token=${typeof window !== 'undefined' ? localStorage.getItem('adminToken') : ''}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-slate-600 hover:text-slate-900 font-semibold inline-flex items-center gap-1"
+                            >
+                              <FaDownload className="text-[10px]" />
+                              <span>Download</span>
+                            </a>
+                          </div>
                           <div className="flex items-center gap-1.5">
                             {doc.verificationStatus !== 'verified' && (
                               <button

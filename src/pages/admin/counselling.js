@@ -16,13 +16,16 @@ import {
   FaTrash,
   FaComments,
   FaTimes,
+  FaUserCheck,
 } from 'react-icons/fa';
 
 export default function AdminCounselling() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [counsellorFilter, setCounsellorFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [counsellors, setCounsellors] = useState([]);
   const [stats, setStats] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
@@ -50,7 +53,7 @@ export default function AdminCounselling() {
 
   useEffect(() => {
     fetchRecords();
-  }, [statusFilter, search]);
+  }, [statusFilter, counsellorFilter, search]);
 
   const fetchRecords = async () => {
     setLoading(true);
@@ -58,6 +61,7 @@ export default function AdminCounselling() {
       const token = localStorage.getItem('adminToken');
       const params = new URLSearchParams();
       if (statusFilter !== 'all') params.append('status', statusFilter);
+      if (counsellorFilter !== 'all') params.append('counsellor', counsellorFilter);
       if (search.trim()) params.append('search', search.trim());
 
       const res = await fetch(`/api/admin/counselling?${params}`, {
@@ -66,6 +70,7 @@ export default function AdminCounselling() {
       if (res.ok) {
         const data = await res.json();
         setRecords(data.records || []);
+        setCounsellors(data.counsellors || []);
         setStats(data.stats || {});
       }
     } catch (err) {
@@ -120,7 +125,9 @@ export default function AdminCounselling() {
   };
 
   const handleSave = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
+    if (saving) return;
+
     if (!form.studentName.trim() || !form.scheduledAt) {
       setError('Student name and scheduled date/time are required');
       return;
@@ -177,6 +184,12 @@ export default function AdminCounselling() {
     }
   };
 
+  const closeModal = () => {
+    if (!saving) {
+      setModalOpen(false);
+    }
+  };
+
   return (
     <AdminLayout title="Student Counselling & Guidance">
       <div className="space-y-6">
@@ -199,20 +212,38 @@ export default function AdminCounselling() {
 
         {/* Filter Tabs & Search */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold overflow-x-auto">
-            {['all', 'scheduled', 'completed', 'follow_up_required', 'cancelled'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setStatusFilter(tab)}
-                className={`px-3 py-1.5 rounded-lg capitalize whitespace-nowrap transition-colors ${
-                  statusFilter === tab
-                    ? 'bg-white text-slate-800 shadow-xs font-bold'
-                    : 'text-slate-500 hover:text-slate-800'
-                }`}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold overflow-x-auto">
+              {['all', 'scheduled', 'completed', 'follow_up_required', 'cancelled'].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setStatusFilter(tab)}
+                  className={`px-3 py-1.5 rounded-lg capitalize whitespace-nowrap transition-colors ${
+                    statusFilter === tab
+                      ? 'bg-white text-slate-800 shadow-xs font-bold'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  {tab.replace(/_/g, ' ')}
+                </button>
+              ))}
+            </div>
+
+            {counsellors.length > 0 && (
+              <select
+                value={counsellorFilter}
+                onChange={(e) => setCounsellorFilter(e.target.value)}
+                className="text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               >
-                {tab.replace(/_/g, ' ')}
-              </button>
-            ))}
+                <option value="all">All Counsellors</option>
+                <option value="unassigned">Not Assigned</option>
+                {counsellors.map((c) => (
+                  <option key={c.username || c.id} value={c.displayName || c.username}>
+                    {c.displayName || c.username}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div className="relative w-full sm:w-64">
@@ -274,7 +305,16 @@ export default function AdminCounselling() {
                         <span className="text-[10px] text-slate-400 capitalize">{rec.type.replace(/_/g, ' ')}</span>
                       </td>
                       <td className="px-5 py-4 text-slate-700 font-medium">
-                        {rec.counsellor || <span className="text-slate-400 italic">Unassigned</span>}
+                        {rec.counsellor ? (
+                          <div className="flex items-center gap-1.5 font-semibold text-slate-800">
+                            <FaUserCheck className="text-emerald-600 text-xs shrink-0" aria-hidden="true" />
+                            <span>{rec.counsellor}</span>
+                          </div>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">
+                            Not assigned
+                          </span>
+                        )}
                       </td>
                       <td className="px-5 py-4">
                         <p className="font-medium text-slate-800">{rec.interestedCourse || 'General Guidance'}</p>
@@ -324,7 +364,7 @@ export default function AdminCounselling() {
         {/* Create / Edit Modal */}
         <Modal
           isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={closeModal}
           title={editingRecord ? 'Update Counselling Session' : 'Schedule Counselling Session'}
           subtitle="Record career guidance discussion, parent feedback, and recommendation notes"
           size="xl"
@@ -333,7 +373,7 @@ export default function AdminCounselling() {
             <>
               <button
                 type="button"
-                onClick={() => setModalOpen(false)}
+                onClick={closeModal}
                 disabled={saving}
                 className="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition-colors text-xs font-semibold"
               >
@@ -366,7 +406,7 @@ export default function AdminCounselling() {
                       type="text"
                       required
                       value={form.studentName}
-                      onChange={(e) => setForm({ ...form, studentName: e.target.value })}
+                      onChange={(e) => setForm((prev) => ({ ...prev, studentName: e.target.value }))}
                       className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
                     />
                   </div>
@@ -375,7 +415,7 @@ export default function AdminCounselling() {
                     <input
                       type="text"
                       value={form.studentPhone}
-                      onChange={(e) => setForm({ ...form, studentPhone: e.target.value })}
+                      onChange={(e) => setForm((prev) => ({ ...prev, studentPhone: e.target.value }))}
                       placeholder="10-digit mobile"
                       className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
                     />
@@ -389,25 +429,38 @@ export default function AdminCounselling() {
                       type="datetime-local"
                       required
                       value={form.scheduledAt}
-                      onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })}
+                      onChange={(e) => setForm((prev) => ({ ...prev, scheduledAt: e.target.value }))}
                       className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
                     />
                   </div>
                   <div>
                     <label className="block font-semibold text-slate-700 mb-1">Assigned Counsellor</label>
-                    <input
-                      type="text"
+                    <select
                       value={form.counsellor}
-                      onChange={(e) => setForm({ ...form, counsellor: e.target.value })}
-                      placeholder="Staff member name"
-                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
-                    />
+                      onChange={(e) => setForm((prev) => ({ ...prev, counsellor: e.target.value }))}
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs bg-white focus:ring-2 focus:ring-blue-500/20 outline-none"
+                    >
+                      <option value="">Not assigned</option>
+                      {counsellors.map((c) => (
+                        <option key={c.username || c.id} value={c.displayName || c.username}>
+                          {c.displayName || c.username} ({c.role === 'counsellor' ? 'Counsellor' : c.role === 'super_admin' ? 'Super Admin' : 'Admin'})
+                        </option>
+                      ))}
+                      {form.counsellor && !counsellors.some((c) => (c.displayName || c.username) === form.counsellor) && (
+                        <option value={form.counsellor}>{form.counsellor} (Current)</option>
+                      )}
+                    </select>
+                    {counsellors.length === 0 && (
+                      <p className="text-[10px] text-slate-400 mt-1">
+                        No active staff members registered in staff directory.
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block font-semibold text-slate-700 mb-1">Session Type</label>
                     <select
                       value={form.type}
-                      onChange={(e) => setForm({ ...form, type: e.target.value })}
+                      onChange={(e) => setForm((prev) => ({ ...prev, type: e.target.value }))}
                       className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs bg-white focus:ring-2 focus:ring-blue-500/20 outline-none"
                     >
                       <option value="in_person">In Person (Office)</option>
@@ -424,7 +477,7 @@ export default function AdminCounselling() {
                     <input
                       type="text"
                       value={form.interestedCourse}
-                      onChange={(e) => setForm({ ...form, interestedCourse: e.target.value })}
+                      onChange={(e) => setForm((prev) => ({ ...prev, interestedCourse: e.target.value }))}
                       placeholder="e.g. B.Tech Artificial Intelligence"
                       className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
                     />
@@ -434,7 +487,7 @@ export default function AdminCounselling() {
                     <input
                       type="text"
                       value={form.preferredCollege}
-                      onChange={(e) => setForm({ ...form, preferredCollege: e.target.value })}
+                      onChange={(e) => setForm((prev) => ({ ...prev, preferredCollege: e.target.value }))}
                       placeholder="e.g. Coimbatore District Colleges"
                       className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
                     />
@@ -446,7 +499,7 @@ export default function AdminCounselling() {
                   <textarea
                     rows={3}
                     value={form.notes}
-                    onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                    onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))}
                     placeholder="Summary of student background, cut-off marks, preferences, financial circumstances..."
                     className="w-full border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
                   />
@@ -458,7 +511,7 @@ export default function AdminCounselling() {
                     <textarea
                       rows={2}
                       value={form.recommendations}
-                      onChange={(e) => setForm({ ...form, recommendations: e.target.value })}
+                      onChange={(e) => setForm((prev) => ({ ...prev, recommendations: e.target.value }))}
                       placeholder="Recommended college options, quota guidance, scholarship eligibility..."
                       className="w-full border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
                     />
@@ -468,7 +521,7 @@ export default function AdminCounselling() {
                     <textarea
                       rows={2}
                       value={form.nextSteps}
-                      onChange={(e) => setForm({ ...form, nextSteps: e.target.value })}
+                      onChange={(e) => setForm((prev) => ({ ...prev, nextSteps: e.target.value }))}
                       placeholder="Awaiting 12th marksheet, campus visit arranged..."
                       className="w-full border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
                     />
@@ -480,7 +533,7 @@ export default function AdminCounselling() {
                     <label className="block font-semibold text-slate-700 mb-1">Status</label>
                     <select
                       value={form.status}
-                      onChange={(e) => setForm({ ...form, status: e.target.value })}
+                      onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value }))}
                       className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs bg-white focus:ring-2 focus:ring-blue-500/20 outline-none"
                     >
                       <option value="scheduled">Scheduled</option>
@@ -494,7 +547,7 @@ export default function AdminCounselling() {
                     <input
                       type="date"
                       value={form.followUpDate}
-                      onChange={(e) => setForm({ ...form, followUpDate: e.target.value })}
+                      onChange={(e) => setForm((prev) => ({ ...prev, followUpDate: e.target.value }))}
                       className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
                     />
                   </div>

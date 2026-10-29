@@ -8,9 +8,10 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import crypto from 'node:crypto';
+import busboy from 'busboy';
 
 export const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024; // 5 MB
-export const MAX_IMAGE_BYTES = 3 * 1024 * 1024; // 3 MB (banners / logos)
+export const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB (banners / logos)
 
 export const KINDS = {
   jpeg: { mime: 'image/jpeg', ext: 'jpg' },
@@ -27,8 +28,42 @@ export const DOCUMENT_TYPES = [
   { value: 'marksheet_10', label: '10th marksheet', kinds: ['jpeg', 'png', 'pdf'] },
   { value: 'marksheet_12', label: '12th marksheet', kinds: ['jpeg', 'png', 'pdf'] },
   { value: 'community_certificate', label: 'Community certificate', kinds: ['jpeg', 'png', 'pdf'] },
+  { value: 'transfer_certificate', label: 'Transfer certificate (TC)', kinds: ['jpeg', 'png', 'pdf'] },
+  { value: 'first_graduate', label: 'First graduate certificate', kinds: ['jpeg', 'png', 'pdf'] },
   { value: 'other', label: 'Other supporting document', kinds: ['jpeg', 'png', 'pdf'] },
 ];
+
+export const MANDATORY_DOCUMENTS = [
+  { id: 'marksheet_10', name: '10th Mark Sheet', fieldKey: 'file_marksheet_10' },
+  { id: 'marksheet_12', name: '12th Mark Sheet', fieldKey: 'file_marksheet_12' },
+  { id: 'aadhaar', name: 'Aadhaar Card (Xerox)', fieldKey: 'file_aadhaar' },
+  { id: 'community_certificate', name: 'Community Certificate', fieldKey: 'file_community_certificate' },
+  { id: 'transfer_certificate', name: 'Transfer Certificate (TC)', fieldKey: 'file_transfer_certificate' },
+  { id: 'first_graduate', name: 'First Graduate Certificate (if applicable)', fieldKey: 'file_first_graduate' },
+];
+
+export const DOC_NAME_TO_TYPE = {
+  '10th Mark Sheet': 'marksheet_10',
+  '12th Mark Sheet': 'marksheet_12',
+  'Aadhaar Card (Xerox)': 'aadhaar',
+  'Aadhaar Card': 'aadhaar',
+  'Community Certificate': 'community_certificate',
+  'Transfer Certificate (TC)': 'transfer_certificate',
+  'Transfer Certificate': 'transfer_certificate',
+  'First Graduate Certificate (if applicable)': 'first_graduate',
+  'First Graduate Certificate': 'first_graduate',
+};
+
+export const DOC_TYPE_TO_NAME = {
+  marksheet_10: '10th Mark Sheet',
+  marksheet_12: '12th Mark Sheet',
+  aadhaar: 'Aadhaar Card (Xerox)',
+  community_certificate: 'Community Certificate',
+  transfer_certificate: 'Transfer Certificate (TC)',
+  first_graduate: 'First Graduate Certificate (if applicable)',
+  photo: 'Student Photograph',
+  other: 'Other Document',
+};
 
 export function detectKind(buf) {
   if (!Buffer.isBuffer(buf) || buf.length < 12) return null;
@@ -78,7 +113,8 @@ export function validateUpload({ fileName, buffer, maxBytes = MAX_DOCUMENT_BYTES
 /** Decode a base64 payload (optionally a data: URL) with a size guard BEFORE allocating the buffer. */
 export function decodeBase64Payload(data, maxBytes = MAX_DOCUMENT_BYTES) {
   if (typeof data !== 'string' || !data) return { ok: false, error: 'No file data supplied' };
-  const b64 = data.replace(/^data:[^;]+;base64,/, '');
+  const raw = data.includes(',') ? data.split(',')[1] : data;
+  const b64 = (raw || '').replace(/\s+/g, '');
   if (!/^[A-Za-z0-9+/]+={0,2}$/.test(b64)) return { ok: false, error: 'Invalid file encoding' };
   const approx = Math.floor((b64.length * 3) / 4);
   if (approx > maxBytes + 4) return { ok: false, error: `File is too large (max ${Math.round(maxBytes / 1024 / 1024)} MB)` };
@@ -156,4 +192,116 @@ export function imageDimensions(buf) {
     return null;
   }
   return null;
+}
+
+/**
+ * Stream multipart/form-data into memory with strict per-file limits.
+ */
+export function parseMultipartForm(req, { maxFileSize = MAX_DOCUMENT_BYTES, maxFiles = 10 } = {}) {
+  return new Promise((resolve, reject) => {
+    let bb;
+    try {
+      bb = busboy({
+        headers: req.headers,
+        limits: {
+          fileSize: maxFileSize,
+          files: maxFiles,
+        },
+      });
+    } catch (err) {
+      return reject(new Error('Failed to initialize multipart parser: ' + err.message));
+    }
+
+    const fields = {};
+    const files = {};
+    let parseError = null;
+
+    bb.on('field', (name, val) => {
+      if (name === 'documents') {
+        if (!fields.documents) fields.documents = [];
+        fields.documents.push(val);
+      } else if (name.endsWith('[]')) {
+        const key = name.slice(0, -2);
+        if (!fields[key]) fields[key] = [];
+        fields[key].push(val);
+      } else {
+        fields[name] = val;
+      }
+    });
+
+    bb.on('file', (fieldname, stream, info) => {
+      const { filename, encoding, mimeType } = info;
+      const chunks = [];
+      let size = 0;
+      let truncated = false;
+
+      stream.on('data', (data) => {
+        size += data.length;
+        if (size > maxFileSize) {
+          truncated = true;
+        } else {
+          chunks.push(data);
+        }
+      });
+
+      stream.on('limit', () => {
+        truncated = true;
+      });
+
+      stream.on('end', () => {
+        if (filename && filename.trim()) {
+          files[fieldname] = {
+            fieldname,
+            filename: sanitizeFileName(filename),
+            originalName: filename,
+            mimeType,
+            buffer: Buffer.concat(chunks),
+            size,
+            truncated,
+          };
+        }
+      });
+    });
+
+    bb.on('error', (err) => {
+      parseError = err;
+      reject(err);
+    });
+
+    bb.on('finish', () => {
+      if (!parseError) {
+        resolve({ fields, files });
+      }
+    });
+
+    req.pipe(bb);
+  });
+}
+
+/**
+ * Parses incoming request body for both multipart/form-data and application/json.
+ */
+export async function parseRequestBody(req) {
+  const contentType = req.headers['content-type'] || '';
+  if (contentType.includes('multipart/form-data')) {
+    return parseMultipartForm(req);
+  }
+
+  // Fallback for application/json (or if body was already parsed by Next.js)
+  if (req.body && typeof req.body === 'object') {
+    return { fields: req.body, files: {} };
+  }
+
+  const chunks = [];
+  for await (const chunk of req) {
+    chunks.push(chunk);
+  }
+  const raw = Buffer.concat(chunks).toString('utf8');
+  if (!raw.trim()) return { fields: {}, files: {} };
+  try {
+    const json = JSON.parse(raw);
+    return { fields: json, files: {} };
+  } catch (err) {
+    throw new Error('Invalid JSON payload');
+  }
 }

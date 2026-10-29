@@ -3,9 +3,16 @@ import { getJwtSecret } from './adminConfig.js';
 import { can, roleFromTokenPayload } from './rbac.js';
 
 export function verifyToken(req) {
+  let token = null;
   const authHeader = req.headers?.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  } else if (req.query?.token && typeof req.query.token === 'string') {
+    token = req.query.token;
+  }
+
+  if (!token) {
     return null;
   }
 
@@ -14,8 +21,6 @@ export function verifyToken(req) {
   if (!secret) {
     return null;
   }
-
-  const token = authHeader.split(' ')[1];
 
   try {
     const decoded = jwt.verify(token, secret, { algorithms: ['HS256'] });

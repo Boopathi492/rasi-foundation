@@ -45,15 +45,18 @@ export function clientIp(req) {
 
 /**
  * Express/Next.js middleware-friendly rate limiter returning boolean
+ * Also exposes .check(key, now) for direct key-based checking.
  */
 export function rateLimiter({ windowMs = 60_000, max = 10 } = {}) {
   const limiter = createRateLimiter({ windowMs, max });
-  return function (req, res) {
+  const fn = function (req, res) {
     const ip = clientIp(req);
     const result = limiter.check(ip);
     if (!result.allowed && res && typeof res.setHeader === 'function') {
-      res.setHeader('Retry-After', result.retryAfterSec);
+      res.setHeader('Retry-After', String(result.retryAfterSec));
     }
     return result.allowed;
   };
+  fn.check = (key, now) => limiter.check(key, now);
+  return fn;
 }

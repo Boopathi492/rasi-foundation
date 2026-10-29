@@ -1,0 +1,1955 @@
+[
+  {
+    "_id": "6ae1ce829fc63d5fdb276a9d",
+    "name": "K.K.C. College of Engineering and Technology",
+    "district": "Ariyalur",
+    "location": "Jayankondam, Ariyalur",
+    "type": "Engineering",
+    "currentTneaCode": "3828",
+    "website": "https://kkccet.in"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb2766bf",
+    "name": "Meenakshi Ramaswamy Engineering College",
+    "district": "Ariyalur",
+    "location": "MR Kalvi Nagar, Thathanur, Ariyalur",
+    "type": "Engineering",
+    "currentTneaCode": "3813",
+    "website": "https://mrec.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad84",
+    "name": "University College of Engineering, Ariyalur (Anna University)",
+    "district": "Ariyalur",
+    "location": "Kathankudikadu, Thelur Post, Ariyalur",
+    "type": "Engineering",
+    "currentTneaCode": "1027",
+    "website": "https://ucea.edu.in"
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace604",
+    "name": "Adithya Institute of Technology",
+    "district": "Bengaluru Zone",
+    "location": "Bengaluru",
+    "type": "Legacy",
+    "currentTneaCode": "",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace60a",
+    "name": "Atria Institute of Technology",
+    "district": "Bengaluru Zone",
+    "location": "Bengaluru",
+    "type": "Legacy",
+    "currentTneaCode": "",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace610",
+    "name": "MVJ College of Engineering",
+    "district": "Bengaluru Zone",
+    "location": "Bengaluru",
+    "type": "Legacy",
+    "currentTneaCode": "",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace605",
+    "name": "SEA College of Engineering & Technology",
+    "district": "Bengaluru Zone",
+    "location": "Bengaluru",
+    "type": "Legacy",
+    "currentTneaCode": "",
+    "website": ""
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad43",
+    "name": "Rajalakshmi Engineering College (Autonomous)",
+    "district": "Chengalpattu",
+    "location": "Rajalakshmi Nagar, Thandalam, Chengalpattu border",
+    "type": "Engineering",
+    "currentTneaCode": "1211",
+    "website": "https://www.rajalakshmi.org"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad42",
+    "name": "SRM Valliammai Engineering College (Autonomous)",
+    "district": "Chengalpattu",
+    "location": "SRM Nagar, Kattankulathur, Chengalpattu",
+    "type": "Engineering",
+    "currentTneaCode": "1422",
+    "website": "https://srmvalliammai.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adc5",
+    "name": "Chennai Institute of Technology (CIT Chennai)",
+    "district": "Chennai",
+    "location": "Sarathy Nagar, Kundrathur, Chennai",
+    "type": "Engineering",
+    "currentTneaCode": "1152",
+    "website": "https://citchennai.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502acf1",
+    "name": "College of Engineering, Guindy (CEG), Anna University",
+    "district": "Chennai",
+    "location": "Guindy, Chennai",
+    "type": "Engineering",
+    "currentTneaCode": "1",
+    "website": "https://ceg.annauniv.edu"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adc7",
+    "name": "Easwari Engineering College (Autonomous)",
+    "district": "Chennai",
+    "location": "Bharathi Salai, Ramapuram, Chennai",
+    "type": "Engineering",
+    "currentTneaCode": "1304",
+    "website": "https://srmeaswari.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502acf2",
+    "name": "Madras Institute of Technology (MIT), Anna University",
+    "district": "Chennai",
+    "location": "Chromepet, Chennai",
+    "type": "Engineering",
+    "currentTneaCode": "4",
+    "website": "https://mitindia.edu"
+  },
+  {
+    "_id": "6ae1ce809fc63d5fdb276604",
+    "name": "Meenakshi Sundararajan Engineering College",
+    "district": "Chennai",
+    "location": "363, Arcot Road, Kodambakkam, Chennai",
+    "type": "Engineering",
+    "currentTneaCode": "1309",
+    "website": "https://msec.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad01",
+    "name": "SSN College of Engineering",
+    "district": "Chennai",
+    "location": "Kalavakkam, Old Mahabalipuram Road, Chennai",
+    "type": "Engineering",
+    "currentTneaCode": "1315",
+    "website": "https://www.ssn.edu.in"
+  },
+  {
+    "_id": "6ae1ce809fc63d5fdb2765fb",
+    "name": "Sri Sairam Engineering College",
+    "district": "Chennai",
+    "location": "Sai Leo Nagar, West Tambaram, Chennai",
+    "type": "Engineering",
+    "currentTneaCode": "1419",
+    "website": "https://sairam.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adcc",
+    "name": "Dr. Mahalingam College of Engineering and Technology (MCET)",
+    "district": "Coimbatore",
+    "location": "NPT Campus, Udumalai Road, Pollachi, Coimbatore",
+    "type": "Engineering",
+    "currentTneaCode": "2706",
+    "website": "https://mcet.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad03",
+    "name": "Government College of Technology (GCT)",
+    "district": "Coimbatore",
+    "location": "Thadagam Road, Coimbatore",
+    "type": "Engineering",
+    "currentTneaCode": "2005",
+    "website": "https://gct.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adcb",
+    "name": "Hindusthan College of Engineering and Technology (HICET)",
+    "district": "Coimbatore",
+    "location": "Othakkalmandapam, Coimbatore",
+    "type": "Engineering",
+    "currentTneaCode": "2707",
+    "website": "https://hicet.ac.in"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb276668",
+    "name": "Kalaignar Karunanidhi Institute of Technology (KIT)",
+    "district": "Coimbatore",
+    "location": "Kannampalayam Post, Coimbatore",
+    "type": "Engineering",
+    "currentTneaCode": "2753",
+    "website": "https://kitcbe.com"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad02",
+    "name": "PSG College of Technology (Autonomous)",
+    "district": "Coimbatore",
+    "location": "Peelamedu, Coimbatore",
+    "type": "Engineering",
+    "currentTneaCode": "2006",
+    "website": "https://www.psgtech.edu"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb27665e",
+    "name": "Sri Krishna College of Technology",
+    "district": "Coimbatore",
+    "location": "Kovaipudur, Coimbatore",
+    "type": "Engineering",
+    "currentTneaCode": "2722",
+    "website": "https://skct.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adca",
+    "name": "Sri Ramakrishna Engineering College (SREC)",
+    "district": "Coimbatore",
+    "location": "Vattamalaipalayam, NGGO Colony Post, Coimbatore",
+    "type": "Engineering",
+    "currentTneaCode": "2719",
+    "website": "https://srec.ac.in"
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5dc",
+    "name": "Adithya Institute of Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2744",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5e8",
+    "name": "Akshaya College of Engineering and Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2763",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5ef",
+    "name": "Arjun College of Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2367",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5f6",
+    "name": "Asian College of Engineering and Technology",
+    "district": "Coimbatore Zone",
+    "location": "Saravanampatti",
+    "type": "Legacy",
+    "currentTneaCode": "2338",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5ff",
+    "name": "CMS College of Engineering and Technology",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2772",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace600",
+    "name": "Christ the King Engineering College",
+    "district": "Coimbatore Zone",
+    "location": "Karamadai",
+    "type": "Legacy",
+    "currentTneaCode": "2650",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5e3",
+    "name": "Coimbatore Institute of Engineering and Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2704",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5d1",
+    "name": "Coimbatore Institute of Technology (CIT)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "7176",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5f8",
+    "name": "Dhaanish Ahmed Institute of Technology",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2349",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5eb",
+    "name": "Dhanalakshmi Srinivasan College of Engineering (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2743",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5df",
+    "name": "Dr. NGP Institute of Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2736",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5ee",
+    "name": "EASA College of Engineering and Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2749",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5e7",
+    "name": "Hindustan Institute of Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2740",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5e6",
+    "name": "Hindusthan College of Engineering and Technology",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2777",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5e9",
+    "name": "INFO Institute of Engineering and Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2732",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5f0",
+    "name": "JCT College of Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2762",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5e0",
+    "name": "KGISL Institute of Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2751",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5ea",
+    "name": "KIT – Kalaignar Karunanidhi Institute of Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2750",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5d4",
+    "name": "KPR Institute of Engineering and Technology",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2764",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5d8",
+    "name": "Karpagam College of Engineering (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2710",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5d9",
+    "name": "Karpagam Institute of Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2735",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5fd",
+    "name": "Kathir College of Engineering",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2745",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5d2",
+    "name": "Kumaraguru College of Technology (KCT)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2712",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5e1",
+    "name": "Nehru Institute of Engineering and Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2729",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5e2",
+    "name": "Nehru Institute of Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2755",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5f2",
+    "name": "P.A. College of Engineering and Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Pollachi",
+    "type": "Legacy",
+    "currentTneaCode": "2741",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5dd",
+    "name": "PPG Institute of Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2753",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5cf",
+    "name": "PSG College of Technology",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2006",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5d0",
+    "name": "PSG Institute of Technology and Applied Research (PSG iTech)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2377",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5fa",
+    "name": "Park College of Engineering and Technology",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2716",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5f1",
+    "name": "Pollachi Institute of Engineering and Technology",
+    "district": "Coimbatore Zone",
+    "location": "Pollachi",
+    "type": "Legacy",
+    "currentTneaCode": "2354",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5e4",
+    "name": "RVS College of Engineering and Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2731",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5f4",
+    "name": "SNS College of Engineering (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2734",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5f3",
+    "name": "SNS College of Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2726",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5db",
+    "name": "Sree Sakthi Engineering College (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Karamadai",
+    "type": "Legacy",
+    "currentTneaCode": "2673",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5d3",
+    "name": "Sri Eshwar College of Engineering",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2739",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5d5",
+    "name": "Sri Krishna College of Engineering and Technology (SKCET)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2718",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5d6",
+    "name": "Sri Ramakrishna Engineering College",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2719",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5d7",
+    "name": "Sri Ramakrishna Institute of Technology",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2725",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5ec",
+    "name": "Sri Ranganathar Institute of Engineering and Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Athipalayam",
+    "type": "Legacy",
+    "currentTneaCode": "2342",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5f5",
+    "name": "Sri Sai Ranganathan Engineering College",
+    "district": "Coimbatore Zone",
+    "location": "Thondamuthur",
+    "type": "Legacy",
+    "currentTneaCode": "2737",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5fc",
+    "name": "Sri Shakthi Institute of Engineering and Technology",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2727",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5ed",
+    "name": "Study World College of Engineering",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2770",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5fe",
+    "name": "Suguna College of Engineering",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2360",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5fb",
+    "name": "Tamil Nadu College of Engineering",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2721",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5e5",
+    "name": "United Institute of Technology (Autonomous)",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2761",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5f9",
+    "name": "VSB College of Engineering and Technical Campus",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2357",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5f7",
+    "name": "Vishnu Lakshmi College of Engineering and Technology",
+    "district": "Coimbatore Zone",
+    "location": "Coimbatore",
+    "type": "Legacy",
+    "currentTneaCode": "2368",
+    "website": ""
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad68",
+    "name": "C. Abdul Hakeem College of Engineering and Technology (affiliate / nearby regional reach)",
+    "district": "Cuddalore",
+    "location": "Melvisharam / Cuddalore regional corridor",
+    "type": "Engineering",
+    "currentTneaCode": "1501",
+    "website": "https://cahcet.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ade9",
+    "name": "C.K. College of Engineering and Technology",
+    "district": "Cuddalore",
+    "location": "Jayaram Nagar, Chellangkuppam, Cuddalore",
+    "type": "Engineering",
+    "currentTneaCode": "1405",
+    "website": "https://ckcet.edu.in"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb2766af",
+    "name": "Krishnasamy College of Engineering and Technology",
+    "district": "Cuddalore",
+    "location": "S.Kumarapuram, Cuddalore",
+    "type": "Engineering",
+    "currentTneaCode": "1407",
+    "website": "https://kcetvpm.org"
+  },
+  {
+    "_id": "6ae1ce829fc63d5fdb276a90",
+    "name": "St. Anne's College of Engineering and Technology",
+    "district": "Cuddalore",
+    "location": "Anguchettypalayam, Panruti, Cuddalore",
+    "type": "Engineering",
+    "currentTneaCode": "1426",
+    "website": "https://stannescet.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad66",
+    "name": "University College of Engineering, Panruti (Anna University)",
+    "district": "Cuddalore",
+    "location": "Panruti, Cuddalore",
+    "type": "Engineering",
+    "currentTneaCode": "1026",
+    "website": "https://ucep.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad6a",
+    "name": "Government College of Engineering (GCE), Dharmapuri",
+    "district": "Dharmapuri",
+    "location": "Settikarai, Dharmapuri",
+    "type": "Engineering",
+    "currentTneaCode": "2661",
+    "website": "https://gcedpi.edu.in"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb276671",
+    "name": "Jayam College of Engineering and Technology",
+    "district": "Dharmapuri",
+    "location": "Dharmapuri-Hogenakkal Falls Road, Nallanur, Dharmapuri",
+    "type": "Engineering",
+    "currentTneaCode": "2607",
+    "website": "https://jcet.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adeb",
+    "name": "Varuvan Vadivelan Institute of Technology",
+    "district": "Dharmapuri",
+    "location": "NH-7, Gundalapatti, Dharmapuri",
+    "type": "Engineering",
+    "currentTneaCode": "2639",
+    "website": "https://vvit.ac.in"
+  },
+  {
+    "_id": "6ae1ce829fc63d5fdb276aa3",
+    "name": "Christian College of Engineering and Technology",
+    "district": "Dindigul",
+    "location": "Oddanchatram, Dindigul",
+    "type": "Engineering",
+    "currentTneaCode": "5903",
+    "website": "https://christianengineering.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad52",
+    "name": "PSNA College of Engineering and Technology (Autonomous)",
+    "district": "Dindigul",
+    "location": "Kothandaraman Nagar, Dindigul",
+    "type": "Engineering",
+    "currentTneaCode": "5812",
+    "website": "https://psnacet.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad54",
+    "name": "SSM Institute of Engineering and Technology",
+    "district": "Dindigul",
+    "location": "Dindigul-Palani Highway, Dindigul",
+    "type": "Engineering",
+    "currentTneaCode": "5817",
+    "website": "https://ssmiet.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad2e",
+    "name": "Bannari Amman Institute of Technology (BIT)",
+    "district": "Erode",
+    "location": "Alathukombai, Sathyamangalam, Erode",
+    "type": "Engineering",
+    "currentTneaCode": "2702",
+    "website": "https://www.bitsathy.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adda",
+    "name": "Erode Sengunthar Engineering College (Autonomous)",
+    "district": "Erode",
+    "location": "Thudupathi, Perundurai, Erode",
+    "type": "Engineering",
+    "currentTneaCode": "2704",
+    "website": "https://erodesengunthar.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad32",
+    "name": "Institute of Road and Transport Technology (IRTT), GCE Erode",
+    "district": "Erode",
+    "location": "Vasavi College Post, Erode",
+    "type": "Engineering",
+    "currentTneaCode": "2709",
+    "website": "https://gceerode.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad2d",
+    "name": "Kongu Engineering College (Autonomous)",
+    "district": "Erode",
+    "location": "Perundurai, Erode",
+    "type": "Engineering",
+    "currentTneaCode": "2711",
+    "website": "https://www.kongu.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502add9",
+    "name": "Velalar College of Engineering and Technology (Autonomous)",
+    "district": "Erode",
+    "location": "Perundurai Road, Thindal Post, Erode",
+    "type": "Engineering",
+    "currentTneaCode": "2723",
+    "website": "https://velalarengg.ac.in"
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5ce",
+    "name": "Aishwarya College of Engineering and Technology",
+    "district": "Erode District",
+    "location": "Erode",
+    "type": "Legacy",
+    "currentTneaCode": "2332",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5cd",
+    "name": "Al-Ameen Engineering College",
+    "district": "Erode District",
+    "location": "Erode",
+    "type": "Legacy",
+    "currentTneaCode": "2652",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5c6",
+    "name": "Erode Sengunthar Engineering College (ESEC)",
+    "district": "Erode District",
+    "location": "Perundurai",
+    "type": "Legacy",
+    "currentTneaCode": "2708",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5c7",
+    "name": "J.K.K. Munirajah College of Technology",
+    "district": "Erode District",
+    "location": "Gobichettipalayam",
+    "type": "Legacy",
+    "currentTneaCode": "2758",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5c8",
+    "name": "M. P. Nachimuthu M. Jaganathan Engineering College (MPNMJ)",
+    "district": "Erode District",
+    "location": "Chennimalai",
+    "type": "Legacy",
+    "currentTneaCode": "2713",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5c9",
+    "name": "Nandha College of Technology",
+    "district": "Erode District",
+    "location": "Erode",
+    "type": "Legacy",
+    "currentTneaCode": "2752",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5ca",
+    "name": "Nandha Engineering College",
+    "district": "Erode District",
+    "location": "Perundurai",
+    "type": "Legacy",
+    "currentTneaCode": "7322",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5cc",
+    "name": "Sasurie College of Engineering",
+    "district": "Erode District",
+    "location": "Vijayamangalam",
+    "type": "Legacy",
+    "currentTneaCode": "2717",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5c5",
+    "name": "Shree Venkateshwara Hi-Tech Engineering College",
+    "district": "Erode District",
+    "location": "Gobichettipalayam",
+    "type": "Legacy",
+    "currentTneaCode": "2747",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5cb",
+    "name": "Surya Engineering College",
+    "district": "Erode District",
+    "location": "Erode",
+    "type": "Legacy",
+    "currentTneaCode": "2748",
+    "website": ""
+  },
+  {
+    "_id": "6ae1037628c7444cf502ae0a",
+    "name": "A.K.T. Memorial College of Engineering and Technology",
+    "district": "Kallakurichi",
+    "location": "AKT Nagar, Neelamangalam, Kallakurichi",
+    "type": "Engineering",
+    "currentTneaCode": "1426",
+    "website": "https://aktmcet.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adba",
+    "name": "Maha Barathi Engineering College",
+    "district": "Kallakurichi",
+    "location": "A-Vasudevanur, Chinnasalem, Kallakurichi",
+    "type": "Engineering",
+    "currentTneaCode": "1442",
+    "website": "https://mbec.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ae0b",
+    "name": "T.S.M. Jain College of Technology",
+    "district": "Kallakurichi",
+    "location": "Melur, Kallakurichi",
+    "type": "Engineering",
+    "currentTneaCode": "1447",
+    "website": "https://tsmjain.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad48",
+    "name": "Adhi College of Engineering and Technology",
+    "district": "Kancheepuram",
+    "location": "Sankarapuram, Walajabad, Kancheepuram",
+    "type": "Engineering",
+    "currentTneaCode": "1432",
+    "website": "https://adhi.edu.in"
+  },
+  {
+    "_id": "6ae1ce809fc63d5fdb276615",
+    "name": "Saveetha Engineering College",
+    "district": "Kancheepuram",
+    "location": "Saveetha Nagar, Thandalam, Kancheepuram",
+    "type": "Engineering",
+    "currentTneaCode": "1217",
+    "website": "https://saveetha.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad57",
+    "name": "Government College of Engineering, Nagercoil (GCE Nagercoil)",
+    "district": "Kanniyakumari",
+    "location": "Konam, Nagercoil, Kanniyakumari",
+    "type": "Engineering",
+    "currentTneaCode": "4982",
+    "website": "https://ucenk.ac.in"
+  },
+  {
+    "_id": "6ae1ce829fc63d5fdb276a7c",
+    "name": "Mar Ephraem College of Engineering and Technology",
+    "district": "Kanniyakumari",
+    "location": "Malankara Hills, Elavuvilai, Marthandam, Kanniyakumari",
+    "type": "Engineering",
+    "currentTneaCode": "4983",
+    "website": "https://marephraem.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad59",
+    "name": "Noorul Islam Centre for Higher Education (Deemed University)",
+    "district": "Kanniyakumari",
+    "location": "Kumaracoil, Thuckalay, Kanniyakumari",
+    "type": "Engineering",
+    "currentTneaCode": "",
+    "website": "https://www.niuniv.com"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ade4",
+    "name": "Ponjesly College of Engineering",
+    "district": "Kanniyakumari",
+    "location": "Alamparai, Vetturnimadam Post, Nagercoil, Kanniyakumari",
+    "type": "Engineering",
+    "currentTneaCode": "4979",
+    "website": "https://ponjesly.ac.in"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb276698",
+    "name": "St. Xavier's Catholic College of Engineering",
+    "district": "Kanniyakumari",
+    "location": "Chunkankadai, Nagercoil, Kanniyakumari",
+    "type": "Engineering",
+    "currentTneaCode": "4968",
+    "website": "https://sxcce.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adee",
+    "name": "Chettinad College of Engineering and Technology",
+    "district": "Karur",
+    "location": "NH-67, Karur-Trichy Highway, Puliyur CF, Karur",
+    "type": "Engineering",
+    "currentTneaCode": "2743",
+    "website": "https://chettinadtech.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad73",
+    "name": "M. Kumarasamy College of Engineering (Autonomous)",
+    "district": "Karur",
+    "location": "Thalavapalayam, Karur",
+    "type": "Engineering",
+    "currentTneaCode": "2708",
+    "website": "https://mkce.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad74",
+    "name": "V.S.B. Engineering College (Autonomous)",
+    "district": "Karur",
+    "location": "NH-67, Covai Road, Karudayampalayam, Karur",
+    "type": "Engineering",
+    "currentTneaCode": "2722",
+    "website": "https://vsbec.com"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad70",
+    "name": "Adhiyamaan College of Engineering (Autonomous)",
+    "district": "Krishnagiri",
+    "location": "AERI Campus, Hosur, Krishnagiri",
+    "type": "Engineering",
+    "currentTneaCode": "2601",
+    "website": "https://adhiyamaan.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adec",
+    "name": "Er. Perumal Manimekalai College of Engineering (Autonomous)",
+    "district": "Krishnagiri",
+    "location": "NH-7, Koneripalli, Hosur, Krishnagiri",
+    "type": "Engineering",
+    "currentTneaCode": "2628",
+    "website": "https://pmctech.org"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad6e",
+    "name": "Government College of Engineering (GCE), Bargur",
+    "district": "Krishnagiri",
+    "location": "Bargur, Krishnagiri",
+    "type": "Engineering",
+    "currentTneaCode": "2603",
+    "website": "https://gcebargur.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad18",
+    "name": "KLN College of Engineering",
+    "district": "Madurai",
+    "location": "Pottapalayam, Madurai Sivagangai Border",
+    "type": "Engineering",
+    "currentTneaCode": "5901",
+    "website": "https://www.klnce.edu"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad0f",
+    "name": "Thiagarajar College of Engineering (TCE)",
+    "district": "Madurai",
+    "location": "Thiruparankundram, Madurai",
+    "type": "Engineering",
+    "currentTneaCode": "5008",
+    "website": "https://www.tce.edu"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adcf",
+    "name": "Velammal College of Engineering and Technology (Autonomous)",
+    "district": "Madurai",
+    "location": "Madurai-Tuticorin Ring Road, Viraganoor, Madurai",
+    "type": "Engineering",
+    "currentTneaCode": "5986",
+    "website": "https://vcet.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad7a",
+    "name": "A.V.C. College of Engineering",
+    "district": "Mayiladuthurai",
+    "location": "Mannampandal, Mayiladuthurai",
+    "type": "Engineering",
+    "currentTneaCode": "3801",
+    "website": "https://avcce.net"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad78",
+    "name": "E.G.S. Pillay Engineering College (Autonomous)",
+    "district": "Nagapattinam",
+    "location": "Old Nagore Road, Thethi, Nagapattinam",
+    "type": "Engineering",
+    "currentTneaCode": "3806",
+    "website": "https://egspec.org"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ae13",
+    "name": "Sir Issac Newton College of Engineering and Technology",
+    "district": "Nagapattinam",
+    "location": "Papakoil, Anthanapettai Post, Nagapattinam",
+    "type": "Engineering",
+    "currentTneaCode": "3830",
+    "website": "https://sincet.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502add8",
+    "name": "Excel Engineering College (Autonomous)",
+    "district": "Namakkal",
+    "location": "NH-544, Salem Main Road, Pallakkapalayam, Komarapalayam, Namakkal",
+    "type": "Engineering",
+    "currentTneaCode": "2634",
+    "website": "https://excelinstitutions.com"
+  },
+  {
+    "_id": "6ae1037628c7444cf502add7",
+    "name": "Mahendra Engineering College (Autonomous)",
+    "district": "Namakkal",
+    "location": "Salem-Tiruchengode Highway, Mahendhirapuri, Mallasamudram, Namakkal",
+    "type": "Engineering",
+    "currentTneaCode": "2609",
+    "website": "https://mahendra.info"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad29",
+    "name": "Muthayammal Engineering College (Autonomous)",
+    "district": "Namakkal",
+    "location": "Kakkaveri, Rasipuram, Namakkal",
+    "type": "Engineering",
+    "currentTneaCode": "2610",
+    "website": "https://mec.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad2a",
+    "name": "Paavai Engineering College (Autonomous)",
+    "district": "Namakkal",
+    "location": "NH-44, Pachal, Namakkal",
+    "type": "Engineering",
+    "currentTneaCode": "2611",
+    "website": "https://pec.paavai.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502add5",
+    "name": "Vivekanandha College of Engineering for Women (Autonomous)",
+    "district": "Namakkal",
+    "location": "Elayampalayam, Tiruchengode, Namakkal",
+    "type": "Engineering",
+    "currentTneaCode": "2623",
+    "website": "https://vcew.ac.in"
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5ba",
+    "name": "Annai Mathammal Sheela Engineering College",
+    "district": "Namakkal District",
+    "location": "Erumapatti",
+    "type": "Legacy",
+    "currentTneaCode": "2602",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5b0",
+    "name": "CMS College of Engineering",
+    "district": "Namakkal District",
+    "location": "Namakkal",
+    "type": "Legacy",
+    "currentTneaCode": "2635",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5b5",
+    "name": "Excel Engineering College",
+    "district": "Namakkal District",
+    "location": "Komarapalayam",
+    "type": "Legacy",
+    "currentTneaCode": "2634",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5b1",
+    "name": "Gnanamani College of Technology",
+    "district": "Namakkal District",
+    "location": "Namakkal",
+    "type": "Legacy",
+    "currentTneaCode": "2624",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5b6",
+    "name": "J.K.K. Nattraja College of Engineering and Technology",
+    "district": "Namakkal District",
+    "location": "Komarapalayam",
+    "type": "Legacy",
+    "currentTneaCode": "2647",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5ac",
+    "name": "K.S. Rangasamy College of Technology (KSRCT)",
+    "district": "Namakkal District",
+    "location": "Tiruchengode",
+    "type": "Legacy",
+    "currentTneaCode": "2607",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5b4",
+    "name": "Mahendra Engineering College",
+    "district": "Namakkal District",
+    "location": "Mallasamudram",
+    "type": "Legacy",
+    "currentTneaCode": "2609",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5b2",
+    "name": "Muthayammal Engineering College",
+    "district": "Namakkal District",
+    "location": "Rasipuram",
+    "type": "Legacy",
+    "currentTneaCode": "2610",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5b7",
+    "name": "PGP College of Engineering and Technology",
+    "district": "Namakkal District",
+    "location": "Namakkal",
+    "type": "Legacy",
+    "currentTneaCode": "2612",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5ae",
+    "name": "Paavai College of Technology",
+    "district": "Namakkal District",
+    "location": "Namakkal",
+    "type": "Legacy",
+    "currentTneaCode": "2628",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5ad",
+    "name": "Paavai Engineering College",
+    "district": "Namakkal District",
+    "location": "Namakkal",
+    "type": "Legacy",
+    "currentTneaCode": "2611",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5bb",
+    "name": "S.R.G. Engineering College",
+    "district": "Namakkal District",
+    "location": "Namakkal",
+    "type": "Legacy",
+    "currentTneaCode": "2767",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5b9",
+    "name": "SSM College of Engineering",
+    "district": "Namakkal District",
+    "location": "Komarapalayam",
+    "type": "Legacy",
+    "currentTneaCode": "2614",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5af",
+    "name": "Selvam College of Technology (Autonomous)",
+    "district": "Namakkal District",
+    "location": "Namakkal",
+    "type": "Legacy",
+    "currentTneaCode": "2625",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5b3",
+    "name": "Sengunthar Engineering College (Autonomous)",
+    "district": "Namakkal District",
+    "location": "Tiruchengode",
+    "type": "Legacy",
+    "currentTneaCode": "2617",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5b8",
+    "name": "Vidhya Vikas College of Engineering and Technology",
+    "district": "Namakkal District",
+    "location": "Tiruchengode",
+    "type": "Legacy",
+    "currentTneaCode": "2633",
+    "website": ""
+  },
+  {
+    "_id": "6ae1037628c7444cf502adbf",
+    "name": "CSI College of Engineering",
+    "district": "Nilgiris",
+    "location": "Ketti Valley, Ooty / Coonoor, Nilgiris",
+    "type": "Engineering",
+    "currentTneaCode": "2752",
+    "website": "https://csice.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad87",
+    "name": "Dhanalakshmi Srinivasan Engineering College (Autonomous)",
+    "district": "Perambalur",
+    "location": "Thuraiyur Road, Perambalur",
+    "type": "Engineering",
+    "currentTneaCode": "3805",
+    "website": "https://dsec.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ae0f",
+    "name": "Roever Engineering College",
+    "district": "Perambalur",
+    "location": "Elambalur, Perambalur",
+    "type": "Engineering",
+    "currentTneaCode": "3817",
+    "website": "https://roeverengg.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adf1",
+    "name": "Chendhuran College of Engineering and Technology",
+    "district": "Pudukkottai",
+    "location": "Lena Vilakku, Pilivalam Post, Pudukkottai",
+    "type": "Engineering",
+    "currentTneaCode": "3829",
+    "website": "https://chendhuran.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad81",
+    "name": "Mount Zion College of Engineering and Technology",
+    "district": "Pudukkottai",
+    "location": "Lena Vilakku, Pilivalam Post, Pudukkottai",
+    "type": "Engineering",
+    "currentTneaCode": "3813",
+    "website": "https://mzcet.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adf4",
+    "name": "Mohamed Sathak Engineering College (MSEC)",
+    "district": "Ramanathapuram",
+    "location": "Sathak Nagar, Kilakarai, Ramanathapuram",
+    "type": "Engineering",
+    "currentTneaCode": "5907",
+    "website": "https://msec.org.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad8c",
+    "name": "Syed Ammal Engineering College (Autonomous)",
+    "district": "Ramanathapuram",
+    "location": "Dr. E.M. Abdullah Nagar, Ramanathapuram",
+    "type": "Engineering",
+    "currentTneaCode": "5919",
+    "website": "https://syedengg.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad8b",
+    "name": "University College of Engineering, Ramanathapuram (Anna University)",
+    "district": "Ramanathapuram",
+    "location": "Pullangudi, Ramanathapuram",
+    "type": "Engineering",
+    "currentTneaCode": "5017",
+    "website": "https://uceramnad.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ada7",
+    "name": "C. Abdul Hakeem College of Engineering & Technology",
+    "district": "Ranipet",
+    "location": "Hakeem Nagar, Melvisharam, Ranipet",
+    "type": "Engineering",
+    "currentTneaCode": "1501",
+    "website": "https://cahcet.edu.in"
+  },
+  {
+    "_id": "6ae1ce829fc63d5fdb276a83",
+    "name": "Ranipettai Engineering College",
+    "district": "Ranipet",
+    "location": "Thenkadappanthangal, Walajah, Ranipet",
+    "type": "Engineering",
+    "currentTneaCode": "1512",
+    "website": "https://ranipettaiengg.com"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad21",
+    "name": "Government College of Engineering (GCE), Salem",
+    "district": "Salem",
+    "location": "Bangalore Highway, Karuppur, Salem",
+    "type": "Engineering",
+    "currentTneaCode": "2615",
+    "website": "https://gcesalem.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad23",
+    "name": "Sona College of Technology (Autonomous)",
+    "district": "Salem",
+    "location": "Junction Main Road, Salem",
+    "type": "Engineering",
+    "currentTneaCode": "2618",
+    "website": "https://www.sonatech.ac.in"
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5c1",
+    "name": "AVS College of Technology",
+    "district": "Salem District",
+    "location": "Salem",
+    "type": "Legacy",
+    "currentTneaCode": "2347",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5c0",
+    "name": "AVS Engineering College",
+    "district": "Salem District",
+    "location": "Salem",
+    "type": "Legacy",
+    "currentTneaCode": "2636",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5c3",
+    "name": "Annapoorana Engineering College",
+    "district": "Salem District",
+    "location": "Salem",
+    "type": "Legacy",
+    "currentTneaCode": "2648",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5bc",
+    "name": "Knowledge Institute of Technology (KIOT)",
+    "district": "Salem District",
+    "location": "Salem",
+    "type": "Legacy",
+    "currentTneaCode": "2653",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5be",
+    "name": "Mahendra College of Engineering",
+    "district": "Salem District",
+    "location": "Salem",
+    "type": "Legacy",
+    "currentTneaCode": "2623",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5bd",
+    "name": "R. P. Sarathy Institute of Technology (RPSIT)",
+    "district": "Salem District",
+    "location": "Salem",
+    "type": "Legacy",
+    "currentTneaCode": "2639",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5bf",
+    "name": "Sri Ganesh Engineering College",
+    "district": "Salem District",
+    "location": "Salem",
+    "type": "Legacy",
+    "currentTneaCode": "2341",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace5c4",
+    "name": "Sri Shanmugha College of Engineering and Technology",
+    "district": "Salem District",
+    "location": "Salem",
+    "type": "Legacy",
+    "currentTneaCode": "2302",
+    "website": ""
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad8e",
+    "name": "Alagappa Chettiar Government College of Engineering and Technology (ACGCET)",
+    "district": "Sivaganga",
+    "location": "College Road, Karaikudi, Sivaganga",
+    "type": "Engineering",
+    "currentTneaCode": "5004",
+    "website": "https://accetedu.in"
+  },
+  {
+    "_id": "6ae1ce839fc63d5fdb276aaa",
+    "name": "K.L.N. College of Information Technology",
+    "district": "Sivaganga",
+    "location": "Pottapalayam, Sivaganga",
+    "type": "Engineering",
+    "currentTneaCode": "5919",
+    "website": "https://klncit.edu.in"
+  },
+  {
+    "_id": "6ae1ce839fc63d5fdb276ab0",
+    "name": "Pandian Saraswathi Yadav Engineering College",
+    "district": "Sivaganga",
+    "location": "Arasanoor, Thirumansolai Post, Sivaganga",
+    "type": "Engineering",
+    "currentTneaCode": "5913",
+    "website": "https://psyec.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad9d",
+    "name": "JP College of Engineering",
+    "district": "Tenkasi",
+    "location": "College Road, Ayikudy, Tenkasi",
+    "type": "Engineering",
+    "currentTneaCode": "4994",
+    "website": "https://jpcoe.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adfb",
+    "name": "S. Veerasamy Chettiar College of Engineering and Technology",
+    "district": "Tenkasi",
+    "location": "SVC Nagar, Puliangudi, Tenkasi",
+    "type": "Engineering",
+    "currentTneaCode": "4971",
+    "website": "https://svccet.ac.in"
+  },
+  {
+    "_id": "6ae1ce809fc63d5fdb27662d",
+    "name": "Government College of Engineering, Thanjavur",
+    "district": "Thanjavur",
+    "location": "Gandharvakottai Road, Sengipatti, Thanjavur",
+    "type": "Engineering",
+    "currentTneaCode": "3465",
+    "website": "https://gcethanjavur.edu.in"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb276679",
+    "name": "P.R. Engineering College",
+    "district": "Thanjavur",
+    "location": "Trichy-Thanjavur Highway, Vallam, Thanjavur",
+    "type": "Engineering",
+    "currentTneaCode": "3816",
+    "website": "https://prec.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad4f",
+    "name": "Periyar Maniammai Institute of Science & Technology (Deemed University)",
+    "district": "Thanjavur",
+    "location": "Periyar Nagar, Vallam, Thanjavur",
+    "type": "Engineering",
+    "currentTneaCode": "",
+    "website": "https://www.pmu.edu"
+  },
+  {
+    "_id": "6ae1ce809fc63d5fdb276626",
+    "name": "Government College of Engineering, Bodinayakkanur",
+    "district": "Theni",
+    "location": "Bodinayakkanur, Theni",
+    "type": "Engineering",
+    "currentTneaCode": "5012",
+    "website": "https://gcebodi.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad95",
+    "name": "Theni Kammavar Sangam College of Technology",
+    "district": "Theni",
+    "location": "Kammavar Nagar, Koduvilarpatti, Theni",
+    "type": "Engineering",
+    "currentTneaCode": "5816",
+    "website": "https://tksct.ac.in"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb276689",
+    "name": "Jayaraj Annapackiam CSI College of Engineering",
+    "district": "Thoothukudi",
+    "location": "Margoschis Nagar, Nazareth, Thoothukudi",
+    "type": "Engineering",
+    "currentTneaCode": "4958",
+    "website": "https://jacsice.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad5e",
+    "name": "National Engineering College (Autonomous)",
+    "district": "Thoothukudi",
+    "location": "K.R. Nagar, Kovilpatti, Thoothukudi",
+    "type": "Engineering",
+    "currentTneaCode": "4962",
+    "website": "https://nec.edu.in"
+  },
+  {
+    "_id": "6ae1ce829fc63d5fdb276a75",
+    "name": "St. Mother Theresa Engineering College",
+    "district": "Thoothukudi",
+    "location": "Vagaikulam, Thoothukudi",
+    "type": "Engineering",
+    "currentTneaCode": "4976",
+    "website": "https://mtec.ac.in"
+  },
+  {
+    "_id": "6ae1ce809fc63d5fdb276634",
+    "name": "Government College of Engineering, Srirangam",
+    "district": "Tiruchirappalli",
+    "location": "Sethurapatti, Srirangam, Tiruchirappalli",
+    "type": "Engineering",
+    "currentTneaCode": "3464",
+    "website": "https://gces.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502add2",
+    "name": "K. Ramakrishnan College of Engineering (Autonomous)",
+    "district": "Tiruchirappalli",
+    "location": "Samayapuram, Kariyamanickam Road, Tiruchirappalli",
+    "type": "Engineering",
+    "currentTneaCode": "3814",
+    "website": "https://krce.ac.in"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb27664e",
+    "name": "M.A.M. College of Engineering",
+    "district": "Tiruchirappalli",
+    "location": "Trichy-Chennai Trunk Road, Siruganur, Tiruchirappalli",
+    "type": "Engineering",
+    "currentTneaCode": "3808",
+    "website": "https://mamce.org"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad1f",
+    "name": "Saranathan College of Engineering",
+    "district": "Tiruchirappalli",
+    "location": "Venkateswara Nagar, Panjappur, Tiruchirappalli",
+    "type": "Engineering",
+    "currentTneaCode": "3819",
+    "website": "https://saranathan.ac.in"
+  },
+  {
+    "_id": "6ae1ce829fc63d5fdb276a6e",
+    "name": "Einstein College of Engineering",
+    "district": "Tirunelveli",
+    "location": "Sir C.V. Raman Nagar, Seethaparpanallur, Tirunelveli",
+    "type": "Engineering",
+    "currentTneaCode": "4955",
+    "website": "https://einsteincollege.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502addc",
+    "name": "Francis Xavier Engineering College (Autonomous)",
+    "district": "Tirunelveli",
+    "location": "Vannarpettai, Tirunelveli",
+    "type": "Engineering",
+    "currentTneaCode": "4955",
+    "website": "https://francisxavier.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad33",
+    "name": "Government College of Engineering (GCE), Tirunelveli",
+    "district": "Tirunelveli",
+    "location": "Tiruchendur Road, Tirunelveli",
+    "type": "Engineering",
+    "currentTneaCode": "4974",
+    "website": "https://gcetly.ac.in"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb276690",
+    "name": "SCAD College of Engineering and Technology",
+    "district": "Tirunelveli",
+    "location": "Cheranmahadevi, Tirunelveli",
+    "type": "Engineering",
+    "currentTneaCode": "4971",
+    "website": "https://scadengineering.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ae00",
+    "name": "Podhigai College of Engineering and Technology",
+    "district": "Tirupathur",
+    "location": "Veliyagaram, Tirupathur",
+    "type": "Engineering",
+    "currentTneaCode": "1526",
+    "website": "https://podhigai.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ada5",
+    "name": "Priyadarshini Engineering College",
+    "district": "Tirupathur",
+    "location": "Vaniyambadi, Tirupathur",
+    "type": "Engineering",
+    "currentTneaCode": "1509",
+    "website": "https://priyadarshini.net.in"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb276656",
+    "name": "Builders Engineering College",
+    "district": "Tiruppur",
+    "location": "EBET Knowledge Park, Kangeyam, Tiruppur",
+    "type": "Engineering",
+    "currentTneaCode": "2377",
+    "website": "https://builderscollege.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad62",
+    "name": "Jai Shriram Engineering College",
+    "district": "Tiruppur",
+    "location": "Dharapuram Road, Avinashipalayam, Tiruppur",
+    "type": "Engineering",
+    "currentTneaCode": "2762",
+    "website": "https://jayshriram.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adad",
+    "name": "Panimalar Engineering College (Autonomous)",
+    "district": "Tiruvallur",
+    "location": "Bangalore Trunk Road, Varadharajapuram, Poonamallee, Tiruvallur",
+    "type": "Engineering",
+    "currentTneaCode": "1210",
+    "website": "https://panimalar.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ae04",
+    "name": "Prathyusha Engineering College (Autonomous)",
+    "district": "Tiruvallur",
+    "location": "Poonamallee-Tiruvallur Road, Aranvoyalkuppam, Tiruvallur",
+    "type": "Engineering",
+    "currentTneaCode": "1114",
+    "website": "https://prathyusha.edu.in"
+  },
+  {
+    "_id": "6ae1ce809fc63d5fdb27660d",
+    "name": "R.M.D. Engineering College",
+    "district": "Tiruvallur",
+    "location": "RSM Nagar, Kavaraipettai, Tiruvallur",
+    "type": "Engineering",
+    "currentTneaCode": "1112",
+    "website": "https://rmd.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ae03",
+    "name": "R.M.K. Engineering College (Autonomous)",
+    "district": "Tiruvallur",
+    "location": "RSM Nagar, Kavaraipettai, Gummidipoondi Taluk, Tiruvallur",
+    "type": "Engineering",
+    "currentTneaCode": "1113",
+    "website": "https://rmkec.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ae05",
+    "name": "S.A. Engineering College (Autonomous)",
+    "district": "Tiruvallur",
+    "location": "Poonamallee-Avadi Road, Veeraraghavapuram, Tiruvallur",
+    "type": "Engineering",
+    "currentTneaCode": "1118",
+    "website": "https://saec.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adac",
+    "name": "Sri Venkateswara College of Engineering (SVCE)",
+    "district": "Tiruvallur",
+    "location": "Pennalur, Sriperumbudur / Tiruvallur border",
+    "type": "Engineering",
+    "currentTneaCode": "1219",
+    "website": "https://www.svce.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adae",
+    "name": "St. Joseph's College of Engineering (Autonomous)",
+    "district": "Tiruvallur",
+    "location": "Jeppiaar Nagar, OMR / Tiruvallur regional corridor",
+    "type": "Engineering",
+    "currentTneaCode": "1317",
+    "website": "https://stjosephs.ac.in"
+  },
+  {
+    "_id": "6ae1ce809fc63d5fdb27661e",
+    "name": "Vel Tech High Tech Dr. Rangarajan Dr. Sakunthala Engineering College",
+    "district": "Tiruvallur",
+    "location": "60, Avadi-Vel Tech Road, Avadi, Tiruvallur",
+    "type": "Engineering",
+    "currentTneaCode": "1118",
+    "website": "https://veltechhightech.com"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adfd",
+    "name": "Arunai Engineering College (Autonomous)",
+    "district": "Tiruvannamalai",
+    "location": "Velu Nagar, Mathur, Tiruvannamalai",
+    "type": "Engineering",
+    "currentTneaCode": "1503",
+    "website": "https://arunai.org"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb2766a1",
+    "name": "SKP Engineering College",
+    "district": "Tiruvannamalai",
+    "location": "Chinnakangiyanur, Tiruvannamalai",
+    "type": "Engineering",
+    "currentTneaCode": "1514",
+    "website": "https://skpec.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ada2",
+    "name": "University College of Engineering, Arni (Anna University)",
+    "district": "Tiruvannamalai",
+    "location": "Thatchur, Arni, Tiruvannamalai",
+    "type": "Engineering",
+    "currentTneaCode": "1025",
+    "website": "https://ucea.ac.in"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb276681",
+    "name": "Anjalai Ammal Mahalingam Engineering College",
+    "district": "Tiruvarur",
+    "location": "Koilvenni, Tiruvarur",
+    "type": "Engineering",
+    "currentTneaCode": "3802",
+    "website": "https://aamec.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adb2",
+    "name": "University College of Engineering, Pattukkottai / Tiruvarur region (Anna University)",
+    "district": "Tiruvarur",
+    "location": "Rajamadam / Tiruvarur coastal corridor",
+    "type": "Engineering",
+    "currentTneaCode": "1028",
+    "website": "https://ucetiruvarur.edu.in"
+  },
+  {
+    "_id": "6ae1ce829fc63d5fdb276a89",
+    "name": "Ganadipathy Tulsi's Jain Engineering College",
+    "district": "Vellore",
+    "location": "Chittoor-Cuddalore Road, Kaniyambadi, Vellore",
+    "type": "Engineering",
+    "currentTneaCode": "1507",
+    "website": "https://gtec.ac.in"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb2766a8",
+    "name": "Kingston Engineering College",
+    "district": "Vellore",
+    "location": "Chittoor Main Road, Christianpet, Vellore",
+    "type": "Engineering",
+    "currentTneaCode": "1523",
+    "website": "https://kingston.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad3c",
+    "name": "Thanthai Periyar Government Institute of Technology (TPGIT)",
+    "district": "Vellore",
+    "location": "Bagayam, Vellore",
+    "type": "Engineering",
+    "currentTneaCode": "1504",
+    "website": "https://tpgit.edu.in"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb2766b7",
+    "name": "IFET College of Engineering",
+    "district": "Viluppuram",
+    "location": "IFET Nagar, Gangarampalayam, Valavanur, Villupuram",
+    "type": "Engineering",
+    "currentTneaCode": "1405",
+    "website": "https://ifet.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ae09",
+    "name": "Surya Group of Institutions (School of Engineering and Technology)",
+    "district": "Viluppuram",
+    "location": "GST Road, Vikravandi, Viluppuram",
+    "type": "Engineering",
+    "currentTneaCode": "1444",
+    "website": "https://suryagroup.edu.in"
+  },
+  {
+    "_id": "6ae1ce829fc63d5fdb276a96",
+    "name": "Surya Group of Institutions School of Engineering",
+    "district": "Viluppuram",
+    "location": "GST Road, Vikravandi, Villupuram",
+    "type": "Engineering",
+    "currentTneaCode": "1435",
+    "website": "https://suryagroup.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adb5",
+    "name": "University College of Engineering, Villupuram (Anna University)",
+    "district": "Viluppuram",
+    "location": "Kakkur, Viluppuram",
+    "type": "Engineering",
+    "currentTneaCode": "1022",
+    "website": "https://ucev.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad99",
+    "name": "Kalasalingam Academy of Research and Education (Deemed University)",
+    "district": "Virudhunagar",
+    "location": "Anand Nagar, Krishnankoil, Virudhunagar",
+    "type": "Engineering",
+    "currentTneaCode": "",
+    "website": "https://kalasalingam.ac.in"
+  },
+  {
+    "_id": "6ae1ce819fc63d5fdb276645",
+    "name": "Kamaraj College of Engineering & Technology",
+    "district": "Virudhunagar",
+    "location": "S.P.G.C. Nagar, K.Vellakulam, Virudhunagar",
+    "type": "Engineering",
+    "currentTneaCode": "4959",
+    "website": "https://kamarajengg.edu.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502ad97",
+    "name": "Mepco Schlenk Engineering College (Autonomous)",
+    "district": "Virudhunagar",
+    "location": "Mepco Nagar, Sivakasi, Virudhunagar",
+    "type": "Engineering",
+    "currentTneaCode": "4960",
+    "website": "https://www.mepcoeng.ac.in"
+  },
+  {
+    "_id": "6ae1037628c7444cf502adf8",
+    "name": "P.S.R. Engineering College (Autonomous)",
+    "district": "Virudhunagar",
+    "location": "Sevalpatti, Sivakasi, Virudhunagar",
+    "type": "Engineering",
+    "currentTneaCode": "4965",
+    "website": "https://psr.edu.in"
+  },
+  {
+    "_id": "6ae1ce809fc63d5fdb27663b",
+    "name": "Sethu Institute of Technology",
+    "district": "Virudhunagar",
+    "location": "Pulloor, Kariapatti, Virudhunagar",
+    "type": "Engineering",
+    "currentTneaCode": "4917",
+    "website": "https://sethu.ac.in"
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace618",
+    "name": "Sree Balaji Institute of Science & Technology",
+    "district": "Well Connected Universities",
+    "location": "Chrompet, Chennai",
+    "type": "Legacy",
+    "currentTneaCode": "",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace623",
+    "name": "Vellore Institute of Technology (VIT)",
+    "district": "Well Connected Universities",
+    "location": "Vellore, Tamil Nadu",
+    "type": "Legacy",
+    "currentTneaCode": "",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace612",
+    "name": "Bharathiyar Institute of Engineering for Women",
+    "district": "Women Centric Colleges",
+    "location": "Attur",
+    "type": "Legacy",
+    "currentTneaCode": "",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace613",
+    "name": "Idhaya Engineering College for Women",
+    "district": "Women Centric Colleges",
+    "location": "Villupuram",
+    "type": "Legacy",
+    "currentTneaCode": "",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace614",
+    "name": "Mahendra Engineering College for Women",
+    "district": "Women Centric Colleges",
+    "location": "Tiruchengode",
+    "type": "Legacy",
+    "currentTneaCode": "",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace616",
+    "name": "Sri Bharathi Engineering College for Women",
+    "district": "Women Centric Colleges",
+    "location": "Alangudi",
+    "type": "Legacy",
+    "currentTneaCode": "",
+    "website": ""
+  },
+  {
+    "_id": "69917d73cf56e5fe32ace617",
+    "name": "Vivekanandha College of Engineering for Women",
+    "district": "Women Centric Colleges",
+    "location": "Tiruchengode",
+    "type": "Legacy",
+    "currentTneaCode": "",
+    "website": ""
+  }
+]

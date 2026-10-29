@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import {
-  FaMapMarkerAlt, FaUniversity, FaCode, FaGraduationCap, FaFemale, FaArrowRight, FaTimes, FaSearch, FaCalendarCheck,
+  FaMapMarkerAlt, FaUniversity, FaCode, FaGraduationCap, FaFemale, FaArrowRight, FaTimes, FaSearch, FaCalendarCheck, FaGlobe, FaExternalLinkAlt
 } from 'react-icons/fa';
 import Layout from '@/frontend/components/Layout';
 import PageBanner from '@/frontend/components/PageBanner';
@@ -449,59 +449,100 @@ const fallbackData = [
 export async function getStaticProps() {
   try {
     await dbConnect();
+    const Course = (await import('@/backend/models/Course')).default;
 
-    const colleges = await College.find({ isActive: true })
-      .sort({ district: 1, order: 1, name: 1 })
-      .lean();
+    const [colleges, courseLinks] = await Promise.all([
+      College.find({ isActive: true })
+        .populate('courses', 'name code level category specialization duration')
+        .sort({ district: 1, order: 1, name: 1 })
+        .lean(),
+      Course.find({ isActive: true, 'colleges.0': { $exists: true } })
+        .select('name code level category specialization duration colleges')
+        .lean()
+    ]);
 
-    // Group colleges by district
-    const groupedColleges = colleges.reduce((acc, college) => {
-      const district = college.district;
-      if (!acc[district]) {
-        acc[district] = [];
-      }
-      acc[district].push({
-        _id: college._id.toString(),
-        name: college.name,
-        location: college.location,
-        tneaCode: college.tneaCode || '',
-        note: college.note || '',
-        departments: college.departments || [],
+    const collegeCoursesMap = new Map();
+    courseLinks.forEach(c => {
+      (c.colleges || []).forEach(colId => {
+        const idStr = String(colId);
+        if (!collegeCoursesMap.has(idStr)) collegeCoursesMap.set(idStr, []);
+        collegeCoursesMap.get(idStr).push({
+          _id: c._id?.toString() || '',
+          name: c.name || '',
+          code: c.code || '',
+          level: c.level || '',
+          category: c.category || '',
+          specialization: c.specialization || '',
+          duration: c.duration || '',
+        });
       });
-      return acc;
-    }, {});
-
-    // MERGE logic: If DB has data, it overlays/augments fallbackData
-    // Create a map of districts from fallback for easy lookup
-    const dataMap = {};
-    fallbackData.forEach(d => {
-      dataMap[d.district] = [...d.colleges];
     });
 
-    // Overlay DB data
-    Object.keys(groupedColleges).forEach(district => {
-      // If the district exists in DB, we use DB data for that district
-      // BUT if the user just added ONE college, we might want to APPEND instead of REPLACE?
-      // For now, if a district has entries in DB, we use the DB as source of truth for THAT district.
-      dataMap[district] = groupedColleges[district];
-    });
+    if (colleges.length > 0) {
+      // Group colleges by district
+      const groupedColleges = colleges.reduce((acc, college) => {
+        const district = college.district || 'Other';
+        if (!acc[district]) {
+          acc[district] = [];
+        }
+        const idStr = String(college._id);
+        const resolvedCourses = (Array.isArray(college.courses) && college.courses.length > 0)
+          ? college.courses.map(cr => ({
+              _id: cr._id?.toString() || '',
+              name: cr.name || '',
+              code: cr.code || '',
+              level: cr.level || '',
+              category: cr.category || '',
+              specialization: cr.specialization || '',
+              duration: cr.duration || ''
+            }))
+          : (collegeCoursesMap.get(idStr) || []);
 
-    const collegesData = Object.keys(dataMap).map(district => ({
-      district,
-      colleges: dataMap[district]
-    }));
+        acc[district].push({
+          _id: college._id.toString(),
+          name: college.name || '',
+          location: college.location || '',
+          district: college.district || '',
+          type: college.type || 'Engineering',
+          specialization: college.specialization || '',
+          institutionType: college.institutionType || '',
+          courses: resolvedCourses,
+          tneaCode: college.tneaCode || '',
+          tneaStatus: college.tneaStatus || (college.tneaCode ? 'verified' : 'not_applicable'),
+          tneaSourceYear: college.tneaSourceYear || '',
+          note: college.note || '',
+          departments: Array.isArray(college.departments) ? college.departments : [],
+          website: college.website || '',
+          logoUrl: college.logo?.storageKey ? `/api/colleges/${college._id}/logo` : null,
+          isActive: college.isActive !== false,
+        });
+        return acc;
+      }, {});
+
+      const collegesData = Object.keys(groupedColleges).map(district => ({
+        district,
+        colleges: groupedColleges[district]
+      }));
+
+      return {
+        props: {
+          collegesData: JSON.parse(JSON.stringify(collegesData)),
+        },
+        revalidate: 60,
+      };
+    }
 
     return {
       props: {
-        collegesData: collegesData,
+        collegesData: JSON.parse(JSON.stringify(fallbackData)),
       },
-      revalidate: 10,
+      revalidate: 60,
     };
   } catch (error) {
     console.error('Error fetching colleges:', error);
     return {
       props: {
-        collegesData: fallbackData,
+        collegesData: JSON.parse(JSON.stringify(fallbackData)),
       },
       revalidate: 60,
     };
@@ -510,6 +551,149 @@ export async function getStaticProps() {
 
 
 const PAGE_SIZE = 12;
+
+export const TAMIL_NADU_DISTRICTS = [
+  'Ariyalur', 'Chengalpattu', 'Chennai', 'Coimbatore', 'Cuddalore', 'Dharmapuri', 'Dindigul',
+  'Erode', 'Kallakurichi', 'Kancheepuram', 'Kanniyakumari', 'Karur', 'Krishnagiri', 'Madurai',
+  'Mayiladuthurai', 'Nagapattinam', 'Namakkal', 'Nilgiris', 'Perambalur', 'Pudukkottai',
+  'Ramanathapuram', 'Ranipet', 'Salem', 'Sivaganga', 'Tenkasi', 'Thanjavur', 'Theni',
+  'Thoothukudi', 'Tiruchirappalli', 'Tirunelveli', 'Tirupathur', 'Tiruppur', 'Tiruvallur',
+  'Tiruvannamalai', 'Tiruvarur', 'Vellore', 'Viluppuram', 'Virudhunagar'
+];
+
+export const STREAMS = [
+  { id: 'all', label: 'All Streams' },
+  { id: 'Engineering', label: 'Engineering' },
+  { id: 'Medical', label: 'Medical & Healthcare' },
+  { id: 'Arts & Science', label: 'Arts & Science' },
+  { id: 'Management', label: 'Management' },
+  { id: 'Law', label: 'Law' },
+  { id: 'Agriculture', label: 'Agriculture' },
+  { id: 'Education', label: 'Education' },
+  { id: 'Polytechnic', label: 'Polytechnic' }
+];
+
+export const INSTITUTION_TYPES = [
+  { id: 'all', label: 'All Types' },
+  { id: 'Government', label: 'Government' },
+  { id: 'Government-Aided', label: 'Government-Aided' },
+  { id: 'Autonomous', label: 'Autonomous' },
+  { id: 'Private', label: 'Private / Self-Financing' }
+];
+
+export const STREAM_SPECIALIZATIONS = {
+  Medical: [
+    'Pharmacy',
+    'Nursing',
+    'Dentistry',
+    'Physiotherapy',
+    'Occupational Therapy',
+    'Allied Health Sciences',
+    'Medical Laboratory Technology',
+    'Radiology & Imaging',
+    'Operation Theatre & Anaesthesia',
+    'Cardiac Care',
+    'Veterinary Science',
+    'Fisheries Science'
+  ],
+  Engineering: [
+    'Computer Science & IT',
+    'Artificial Intelligence & Data Science',
+    'Electronics & Communication',
+    'Electrical & Electronics',
+    'Mechanical Engineering',
+    'Civil Engineering',
+    'Biotechnology',
+    'Mechatronics & Robotics',
+    'Chemical Engineering'
+  ],
+  'Arts & Science': [
+    'Computer Science & Applications',
+    'Commerce & Accounting',
+    'Mathematics & Statistics',
+    'Physics & Chemistry',
+    'Life Sciences & Biotechnology',
+    'English & Literature',
+    'Tamil & Languages',
+    'Economics & Management'
+  ],
+  Agriculture: [
+    'Agriculture',
+    'Horticulture',
+    'Agricultural Engineering',
+    'Forestry',
+    'Food Technology'
+  ],
+  Polytechnic: [
+    'Mechanical Engineering',
+    'Civil Engineering',
+    'Electrical & Electronics',
+    'Electronics & Communication',
+    'Computer Engineering',
+    'Automobile Engineering'
+  ],
+  Management: [
+    'Business Administration (BBA)',
+    'Master of Business Administration (MBA)',
+    'Finance & Banking',
+    'Logistics & Supply Chain'
+  ],
+  Law: [
+    '5-Year Integrated Law (BA/BBA/BCom LLB)',
+    '3-Year LLB',
+    'Master of Laws (LLM)'
+  ],
+  Education: [
+    'Bachelor of Education (B.Ed)',
+    'Master of Education (M.Ed)',
+    'Special Education',
+    'Diploma in Elementary Education (D.El.Ed)'
+  ]
+};
+
+export const STREAM_COURSES = {
+  Medical: [
+    'MBBS', 'BDS', 'B.Pharm', 'Pharm.D', 'B.Sc Nursing', 'BPT', 'BOT',
+    'B.Sc MLT', 'B.Sc Operation Theatre and Anaesthesia', 'B.Sc Cardiac Care',
+    'B.Sc Radiology', 'M.Pharm', 'MDS', 'B.V.Sc', 'B.F.Sc'
+  ],
+  Engineering: [
+    'B.E. Computer Science and Engineering',
+    'B.Tech. Artificial Intelligence and Data Science',
+    'B.Tech. Information Technology',
+    'B.E. Electronics and Communication Engineering',
+    'B.E. Electrical and Electronics Engineering',
+    'B.E. Mechanical Engineering',
+    'B.E. Civil Engineering',
+    'B.E. Mechatronics Engineering',
+    'B.Tech. Biotechnology'
+  ],
+  'Arts & Science': [
+    'B.Sc Computer Science', 'B.Sc Information Technology', 'B.Sc Mathematics',
+    'B.Sc Physics', 'B.Sc Chemistry', 'B.Sc Biotechnology',
+    'B.Com General', 'B.Com Corporate Secretaryship', 'B.Com Professional Accounting',
+    'B.A. English', 'B.A. Tamil', 'B.A. Economics', 'BBA', 'BCA'
+  ],
+  Agriculture: [
+    'B.Sc (Hons) Agriculture', 'B.Sc (Hons) Horticulture',
+    'B.Tech Agricultural Engineering', 'B.Sc (Hons) Forestry', 'B.F.Sc Fisheries Science'
+  ],
+  Polytechnic: [
+    'Diploma in Mechanical Engineering', 'Diploma in Civil Engineering',
+    'Diploma in Electrical and Electronics Engineering',
+    'Diploma in Electronics and Communication Engineering',
+    'Diploma in Computer Engineering'
+  ],
+  Management: [
+    'BBA', 'MBA', 'MBA Finance', 'MBA Marketing', 'MBA Human Resource'
+  ],
+  Law: [
+    'BA LLB (Hons)', 'BBA LLB (Hons)', 'B.Com LLB (Hons)', 'LLB (3 Years)', 'LLM'
+  ],
+  Education: [
+    'B.Ed', 'M.Ed', 'B.Ed Special Education', 'D.El.Ed'
+  ]
+};
 
 function CollegeModal({ college, onClose }) {
   const closeRef = useRef(null);
@@ -541,25 +725,82 @@ function CollegeModal({ college, onClose }) {
           <button ref={closeRef} type="button" onClick={onClose} aria-label="Close dialog" className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 hover:bg-white/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
             <FaTimes aria-hidden="true" />
           </button>
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-semibold">{college.type || 'Engineering'}</span>
+            {college.specialization && (
+              <span className="rounded-full bg-gold-400 text-forest-dark px-2.5 py-0.5 text-xs font-bold">
+                {college.specialization}
+              </span>
+            )}
+            {college.institutionType && (
+              <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-semibold">
+                {college.institutionType}
+              </span>
+            )}
+            {college.zone && <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-semibold">{college.zone}</span>}
+          </div>
           <h2 id="college-dialog-title" className="font-heading text-xl font-bold">{college.name}</h2>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-white/80"><FaMapMarkerAlt aria-hidden="true" /> {college.location}</p>
-          {college.tneaCode && <p className="mt-1 text-sm text-white/80">TNEA Code: {college.tneaCode}</p>}
-        </div>
-        <div className="flex-1 overflow-y-auto p-6">
-          <h3 className="mb-3 font-sans text-base font-semibold text-gray-900">
-            Departments {departments.length > 0 && <span className="text-sm font-normal text-gray-500">({departments.length})</span>}
-          </h3>
-          {departments.length > 0 ? (
-            <ul className="space-y-2">
-              {departments.map((dept) => (
-                <li key={dept} className="flex items-center gap-3 rounded-xl bg-gray-50 px-3 py-2.5 text-sm font-medium text-gray-700">
-                  <FaGraduationCap className="shrink-0 text-forest" aria-hidden="true" /> {dept}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="py-4 text-center text-sm text-gray-600">No department information is listed for this college yet.</p>
+          {college.tneaStatus === 'verified' && college.tneaCode && (
+            <p className="mt-1 text-sm text-gold-300 font-semibold">
+              TNEA Code: {college.tneaCode} {college.tneaSourceYear ? `(${college.tneaSourceYear})` : ''}
+            </p>
           )}
+          {college.tneaStatus === 'pending_verification' && (
+            <p className="mt-1 text-sm text-amber-200 font-medium">
+              TNEA Code: Pending Verification
+            </p>
+          )}
+          {college.note && <p className="mt-1 text-xs text-white/80">{college.note}</p>}
+        </div>
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {Array.isArray(college.courses) && college.courses.length > 0 && (
+            <div>
+              <h3 className="font-sans text-xs font-bold uppercase tracking-wider text-forest mb-2">
+                Degree Offerings ({college.courses.length})
+              </h3>
+              <div className="flex flex-wrap gap-1.5">
+                {college.courses.map((cr) => (
+                  <span
+                    key={cr._id || cr.name}
+                    className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 border border-emerald-200/60 px-2.5 py-1 text-xs font-semibold text-emerald-800"
+                  >
+                    <FaGraduationCap className="text-forest text-[11px]" />
+                    {cr.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-sans text-base font-semibold text-gray-900">
+                Departments {departments.length > 0 && <span className="text-sm font-normal text-gray-500">({departments.length})</span>}
+              </h3>
+              {college.website && (
+                <a
+                  href={college.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-forest hover:underline"
+                >
+                  <FaGlobe aria-hidden="true" /> Official Website <FaExternalLinkAlt className="text-[10px]" aria-hidden="true" />
+                </a>
+              )}
+            </div>
+            {departments.length > 0 ? (
+              <ul className="space-y-2">
+                {departments.map((dept) => (
+                  <li key={dept} className="flex items-center gap-3 rounded-xl bg-gray-50 px-3 py-2.5 text-sm font-medium text-gray-700">
+                    <FaGraduationCap className="shrink-0 text-forest" aria-hidden="true" /> {dept}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="py-2 text-center text-sm text-gray-500">No department information is listed for this college yet.</p>
+            )}
+          </div>
         </div>
         <div className="flex gap-3 border-t border-gray-100 bg-gray-50 p-4">
           <button type="button" onClick={onClose} className="flex-1 rounded-full border-2 border-gray-300 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-100">Close</button>
@@ -571,46 +812,194 @@ function CollegeModal({ college, onClose }) {
 }
 
 export default function Colleges({ collegesData }) {
+  const [data, setData] = useState(collegesData || []);
   const [showWomenColleges, setShowWomenColleges] = useState(false);
   const [selectedCollege, setSelectedCollege] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [zone, setZone] = useState('all');
+  const [selectedStream, setSelectedStream] = useState('all');
+  const [selectedSpecialization, setSelectedSpecialization] = useState('all');
+  const [selectedCourse, setSelectedCourse] = useState('all');
+  const [selectedInstitutionType, setSelectedInstitutionType] = useState('all');
   const [onlyTnea, setOnlyTnea] = useState(false);
   const [visible, setVisible] = useState(PAGE_SIZE);
   const directoryRef = useRef(null);
 
-  // Flatten the zone groups; only real fields are used (name, location, zone, TNEA code, note, departments).
+  // Client-side hydration from /api/colleges
+  useEffect(() => {
+    let cancelled = false;
+    async function loadFresh() {
+      try {
+        const res = await fetch('/api/colleges');
+        if (res.ok) {
+          const fresh = await res.json();
+          if (!cancelled && Array.isArray(fresh) && fresh.length > 0) {
+            setData(fresh);
+          }
+        }
+      } catch (_) {}
+    }
+    loadFresh();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Flatten the zone groups; include specialization, institutionType, website, etc.
   const allColleges = useMemo(() => {
     const seen = new Set();
     const list = [];
-    (collegesData || []).forEach((group) => {
+    (data || []).forEach((group) => {
       (group.colleges || []).forEach((c) => {
         const key = `${group.district}|${(c.name || '').toLowerCase()}`;
         if (!c.name || seen.has(key)) return;
         seen.add(key);
-        list.push({ ...c, zone: group.district });
+        list.push({
+          ...c,
+          zone: group.district,
+          type: c.type || 'Engineering',
+          specialization: c.specialization || '',
+          institutionType: c.institutionType || '',
+          courses: Array.isArray(c.courses) ? c.courses : [],
+          website: c.website || '',
+          departments: Array.isArray(c.departments) ? c.departments : [],
+        });
       });
     });
     return list;
-  }, [collegesData]);
+  }, [data]);
 
-  const zones = useMemo(() => [...new Set(allColleges.map((c) => c.zone))], [allColleges]);
+  const { officialDistricts, legacyZones, zones } = useMemo(() => {
+    const rawDistricts = new Set(allColleges.map((c) => c.zone));
+    const officialSet = new Set(TAMIL_NADU_DISTRICTS);
+
+    const official = TAMIL_NADU_DISTRICTS.slice().sort();
+    const legacy = [];
+
+    rawDistricts.forEach((d) => {
+      if (d && !officialSet.has(d)) {
+        legacy.push(d);
+      }
+    });
+    legacy.sort();
+
+    return { officialDistricts: official, legacyZones: legacy, zones: [...official, ...legacy] };
+  }, [allColleges]);
+
+  // Available specializations based on selected stream or all
+  const availableSpecializations = useMemo(() => {
+    if (selectedStream !== 'all' && STREAM_SPECIALIZATIONS[selectedStream]) {
+      return STREAM_SPECIALIZATIONS[selectedStream];
+    }
+    const specs = new Set();
+    allColleges.forEach((c) => {
+      if (c.specialization) specs.add(c.specialization);
+    });
+    return Array.from(specs).sort();
+  }, [selectedStream, allColleges]);
+
+  // Available courses based on selected stream
+  const availableCourses = useMemo(() => {
+    if (selectedStream !== 'all' && STREAM_COURSES[selectedStream]) {
+      return STREAM_COURSES[selectedStream];
+    }
+    const coursesSet = new Set();
+    allColleges.forEach((c) => {
+      (c.departments || []).forEach((d) => {
+        if (d && d.length < 50) coursesSet.add(d);
+      });
+    });
+    return Array.from(coursesSet).slice(0, 30).sort();
+  }, [selectedStream, allColleges]);
 
   const filtered = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
+    const specLower = selectedSpecialization.trim().toLowerCase();
+    const courseLower = selectedCourse.trim().toLowerCase();
+    const instTypeLower = selectedInstitutionType.trim().toLowerCase();
+
     return allColleges.filter((c) => {
+      // 1. District
       if (zone !== 'all' && c.zone !== zone) return false;
-      if (onlyTnea && !c.tneaCode) return false;
+
+      // 2. Stream
+      if (selectedStream !== 'all' && (c.type || 'Engineering') !== selectedStream) return false;
+
+      // 3. Institution Type
+      if (selectedInstitutionType !== 'all') {
+        const cType = (c.institutionType || '').toLowerCase();
+        const cName = (c.name || '').toLowerCase();
+        if (instTypeLower === 'government') {
+          if (!cType.includes('government') && !cName.includes('government')) return false;
+        } else if (instTypeLower === 'government-aided') {
+          if (!cType.includes('aided') && !cName.includes('aided')) return false;
+        } else if (instTypeLower === 'autonomous') {
+          if (!cType.includes('autonomous') && !cName.includes('(autonomous)')) return false;
+        } else if (instTypeLower === 'private') {
+          if (cType.includes('government') || cName.includes('government')) return false;
+        }
+      }
+
+      // 4. Specialization
+      if (selectedSpecialization !== 'all') {
+        const colSpec = (c.specialization || '').toLowerCase();
+        const colDepts = (c.departments || []).map((d) => d.toLowerCase());
+        const match =
+          colSpec.includes(specLower) ||
+          colDepts.some((d) => d.includes(specLower));
+        if (!match) return false;
+      }
+
+      // 5. Course
+      if (selectedCourse !== 'all') {
+        const colDepts = (c.departments || []).map((d) => d.toLowerCase());
+        const colSpec = (c.specialization || '').toLowerCase();
+        const colCourses = (c.courses || []).map((cr) => (cr.name || '').toLowerCase());
+        const match =
+          colDepts.some((d) => d.includes(courseLower)) ||
+          colSpec.includes(courseLower) ||
+          colCourses.some((cn) => cn.includes(courseLower));
+        if (!match) return false;
+      }
+
+      // 6. TNEA code
+      if (onlyTnea && (c.tneaStatus !== 'verified' || !c.tneaCode)) return false;
+
+      // 7. Search keyword
       if (!q) return true;
       return (
         c.name.toLowerCase().includes(q) ||
         (c.location || '').toLowerCase().includes(q) ||
+        (c.zone || '').toLowerCase().includes(q) ||
+        (c.type || '').toLowerCase().includes(q) ||
+        (c.specialization && c.specialization.toLowerCase().includes(q)) ||
+        (c.institutionType && c.institutionType.toLowerCase().includes(q)) ||
+        (c.tneaCode && c.tneaCode.toLowerCase().includes(q)) ||
         (c.departments || []).some((d) => d.toLowerCase().includes(q))
       );
     });
-  }, [allColleges, searchTerm, zone, onlyTnea]);
+  }, [allColleges, searchTerm, zone, selectedStream, selectedSpecialization, selectedCourse, selectedInstitutionType, onlyTnea]);
 
-  useEffect(() => { setVisible(PAGE_SIZE); }, [searchTerm, zone, onlyTnea]);
+  useEffect(() => {
+    setVisible(PAGE_SIZE);
+  }, [searchTerm, zone, selectedStream, selectedSpecialization, selectedCourse, selectedInstitutionType, onlyTnea]);
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setZone('all');
+    setSelectedStream('all');
+    setSelectedSpecialization('all');
+    setSelectedCourse('all');
+    setSelectedInstitutionType('all');
+    setOnlyTnea(false);
+  };
+
+  const isAnyFilterActive =
+    Boolean(searchTerm) ||
+    zone !== 'all' ||
+    selectedStream !== 'all' ||
+    selectedSpecialization !== 'all' ||
+    selectedCourse !== 'all' ||
+    selectedInstitutionType !== 'all' ||
+    onlyTnea;
 
   const shown = filtered.slice(0, visible);
   const showcase = allColleges.filter((c) => !/bengaluru|bangalore/i.test(`${c.zone} ${c.location}`)).slice(0, 24);
@@ -619,6 +1008,7 @@ export default function Colleges({ collegesData }) {
   const jumpToCollege = (name) => {
     setSearchTerm(name);
     setZone('all');
+    setSelectedStream('all');
     directoryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
@@ -794,29 +1184,151 @@ export default function Colleges({ collegesData }) {
           <p className="rf-eyebrow">Directory</p>
           <h2 id="directory-heading" className="font-heading text-3xl font-bold text-gray-900 md:text-4xl">Search and filter colleges</h2>
 
-          <div className="mt-6 grid gap-3 rounded-3xl border border-gray-100 bg-white p-4 shadow-card md:grid-cols-[1.6fr_1fr_auto] md:items-center">
-            <div className="relative">
-              <label htmlFor="college-search" className="sr-only">Search colleges by name, location or department</label>
-              <FaSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
-              <input id="college-search" type="search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by college, location or department" className={`${field} pl-11`} />
+          {/* Stream / Category Filter Pills */}
+          <div className="mt-6 flex flex-wrap gap-2">
+            {STREAMS.map((s) => {
+              const isSelected = selectedStream === s.id;
+              const count = s.id === 'all'
+                ? allColleges.length
+                : allColleges.filter((c) => (c.type || 'Engineering') === s.id).length;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setSelectedStream(s.id)}
+                  className={`rounded-full px-4 py-2 text-xs font-bold transition-all ${
+                    isSelected
+                      ? 'bg-forest text-white shadow-sm ring-2 ring-forest ring-offset-2'
+                      : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                  }`}
+                >
+                  {s.label} ({count})
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Combined Filters Panel */}
+          <div className="mt-4 rounded-3xl border border-gray-100 bg-white p-5 shadow-card space-y-3">
+            <div className="grid gap-3 md:grid-cols-[1.5fr_1fr_1fr]">
+              <div className="relative">
+                <label htmlFor="college-search" className="sr-only">Search colleges by name, location, course or specialization</label>
+                <FaSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+                <input
+                  id="college-search"
+                  type="search"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search by college name, city, branch, degree..."
+                  className={`${field} pl-11`}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="college-zone" className="sr-only">Filter by district</label>
+                <select id="college-zone" value={zone} onChange={(e) => setZone(e.target.value)} className={field}>
+                  <option value="all">All Tamil Nadu Districts & Zones ({allColleges.length})</option>
+                  <optgroup label="Official Tamil Nadu Districts (38)">
+                    {officialDistricts.map((d) => {
+                      const count = allColleges.filter((c) => c.zone === d).length;
+                      return (
+                        <option key={d} value={d}>
+                          {d} {count > 0 ? `(${count})` : ''}
+                        </option>
+                      );
+                    })}
+                  </optgroup>
+                  {legacyZones.length > 0 && (
+                    <optgroup label="Legacy Zones & Regional Clusters">
+                      {legacyZones.map((z) => {
+                        const count = allColleges.filter((c) => c.zone === z).length;
+                        return (
+                          <option key={z} value={z}>
+                            {z} {count > 0 ? `(${count})` : ''}
+                          </option>
+                        );
+                      })}
+                    </optgroup>
+                  )}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="college-inst-type" className="sr-only">Filter by institution type</label>
+                <select
+                  id="college-inst-type"
+                  value={selectedInstitutionType}
+                  onChange={(e) => setSelectedInstitutionType(e.target.value)}
+                  className={field}
+                >
+                  {INSTITUTION_TYPES.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <div>
-              <label htmlFor="college-zone" className="sr-only">Filter by zone or district</label>
-              <select id="college-zone" value={zone} onChange={(e) => setZone(e.target.value)} className={field}>
-                <option value="all">All zones and districts</option>
-                {zones.map((z) => <option key={z} value={z}>{z}</option>)}
-              </select>
+
+            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-[1.2fr_1.2fr_auto] items-center pt-1 border-t border-gray-100">
+              <div>
+                <label htmlFor="college-specialization" className="sr-only">Filter by specialization</label>
+                <select
+                  id="college-specialization"
+                  value={selectedSpecialization}
+                  onChange={(e) => setSelectedSpecialization(e.target.value)}
+                  className={field}
+                >
+                  <option value="all">All Specializations ({availableSpecializations.length})</option>
+                  {availableSpecializations.map((spec) => (
+                    <option key={spec} value={spec}>
+                      {spec}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="college-course" className="sr-only">Filter by course or degree</label>
+                <select
+                  id="college-course"
+                  value={selectedCourse}
+                  onChange={(e) => setSelectedCourse(e.target.value)}
+                  className={field}
+                >
+                  <option value="all">All Degrees / Courses Offered ({availableCourses.length})</option>
+                  {availableCourses.map((crs) => (
+                    <option key={crs} value={crs}>
+                      {crs}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center gap-4 px-2">
+                <label className="flex cursor-pointer items-center gap-2 text-xs font-semibold text-gray-700 whitespace-nowrap">
+                  <input
+                    type="checkbox"
+                    checked={onlyTnea}
+                    onChange={(e) => setOnlyTnea(e.target.checked)}
+                    className="h-4 w-4 accent-forest"
+                  />
+                  Verified TNEA Code
+                </label>
+              </div>
             </div>
-            <label className="flex cursor-pointer items-center gap-2 px-2 text-sm font-medium text-gray-700">
-              <input type="checkbox" checked={onlyTnea} onChange={(e) => setOnlyTnea(e.target.checked)} className="h-4 w-4 accent-forest" />
-              Has TNEA code
-            </label>
           </div>
 
           <p className="mt-4 text-sm text-gray-600" aria-live="polite">
             Showing {Math.min(shown.length, filtered.length)} of {filtered.length} colleges
-            {(searchTerm || zone !== 'all' || onlyTnea) && (
-              <button type="button" onClick={() => { setSearchTerm(''); setZone('all'); setOnlyTnea(false); }} className="ml-3 font-semibold text-crimson underline">Clear filters</button>
+            {isAnyFilterActive && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="ml-3 font-semibold text-crimson underline"
+              >
+                Clear all filters
+              </button>
             )}
           </p>
 
@@ -831,16 +1343,41 @@ export default function Colleges({ collegesData }) {
                       <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-600"><FaMapMarkerAlt className="shrink-0 text-xs text-crimson" aria-hidden="true" />{c.location}</p>
                     </div>
                   </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="rounded-full bg-forest/10 px-2.5 py-1 text-xs font-semibold text-forest">{c.zone}</span>
-                    {c.tneaCode && <span className="inline-flex items-center gap-1 rounded-full bg-gold-100 px-2.5 py-1 text-xs font-semibold text-gold-600"><FaCode aria-hidden="true" /> TNEA {c.tneaCode}</span>}
-                    {c.note && <span className="rounded-full bg-crimson/10 px-2.5 py-1 text-xs font-semibold text-crimson">{c.note}</span>}
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    <span className="rounded-full bg-emerald-50 border border-emerald-200/60 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">{c.type || 'Engineering'}</span>
+                    {c.specialization && (
+                      <span className="rounded-full bg-blue-50 border border-blue-200/60 px-2.5 py-0.5 text-xs font-semibold text-blue-800">
+                        {c.specialization}
+                      </span>
+                    )}
+                    {c.institutionType && (
+                      <span className="rounded-full bg-amber-50 border border-amber-200/60 px-2.5 py-0.5 text-xs font-semibold text-amber-800">
+                        {c.institutionType}
+                      </span>
+                    )}
+                    <span className="rounded-full bg-forest/10 px-2.5 py-0.5 text-xs font-semibold text-forest">{c.zone}</span>
+                    {c.tneaStatus === 'verified' && c.tneaCode && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-gold-100 px-2.5 py-0.5 text-xs font-semibold text-gold-700" title={`Verified TNEA Code: ${c.tneaCode}${c.tneaSourceYear ? ` (${c.tneaSourceYear})` : ''}`}>
+                        <FaCode aria-hidden="true" /> TNEA {c.tneaCode}
+                      </span>
+                    )}
+                    {c.tneaStatus === 'pending_verification' && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800" title="TNEA counselling code pending verification">
+                        <FaCode aria-hidden="true" /> TNEA Pending
+                      </span>
+                    )}
+                    {c.note && <span className="rounded-full bg-crimson/10 px-2.5 py-0.5 text-xs font-semibold text-crimson">{c.note}</span>}
                   </div>
                   <div className="mt-auto flex flex-wrap items-center gap-3 pt-4">
                     {c.departments && c.departments.length > 0 && (
                       <button type="button" onClick={() => setSelectedCollege(c)} className="inline-flex items-center gap-2 rounded-full border border-forest px-4 py-2 text-xs font-semibold text-forest hover:bg-forest hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2">
                         View {c.departments.length} departments <FaArrowRight aria-hidden="true" />
                       </button>
+                    )}
+                    {c.website && (
+                      <a href={c.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:underline">
+                        <FaGlobe aria-hidden="true" /> Website
+                      </a>
                     )}
                     <Link href={`/contact?college=${encodeURIComponent(c.name)}`} className="inline-flex items-center gap-2 text-xs font-semibold text-crimson hover:underline">
                       Enquire <FaArrowRight aria-hidden="true" />

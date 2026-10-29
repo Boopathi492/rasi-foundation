@@ -15,6 +15,33 @@ import {
   FaUniversity,
 } from 'react-icons/fa';
 
+export const COURSE_CATEGORIES = [
+  { value: 'engineering', label: 'Engineering & Technology (engineering)' },
+  { value: 'medical', label: 'Medical & Healthcare (medical)' },
+  { value: 'management', label: 'Management & Business (management)' },
+  { value: 'arts', label: 'Arts & Science (arts)' },
+  { value: 'law', label: 'Law & Legal Studies (law)' },
+  { value: 'education', label: 'Education & Teaching (education)' },
+  { value: 'agriculture', label: 'Agriculture & Allied Sciences (agriculture)' },
+  { value: 'other', label: 'Other Disciplines (other)' },
+];
+
+export const COURSE_DURATIONS = [
+  '4 Years (8 Semesters)',
+  '3 Years (6 Semesters)',
+  '5 Years (10 Semesters)',
+  '5.5 Years (11 Semesters)',
+  '2 Years (4 Semesters)',
+  '1 Year (2 Semesters)',
+  '6 Months (1 Semester)',
+  '4 Years',
+  '3 Years',
+  '5 Years',
+  '5.5 Years',
+  '2 Years',
+  '1 Year',
+];
+
 export default function AdminCourses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,6 +53,8 @@ export default function AdminCourses() {
   const [deleting, setDeleting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
+  const [isCustomDuration, setIsCustomDuration] = useState(false);
 
   const [form, setForm] = useState({
     name: '',
@@ -67,14 +96,19 @@ export default function AdminCourses() {
 
   const openCreateModal = () => {
     setEditingCourse(null);
+    setIsCustomCategory(false);
+    setIsCustomDuration(false);
     setForm({
       name: '',
       code: '',
       level: 'UG',
-      category: '',
+      category: 'engineering',
+      specialization: '',
       description: '',
       eligibility: '',
-      duration: '',
+      duration: '4 Years (8 Semesters)',
+      sourceUrl: '',
+      verificationStatus: 'verified',
       isActive: true,
       order: 0,
     });
@@ -84,14 +118,21 @@ export default function AdminCourses() {
 
   const openEditModal = (c) => {
     setEditingCourse(c);
+    const hasCustomCat = Boolean(c.category && !COURSE_CATEGORIES.some((cat) => cat.value === c.category));
+    const hasCustomDur = Boolean(c.duration && !COURSE_DURATIONS.includes(c.duration));
+    setIsCustomCategory(hasCustomCat);
+    setIsCustomDuration(hasCustomDur);
     setForm({
       name: c.name || '',
       code: c.code || '',
       level: c.level || 'UG',
       category: c.category || '',
+      specialization: c.specialization || '',
       description: c.description || '',
       eligibility: c.eligibility || '',
       duration: c.duration || '',
+      sourceUrl: c.sourceUrl || '',
+      verificationStatus: c.verificationStatus || 'verified',
       isActive: Boolean(c.isActive),
       order: c.order || 0,
     });
@@ -100,7 +141,9 @@ export default function AdminCourses() {
   };
 
   const handleSave = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
+    if (saving) return;
+
     if (!form.name.trim()) {
       setError('Course name is required');
       return;
@@ -154,6 +197,12 @@ export default function AdminCourses() {
       console.error('Delete error:', err);
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const closeModal = () => {
+    if (!saving) {
+      setModalOpen(false);
     }
   };
 
@@ -226,8 +275,9 @@ export default function AdminCourses() {
                   <tr>
                     <th className="px-5 py-3.5">Course Name & Code</th>
                     <th className="px-5 py-3.5">Level</th>
-                    <th className="px-5 py-3.5">Category / Discipline</th>
+                    <th className="px-5 py-3.5">Category & Specialization</th>
                     <th className="px-5 py-3.5">Duration</th>
+                    <th className="px-5 py-3.5">Offering Colleges</th>
                     <th className="px-5 py-3.5">Status</th>
                     <th className="px-5 py-3.5 text-right">Actions</th>
                   </tr>
@@ -248,8 +298,26 @@ export default function AdminCourses() {
                           {c.level}
                         </span>
                       </td>
-                      <td className="px-5 py-4 text-slate-700 font-medium">{c.category || '—'}</td>
+                      <td className="px-5 py-4 text-slate-700 font-medium">
+                        <div>
+                          <p>{c.category || '—'}</p>
+                          {c.specialization && (
+                            <span className="inline-block mt-0.5 text-[10px] text-teal-700 bg-teal-50 border border-teal-200/50 px-1.5 py-0.5 rounded">
+                              {c.specialization}
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td className="px-5 py-4 text-slate-600">{c.duration || '—'}</td>
+                      <td className="px-5 py-4 text-slate-700">
+                        {Array.isArray(c.colleges) && c.colleges.length > 0 ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
+                            <FaUniversity className="text-[10px]" /> {c.colleges.length} colleges
+                          </span>
+                        ) : (
+                          <span className="text-slate-400 text-[11px]">None linked</span>
+                        )}
+                      </td>
                       <td className="px-5 py-4">
                         <span
                           className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
@@ -288,16 +356,16 @@ export default function AdminCourses() {
         {/* Modal */}
         <Modal
           isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={closeModal}
           title={editingCourse ? 'Edit Degree / Diploma Program' : 'Add New Academic Course'}
           subtitle="Configure degree programs, eligibility requirements, duration and branches"
-          size="lg"
+          size="xl"
           preventClose={saving}
           footer={
             <>
               <button
                 type="button"
-                onClick={() => setModalOpen(false)}
+                onClick={closeModal}
                 disabled={saving}
                 className="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition-colors text-xs font-semibold"
               >
@@ -329,7 +397,7 @@ export default function AdminCourses() {
                     type="text"
                     required
                     value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
                     placeholder="e.g. B.Tech Artificial Intelligence and Data Science"
                     className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
                   />
@@ -341,7 +409,7 @@ export default function AdminCourses() {
                     <input
                       type="text"
                       value={form.code}
-                      onChange={(e) => setForm({ ...form, code: e.target.value })}
+                      onChange={(e) => setForm((prev) => ({ ...prev, code: e.target.value }))}
                       placeholder="e.g. AI-DS"
                       className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none uppercase"
                     />
@@ -350,7 +418,7 @@ export default function AdminCourses() {
                     <label className="block font-semibold text-slate-700 mb-1">Level</label>
                     <select
                       value={form.level}
-                      onChange={(e) => setForm({ ...form, level: e.target.value })}
+                      onChange={(e) => setForm((prev) => ({ ...prev, level: e.target.value }))}
                       className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs bg-white focus:ring-2 focus:ring-blue-500/20 outline-none"
                     >
                       <option value="UG">UG (Undergraduate)</option>
@@ -363,23 +431,76 @@ export default function AdminCourses() {
                   </div>
                   <div>
                     <label className="block font-semibold text-slate-700 mb-1">Duration</label>
-                    <input
-                      type="text"
-                      value={form.duration}
-                      onChange={(e) => setForm({ ...form, duration: e.target.value })}
-                      placeholder="e.g. 4 Years (8 Semesters)"
-                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
-                    />
+                    <select
+                      value={isCustomDuration ? '__custom__' : (form.duration || '')}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '__custom__') {
+                          setIsCustomDuration(true);
+                        } else {
+                          setIsCustomDuration(false);
+                          setForm((prev) => ({ ...prev, duration: val }));
+                        }
+                      }}
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs bg-white focus:ring-2 focus:ring-blue-500/20 outline-none"
+                    >
+                      <option value="">Select duration...</option>
+                      {COURSE_DURATIONS.map((dur) => (
+                        <option key={dur} value={dur}>{dur}</option>
+                      ))}
+                      <option value="__custom__">Custom Duration...</option>
+                    </select>
+                    {isCustomDuration && (
+                      <input
+                        type="text"
+                        value={form.duration}
+                        onChange={(e) => setForm((prev) => ({ ...prev, duration: e.target.value }))}
+                        placeholder="e.g. 4.5 Years (9 Semesters)"
+                        className="mt-2 w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
+                      />
+                    )}
                   </div>
                 </div>
 
                 <div>
                   <label className="block font-semibold text-slate-700 mb-1">Category / Discipline</label>
+                  <select
+                    value={isCustomCategory ? '__custom__' : (form.category || '')}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === '__custom__') {
+                        setIsCustomCategory(true);
+                      } else {
+                        setIsCustomCategory(false);
+                        setForm((prev) => ({ ...prev, category: val }));
+                      }
+                    }}
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs bg-white focus:ring-2 focus:ring-blue-500/20 outline-none"
+                  >
+                    <option value="">Select category / discipline...</option>
+                    {COURSE_CATEGORIES.map((cat) => (
+                      <option key={cat.value} value={cat.value}>{cat.label}</option>
+                    ))}
+                    <option value="__custom__">Custom Discipline...</option>
+                  </select>
+                  {isCustomCategory && (
+                    <input
+                      type="text"
+                      value={form.category}
+                      onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
+                      placeholder="Enter custom discipline name"
+                      className="mt-2 w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
+                    />
+                  )}
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Specialization / Discipline Focus</label>
                   <input
                     type="text"
-                    value={form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    placeholder="e.g. Engineering & Technology / Computer Sciences"
+                    value={form.specialization || ''}
+                    onChange={(e) => setForm((prev) => ({ ...prev, specialization: e.target.value }))}
+                    placeholder="e.g. Artificial Intelligence, Pharmacy, Nursing, Allied Health"
                     className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
                   />
                 </div>
@@ -389,7 +510,7 @@ export default function AdminCourses() {
                   <textarea
                     rows={2}
                     value={form.eligibility}
-                    onChange={(e) => setForm({ ...form, eligibility: e.target.value })}
+                    onChange={(e) => setForm((prev) => ({ ...prev, eligibility: e.target.value }))}
                     placeholder="e.g. Pass in 10+2 with Physics, Chemistry, and Mathematics..."
                     className="w-full border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
                   />
@@ -400,10 +521,35 @@ export default function AdminCourses() {
                   <textarea
                     rows={3}
                     value={form.description}
-                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
                     placeholder="Brief description of the course specializations and industry prospects..."
                     className="w-full border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
                   />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">Source / Curriculum Reference URL</label>
+                    <input
+                      type="url"
+                      value={form.sourceUrl || ''}
+                      onChange={(e) => setForm((prev) => ({ ...prev, sourceUrl: e.target.value }))}
+                      placeholder="https://..."
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500/20 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">Verification Status</label>
+                    <select
+                      value={form.verificationStatus || 'verified'}
+                      onChange={(e) => setForm((prev) => ({ ...prev, verificationStatus: e.target.value }))}
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs bg-white focus:ring-2 focus:ring-blue-500/20 outline-none"
+                    >
+                      <option value="verified">Verified (Curriculum / Board Approved)</option>
+                      <option value="Regulator Approved">Regulator Approved</option>
+                      <option value="pending">Pending Verification</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-2 pt-1">
@@ -411,7 +557,7 @@ export default function AdminCourses() {
                     type="checkbox"
                     id="isCourseActive"
                     checked={form.isActive}
-                    onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+                    onChange={(e) => setForm((prev) => ({ ...prev, isActive: e.target.checked }))}
                     className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
                   />
                   <label htmlFor="isCourseActive" className="text-xs font-semibold text-slate-700">

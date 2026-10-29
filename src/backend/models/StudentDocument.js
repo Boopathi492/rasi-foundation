@@ -1,11 +1,24 @@
-﻿import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 
 // Collection: student_documents. Metadata only - file bytes live in private storage and are addressed by
 // storageKey (relative key, never an absolute path). Access is always through an authorised API route.
 const StudentDocumentSchema = new mongoose.Schema(
   {
     biodataId: { type: mongoose.Schema.Types.ObjectId, ref: 'BioData', required: true, index: true },
-    documentType: { type: String, enum: ['photo', 'aadhaar', 'marksheet_10', 'marksheet_12', 'community_certificate', 'other'], required: true },
+    documentType: {
+      type: String,
+      enum: [
+        'photo',
+        'aadhaar',
+        'marksheet_10',
+        'marksheet_12',
+        'community_certificate',
+        'transfer_certificate',
+        'first_graduate',
+        'other',
+      ],
+      required: true,
+    },
     originalName: { type: String, trim: true, maxlength: 120, default: 'file' },
     storageKey: { type: String, required: true, unique: true },
     mime: { type: String, required: true },

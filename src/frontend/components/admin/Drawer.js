@@ -13,6 +13,12 @@ export default function Drawer({
 }) {
   const drawerRef = useRef(null);
   const previouslyFocusedElement = useRef(null);
+  const onCloseRef = useRef(onClose);
+  const preventCloseRef = useRef(preventClose);
+
+  // Keep callback refs synchronized without re-triggering the open effect
+  onCloseRef.current = onClose;
+  preventCloseRef.current = preventClose;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -22,30 +28,72 @@ export default function Drawer({
     document.body.style.overflow = 'hidden';
 
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && !preventClose) {
-        onClose();
+      if (e.key === 'Escape') {
+        if (!preventCloseRef.current) {
+          e.preventDefault();
+          onCloseRef.current?.();
+        }
+        return;
+      }
+
+      // Keyboard navigation / focus trap
+      if (e.key === 'Tab' && drawerRef.current) {
+        const focusableElements = Array.from(
+          drawerRef.current.querySelectorAll(
+            'button:not([disabled]), [href], input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter((el) => el.offsetParent !== null || el.offsetWidth > 0 || el.offsetHeight > 0);
+
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
 
-    setTimeout(() => {
-      if (drawerRef.current) {
+    const timer = setTimeout(() => {
+      if (!drawerRef.current) return;
+      const firstInput = drawerRef.current.querySelector(
+        'input:not([type="hidden"]):not([disabled]):not([readonly]), textarea:not([disabled]):not([readonly]), select:not([disabled])'
+      );
+      if (firstInput) {
+        firstInput.focus();
+      } else {
         const focusable = drawerRef.current.querySelector(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          'button:not([disabled]), [href], input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
         );
         focusable?.focus();
       }
     }, 50);
 
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = originalOverflow;
       if (previouslyFocusedElement.current && typeof previouslyFocusedElement.current.focus === 'function') {
-        previouslyFocusedElement.current.focus();
+        try {
+          previouslyFocusedElement.current.focus();
+        } catch {
+          // ignore
+        }
       }
     };
-  }, [isOpen, onClose, preventClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -58,8 +106,15 @@ export default function Drawer({
   }[width] || 'max-w-xl';
 
   const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget && !preventClose) {
-      onClose();
+    if (e.target === e.currentTarget && !preventCloseRef.current) {
+      onCloseRef.current?.();
+    }
+  };
+
+  const handleCloseClick = (e) => {
+    e.stopPropagation();
+    if (!preventCloseRef.current) {
+      onCloseRef.current?.();
     }
   };
 
@@ -69,14 +124,14 @@ export default function Drawer({
       aria-modal="true"
       aria-labelledby="drawer-headline"
       onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 overflow-hidden bg-slate-950/60 backdrop-blur-xs flex justify-end animate-fade-in"
+      className="fixed inset-0 z-50 overflow-hidden bg-slate-900/40 backdrop-blur-[2px] flex justify-end animate-fade-in"
     >
       <div
         ref={drawerRef}
         className={`w-full ${widthClasses} bg-white shadow-2xl h-full flex flex-col border-l border-slate-200 transform transition-transform animate-slide-in`}
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
+        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80 shrink-0">
           <div>
             <h3 id="drawer-headline" className="text-base font-bold text-slate-900 tracking-tight">
               {title}
@@ -85,7 +140,7 @@ export default function Drawer({
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleCloseClick}
             disabled={preventClose}
             className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-40"
             aria-label="Close drawer"

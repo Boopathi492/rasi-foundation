@@ -27,6 +27,8 @@ async function handler(req, res) {
         { name: { $regex: search, $options: 'i' } },
         { code: { $regex: search, $options: 'i' } },
         { category: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { eligibility: { $regex: search, $options: 'i' } },
       ];
     }
 
@@ -70,10 +72,13 @@ async function handler(req, res) {
       code = '',
       level = 'UG',
       category = '',
+      specialization = '',
       description = '',
       eligibility = '',
       duration = '',
       colleges = [],
+      sourceUrl = '',
+      verificationStatus = 'verified',
       isActive = true,
       order = 0,
     } = req.body || {};
@@ -96,10 +101,13 @@ async function handler(req, res) {
       code: code.trim().toUpperCase(),
       level,
       category: category.trim(),
+      specialization: specialization.trim(),
       description: description.trim(),
       eligibility: eligibility.trim(),
       duration: duration.trim(),
       colleges: Array.isArray(colleges) ? colleges : [],
+      sourceUrl: sourceUrl.trim(),
+      verificationStatus: verificationStatus.trim(),
       isActive: Boolean(isActive),
       order: parseInt(order, 10) || 0,
     });

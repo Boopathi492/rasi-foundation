@@ -23,6 +23,16 @@ export const config = {
   },
 };
 
+function parseScheduleDate(dateStr, isEnd = false) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return null;
+  if (isEnd && typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr.trim())) {
+    d.setUTCHours(23, 59, 59, 999);
+  }
+  return d;
+}
+
 async function handler(req, res) {
   await dbConnect();
   const { id } = req.query;
@@ -98,8 +108,8 @@ async function handler(req, res) {
     if (order !== undefined) banner.order = parseInt(order, 10) || 0;
     if (transitionMs !== undefined) banner.transitionMs = Math.max(800, Math.min(15000, parseInt(transitionMs, 10) || 5000));
     if (isActive !== undefined) banner.isActive = Boolean(isActive);
-    if (startsAt !== undefined) banner.startsAt = startsAt ? new Date(startsAt) : null;
-    if (endsAt !== undefined) banner.endsAt = endsAt ? new Date(endsAt) : null;
+    if (startsAt !== undefined) banner.startsAt = parseScheduleDate(startsAt, false);
+    if (endsAt !== undefined) banner.endsAt = parseScheduleDate(endsAt, true);
 
     // Optional replacement of desktop image
     if (desktopImageData) {

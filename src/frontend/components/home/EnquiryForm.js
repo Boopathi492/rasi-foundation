@@ -84,6 +84,7 @@ export default function EnquiryForm({
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); // idle | submitting | success | error
   const [serverError, setServerError] = useState('');
+  const [reference, setReference] = useState('');
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -139,6 +140,8 @@ export default function EnquiryForm({
       }
 
       markEnquiryPopupDismissed();
+      const refId = json.data?._id;
+      if (refId) setReference('REF-' + String(refId).slice(-8).toUpperCase());
       setStatus('success');
       setForm(EMPTY);
       if (onSuccess) onSuccess();
@@ -169,7 +172,12 @@ export default function EnquiryForm({
         <h3 className="font-heading text-xl font-bold text-gray-900">
           Thank you! Your enquiry has been received.
         </h3>
-        <p className="mt-1.5 text-xs leading-relaxed text-gray-700 sm:text-sm">
+        {reference && (
+          <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-white/80 px-3 py-1 font-mono text-xs font-semibold text-emerald-900">
+            <span>Reference ID:</span> <span>{reference}</span>
+          </p>
+        )}
+        <p className="mt-2 text-xs leading-relaxed text-gray-700 sm:text-sm">
           Our counselling team will reach out to you on the mobile number or email address you provided.
         </p>
         {!compact && (

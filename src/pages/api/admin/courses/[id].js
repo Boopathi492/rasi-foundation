@@ -35,10 +35,13 @@ async function handler(req, res) {
       code,
       level,
       category,
+      specialization,
       description,
       eligibility,
       duration,
       colleges,
+      sourceUrl,
+      verificationStatus,
       isActive,
       order,
     } = req.body || {};
@@ -47,10 +50,13 @@ async function handler(req, res) {
     if (code !== undefined) course.code = code.trim().toUpperCase();
     if (level !== undefined) course.level = level;
     if (category !== undefined) course.category = category.trim();
+    if (specialization !== undefined) course.specialization = specialization.trim();
     if (description !== undefined) course.description = description.trim();
     if (eligibility !== undefined) course.eligibility = eligibility.trim();
     if (duration !== undefined) course.duration = duration.trim();
     if (colleges !== undefined) course.colleges = Array.isArray(colleges) ? colleges : [];
+    if (sourceUrl !== undefined) course.sourceUrl = sourceUrl.trim();
+    if (verificationStatus !== undefined) course.verificationStatus = verificationStatus.trim();
     if (isActive !== undefined) course.isActive = Boolean(isActive);
     if (order !== undefined) course.order = parseInt(order, 10) || 0;
 

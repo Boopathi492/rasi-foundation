@@ -98,6 +98,12 @@ async function handler(req, res) {
       .limit(5)
       .lean();
 
+    // Recent counselling requests
+    const recentCounselling = await CounsellingRecord.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .lean();
+
     return res.status(200).json({
       success: true,
       stats: {
@@ -121,6 +127,7 @@ async function handler(req, res) {
         activity: recentActivity,
         enquiries: recentEnquiries,
         contacts: recentContacts,
+        counselling: recentCounselling,
       },
     });
   } catch (error) {

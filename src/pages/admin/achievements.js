@@ -217,8 +217,8 @@ export default function AdminAchievements() {
             )}
 
             {showModal && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-                    <div className="bg-white rounded-[2.5rem] max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] flex items-center justify-center z-[100] p-4">
+                    <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[90dvh] flex flex-col shadow-xl border border-slate-200/90 overflow-hidden">
                         <div className="p-8 border-b flex items-center justify-between sticky top-0 bg-white z-10">
                             <h3 className="text-2xl font-black text-gray-900 tracking-tight">
                                 {isEditing ? 'Edit Achievement' : 'Post Achievement'}
@@ -228,7 +228,7 @@ export default function AdminAchievements() {
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                        <form onSubmit={handleSubmit} className="p-8 space-y-6 overflow-y-auto flex-1 min-h-0">
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Type</label>

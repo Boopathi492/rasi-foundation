@@ -10,6 +10,7 @@ import Stepper from '@/frontend/components/forms/Stepper';
 import StepPanel from '@/frontend/components/forms/StepPanel';
 import ReviewSection from '@/frontend/components/forms/ReviewSection';
 import FormAlert from '@/frontend/components/forms/FormAlert';
+import ThankYouConfirmation from '@/frontend/components/common/ThankYouConfirmation';
 import { Field, ChoiceGroup, CheckboxField, inputClass } from '@/frontend/components/forms/Field';
 import { CONTACT, TN_DISTRICTS } from '@/data/siteConfig';
 
@@ -77,6 +78,7 @@ export default function BookCounselling() {
   const [status, setStatus] = useState('idle'); // idle | submitting | success | error
   const [serverError, setServerError] = useState('');
   const [reference, setReference] = useState('');
+  const [lastSubmitted, setLastSubmitted] = useState(null);
   const [colleges, setColleges] = useState([]);
   const submitLock = useRef(false);
   const formTop = useRef(null);
@@ -143,19 +145,9 @@ export default function BookCounselling() {
     setStatus('submitting');
     setServerError('');
 
-    // Counselling requests reuse POST /api/enquiry (no dedicated model exists). They are tagged
-    // with "[Counselling Booking]" so staff can tell them apart from general enquiries.
-    const details = [
-      '[Counselling Booking]',
-      `Preferred district: ${form.district}`,
-      form.college.trim() && `Preferred college: ${form.college.trim()}`,
-      form.contactMethod && `Preferred contact method: ${form.contactMethod}`,
-      form.contactTime && `Best time to contact: ${form.contactTime}`,
-      form.message.trim() && `Message: ${form.message.trim()}`,
-    ].filter(Boolean).join('\n');
-
+    // Counselling requests route to dedicated endpoint POST /api/counselling (persisted in CounsellingRecord)
     try {
-      const res = await fetch('/api/enquiry', {
+      const res = await fetch('/api/counselling', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -164,14 +156,25 @@ export default function BookCounselling() {
           phone,
           course: form.course,
           qualification: form.qualification,
-          message: details,
+          district: form.district,
+          college: form.college.trim(),
+          contactMethod: form.contactMethod,
+          contactTime: form.contactTime,
+          message: form.message.trim(),
         }),
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.success) {
         throw new Error(json.error || `Request failed (${res.status})`);
       }
-      setReference(json.data?._id ? String(json.data._id).slice(-8).toUpperCase() : '');
+      const refId = json.booking?._id || json.data?._id;
+      setReference(refId ? `REF-${String(refId).slice(-8).toUpperCase()}` : '');
+      setLastSubmitted({
+        name: form.name.trim(),
+        course: form.course,
+        contactMethod: form.contactMethod,
+        district: form.district,
+      });
       setStatus('success');
       setForm(EMPTY);
       setStep(0);
@@ -256,24 +259,28 @@ export default function BookCounselling() {
 
       {/* Form + aside */}
       <section id="counselling-form" ref={formTop} className="scroll-mt-24 bg-gradient-to-b from-brand-50/60 to-white py-10 md:py-14">
-        <div className="container mx-auto grid gap-8 px-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-          <div className="rf-card p-5 sm:p-8">
+        <div className={`container mx-auto ${status === 'success' ? 'max-w-2xl px-4' : 'grid gap-8 px-4 lg:grid-cols-[minmax(0,1fr)_340px]'}`}>
+          <div className={status === 'success' ? '' : 'rf-card p-5 sm:p-8'}>
             {status === 'success' ? (
-              <div role="status" className="py-4 text-center">
-                <FaCheckCircle aria-hidden="true" className="mx-auto mb-3 text-5xl text-brand-700" />
-                <h2 className="font-heading text-2xl font-bold text-gray-900">Request received</h2>
-                <p className="mx-auto mt-2 max-w-lg text-gray-700">
-                  Your counselling request has been saved. Our team will contact you on the mobile number you provided.
-                </p>
-                {reference && <p className="mt-2 text-sm text-gray-600">Reference: <span className="font-mono font-semibold">{reference}</span></p>}
-                <p className="mx-auto mt-3 max-w-lg rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
-                  This is a request only. No appointment date or time has been fixed yet, and it will be arranged when our team contacts you.
-                </p>
-                <div className="mt-6 flex flex-wrap justify-center gap-3">
-                  <button type="button" onClick={() => { setStatus('idle'); setInteracted(false); }} className="rf-btn-outline">Submit another request</button>
-                  <Link href="/" className="rf-btn-primary">Back to home</Link>
-                </div>
-              </div>
+              <ThankYouConfirmation
+                title="Counselling Request Received"
+                subtitle="Your career counselling request has been saved. Our counselling team will review your academic goals and contact you."
+                reference={reference}
+                details={[
+                  ...(lastSubmitted?.name ? [{ label: 'Student', value: lastSubmitted.name }] : []),
+                  ...(lastSubmitted?.course ? [{ label: 'Course Interest', value: lastSubmitted.course }] : []),
+                  ...(lastSubmitted?.contactMethod ? [{ label: 'Preferred Contact', value: lastSubmitted.contactMethod }] : []),
+                  ...(lastSubmitted?.district ? [{ label: 'District', value: lastSubmitted.district }] : []),
+                ]}
+                nextSteps="Our team will reach out via your preferred contact method to discuss course eligibility, college cut-offs, and admissions."
+                onReset={() => {
+                  setStatus('idle');
+                  setInteracted(false);
+                  setLastSubmitted(null);
+                }}
+                resetLabel="Submit Another Request"
+                homeHref="/"
+              />
             ) : (
               <form onSubmit={onSubmit} noValidate aria-busy={submitting}>
                 <Stepper steps={STEPS} current={step} maxReached={maxReached} onStepClick={goTo} label="Counselling request progress" />
@@ -404,25 +411,27 @@ export default function BookCounselling() {
             )}
           </div>
 
-          <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start" aria-label="About counselling">
-            <div className="rf-card p-5">
-              <h2 className="font-heading text-lg font-bold text-gray-900">About counselling</h2>
-              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-gray-700">
-                <li>Counselling helps students understand course and college options.</li>
-                <li>You can discuss academic interests and admission-related next steps.</li>
-                <li>Recommendations depend on the student&apos;s preferences and the information available.</li>
-              </ul>
-            </div>
-            <FormAlert kind="info" title="Please note">
-              Counselling does not guarantee admission, a scholarship or any particular outcome. Submitting this form sends
-              a request; it does not book a confirmed appointment.
-            </FormAlert>
-            <div className="rf-card p-5 text-sm text-gray-700">
-              <p className="font-semibold text-gray-900">Prefer to talk now?</p>
-              <p className="mt-1">Call <a href={`tel:${CONTACT.phoneTel}`} className="font-semibold text-brand-800 underline">{CONTACT.phoneDisplay}</a>.</p>
-              <p className="mt-2">For a general question, use the <Link href="/contact" className="font-semibold text-brand-800 underline">enquiry form</Link>.</p>
-            </div>
-          </aside>
+          {status !== 'success' && (
+            <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start" aria-label="About counselling">
+              <div className="rf-card p-5">
+                <h2 className="font-heading text-lg font-bold text-gray-900">About counselling</h2>
+                <ul className="mt-3 space-y-2 text-sm leading-relaxed text-gray-700">
+                  <li>Counselling helps students understand course and college options.</li>
+                  <li>You can discuss academic interests and admission-related next steps.</li>
+                  <li>Recommendations depend on the student&apos;s preferences and the information available.</li>
+                </ul>
+              </div>
+              <FormAlert kind="info" title="Please note">
+                Counselling does not guarantee admission, a scholarship or any particular outcome. Submitting this form sends
+                a request; it does not book a confirmed appointment.
+              </FormAlert>
+              <div className="rf-card p-5 text-sm text-gray-700">
+                <p className="font-semibold text-gray-900">Prefer to talk now?</p>
+                <p className="mt-1">Call <a href={`tel:${CONTACT.phoneTel}`} className="font-semibold text-brand-800 underline">{CONTACT.phoneDisplay}</a>.</p>
+                <p className="mt-2">For a general question, use the <Link href="/contact" className="font-semibold text-brand-800 underline">enquiry form</Link>.</p>
+              </div>
+            </aside>
+          )}
         </div>
       </section>
     </Layout>

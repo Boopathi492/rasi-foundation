@@ -50,12 +50,19 @@ async function handler(req, res) {
       location,
       district,
       tneaCode,
+      tneaStatus,
+      tneaSourceYear,
       note,
       isActive,
       order,
       departments,
       website,
       type,
+      specialization,
+      institutionType,
+      courses,
+      sourceUrl,
+      verificationStatus,
       logoData,
       logoName,
       removeLogo,
@@ -65,6 +72,8 @@ async function handler(req, res) {
     if (location !== undefined) college.location = location.trim();
     if (district !== undefined) college.district = district.trim();
     if (tneaCode !== undefined) college.tneaCode = tneaCode.trim();
+    if (tneaStatus !== undefined) college.tneaStatus = tneaStatus.trim();
+    if (tneaSourceYear !== undefined) college.tneaSourceYear = tneaSourceYear.trim();
     if (note !== undefined) college.note = note.trim();
     if (isActive !== undefined) college.isActive = Boolean(isActive);
     if (order !== undefined) college.order = parseInt(order, 10) || 0;
@@ -73,6 +82,11 @@ async function handler(req, res) {
     }
     if (website !== undefined) college.website = website.trim();
     if (type !== undefined) college.type = type;
+    if (specialization !== undefined) college.specialization = specialization.trim();
+    if (institutionType !== undefined) college.institutionType = institutionType.trim();
+    if (courses !== undefined) college.courses = Array.isArray(courses) ? courses : [];
+    if (sourceUrl !== undefined) college.sourceUrl = sourceUrl.trim();
+    if (verificationStatus !== undefined) college.verificationStatus = verificationStatus.trim();
 
     // Handle logo upload
     if (logoData) {

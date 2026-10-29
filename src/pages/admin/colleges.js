@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '@/frontend/components/AdminLayout';
-import Modal from '@/frontend/components/admin/Modal';
-import ConfirmDialog from '@/frontend/components/admin/ConfirmDialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaSearch,
@@ -16,45 +14,95 @@ import {
   FaSeedling,
   FaCode,
   FaToggleOn,
-  FaToggleOff
+  FaToggleOff,
+  FaGraduationCap,
+  FaGlobe,
+  FaExternalLinkAlt
 } from 'react-icons/fa';
 
-const DISTRICTS = [
+export const DISTRICTS = [
+  'Ariyalur',
+  'Chengalpattu',
+  'Chennai',
+  'Coimbatore',
+  'Cuddalore',
+  'Dharmapuri',
+  'Dindigul',
+  'Erode',
+  'Kallakurichi',
+  'Kancheepuram',
+  'Kanniyakumari',
+  'Karur',
+  'Krishnagiri',
+  'Madurai',
+  'Mayiladuthurai',
+  'Nagapattinam',
+  'Namakkal',
+  'Nilgiris',
+  'Perambalur',
+  'Pudukkottai',
+  'Ramanathapuram',
+  'Ranipet',
+  'Salem',
+  'Sivaganga',
+  'Tenkasi',
+  'Thanjavur',
+  'Theni',
+  'Thoothukudi',
+  'Tiruchirappalli',
+  'Tirunelveli',
+  'Tirupathur',
+  'Tiruppur',
+  'Tiruvallur',
+  'Tiruvannamalai',
+  'Tiruvarur',
+  'Vellore',
+  'Viluppuram',
+  'Virudhunagar',
+  'Bengaluru Zone',
+  'Coimbatore Zone',
+  'Erode District',
   'Namakkal District',
   'Salem District',
-  'Erode District',
-  'Coimbatore Zone',
-  'Bengaluru Zone',
   'Women Centric Colleges',
-  'Well Connected Universities',
+  'Well Connected Universities'
 ];
 
-const districtColors = {
-  'Namakkal District': 'from-red-500 to-red-600',
-  'Salem District': 'from-green-500 to-green-600',
-  'Erode District': 'from-blue-500 to-blue-600',
-  'Coimbatore Zone': 'from-purple-500 to-purple-600',
-  'Bengaluru Zone': 'from-indigo-500 to-indigo-600',
-  'Women Centric Colleges': 'from-pink-500 to-rose-600',
-  'Well Connected Universities': 'from-teal-500 to-cyan-600',
-};
+export const COLLEGE_TYPES = [
+  'Engineering',
+  'Arts & Science',
+  'Medical',
+  'Polytechnic',
+  'Law',
+  'Management',
+  'Education',
+  'Agriculture',
+  'Other'
+];
 
 export default function AdminColleges() {
   const [colleges, setColleges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [districtFilter, setDistrictFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [editingCollege, setEditingCollege] = useState(null);
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const [deleting, setDeleting] = useState(false);
-  const [seeding, setSeeding] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [formData, setFormData] = useState({
     name: '',
     location: '',
-    district: DISTRICTS[0],
+    district: 'Chennai',
+    type: 'Engineering',
+    specialization: '',
+    institutionType: '',
+    sourceUrl: '',
+    verificationStatus: 'directory_listed',
     tneaCode: '',
+    tneaStatus: 'not_applicable',
+    tneaSourceYear: '',
+    website: '',
+    departments: '',
     note: '',
     isActive: true,
     order: 0,
@@ -87,7 +135,6 @@ export default function AdminColleges() {
       });
 
       if (response.status === 401) {
-        // Token expired or invalid, redirect to login
         localStorage.removeItem('adminToken');
         localStorage.removeItem('adminUser');
         window.location.href = '/admin/login';
@@ -107,33 +154,6 @@ export default function AdminColleges() {
     }
   };
 
-  const seedColleges = async () => {
-    if (!confirm('This will seed initial colleges data. Continue?')) return;
-
-    setSeeding(true);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch('/api/admin/colleges/seed', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert(`Successfully seeded ${data.count} colleges!`);
-        fetchColleges();
-      } else {
-        alert(data.message || 'Failed to seed colleges');
-      }
-    } catch (error) {
-      console.error('Failed to seed colleges:', error);
-      alert('Failed to seed colleges');
-    } finally {
-      setSeeding(false);
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -143,23 +163,50 @@ export default function AdminColleges() {
         ? `/api/admin/colleges/${editingCollege._id}`
         : '/api/admin/colleges';
 
+      // Parse departments string into array of trimmed non-empty strings
+      const deptsArray = typeof formData.departments === 'string'
+        ? formData.departments
+            .split(/[\n,]+/)
+            .map(d => d.trim())
+            .filter(Boolean)
+        : Array.isArray(formData.departments) ? formData.departments : [];
+
+      const payload = {
+        name: formData.name.trim(),
+        location: formData.location.trim(),
+        district: formData.district.trim(),
+        type: formData.type || 'Engineering',
+        specialization: formData.specialization ? formData.specialization.trim() : '',
+        institutionType: formData.institutionType ? formData.institutionType.trim() : '',
+        sourceUrl: formData.sourceUrl ? formData.sourceUrl.trim() : '',
+        verificationStatus: formData.verificationStatus || 'directory_listed',
+        tneaCode: formData.tneaCode ? formData.tneaCode.trim() : '',
+        tneaStatus: formData.tneaStatus || 'not_applicable',
+        tneaSourceYear: formData.tneaSourceYear ? formData.tneaSourceYear.trim() : '',
+        website: formData.website ? formData.website.trim() : '',
+        departments: deptsArray,
+        note: formData.note ? formData.note.trim() : '',
+        isActive: Boolean(formData.isActive),
+        order: parseInt(formData.order, 10) || 0,
+      };
+
       const response = await fetch(url, {
         method: editingCollege ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       if (response.ok) {
-        const college = await response.json();
+        const saved = await response.json();
         if (editingCollege) {
-          setColleges(colleges.map(c => c._id === college._id ? college : c));
+          setColleges(colleges.map(c => c._id === saved._id ? saved : c));
           setToast({ show: true, message: 'College updated successfully!', type: 'success' });
         } else {
-          setColleges([...colleges, college]);
-          setToast({ show: true, message: `${college.name} added successfully!`, type: 'success' });
+          setColleges([...colleges, saved]);
+          setToast({ show: true, message: `${saved.name} added successfully!`, type: 'success' });
         }
         closeModal();
       } else {
@@ -223,12 +270,21 @@ export default function AdminColleges() {
   const openEditModal = (college) => {
     setEditingCollege(college);
     setFormData({
-      name: college.name,
-      location: college.location,
-      district: college.district,
+      name: college.name || '',
+      location: college.location || '',
+      district: college.district || 'Chennai',
+      type: college.type || 'Engineering',
+      specialization: college.specialization || '',
+      institutionType: college.institutionType || '',
+      sourceUrl: college.sourceUrl || '',
+      verificationStatus: college.verificationStatus || 'directory_listed',
       tneaCode: college.tneaCode || '',
+      tneaStatus: college.tneaStatus || (college.tneaCode ? 'verified' : 'not_applicable'),
+      tneaSourceYear: college.tneaSourceYear || '',
+      website: college.website || '',
+      departments: Array.isArray(college.departments) ? college.departments.join('\n') : '',
       note: college.note || '',
-      isActive: college.isActive,
+      isActive: college.isActive !== false,
       order: college.order || 0,
     });
     setShowModal(true);
@@ -239,11 +295,20 @@ export default function AdminColleges() {
     setFormData({
       name: '',
       location: '',
-      district: DISTRICTS[0],
-      code: '',
+      district: 'Chennai',
+      type: 'Engineering',
+      specialization: '',
+      institutionType: '',
+      sourceUrl: '',
+      verificationStatus: 'directory_listed',
+      tneaCode: '',
+      tneaStatus: 'not_applicable',
+      tneaSourceYear: '',
+      website: '',
+      departments: '',
       note: '',
       isActive: true,
-      order: colleges.length,
+      order: colleges.length + 1,
     });
     setShowModal(true);
   };
@@ -254,8 +319,17 @@ export default function AdminColleges() {
     setFormData({
       name: '',
       location: '',
-      district: DISTRICTS[0],
+      district: 'Chennai',
+      type: 'Engineering',
+      specialization: '',
+      institutionType: '',
+      sourceUrl: '',
+      verificationStatus: 'directory_listed',
       tneaCode: '',
+      tneaStatus: 'not_applicable',
+      tneaSourceYear: '',
+      website: '',
+      departments: '',
       note: '',
       isActive: true,
       order: 0,
@@ -263,28 +337,38 @@ export default function AdminColleges() {
   };
 
   const filteredColleges = colleges.filter(college => {
-    const matchesSearch =
-      college.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      college.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (college.tneaCode && college.tneaCode.toLowerCase().includes(searchQuery.toLowerCase()));
+    const q = searchQuery.toLowerCase().trim();
+    const matchesSearch = !q ||
+      college.name.toLowerCase().includes(q) ||
+      (college.location || '').toLowerCase().includes(q) ||
+      (college.district || '').toLowerCase().includes(q) ||
+      (college.type || '').toLowerCase().includes(q) ||
+      (college.tneaCode && college.tneaCode.toLowerCase().includes(q)) ||
+      (Array.isArray(college.departments) && college.departments.some(d => d.toLowerCase().includes(q)));
+
     const matchesDistrict = districtFilter === 'all' || college.district === districtFilter;
-    return matchesSearch && matchesDistrict;
+    const matchesType = typeFilter === 'all' || (college.type || 'Engineering') === typeFilter;
+    return matchesSearch && matchesDistrict && matchesType;
   });
 
   // Group by district
   const groupedColleges = filteredColleges.reduce((acc, college) => {
-    if (!acc[college.district]) {
-      acc[college.district] = [];
+    const dist = college.district || 'Other';
+    if (!acc[dist]) {
+      acc[dist] = [];
     }
-    acc[college.district].push(college);
+    acc[dist].push(college);
     return acc;
   }, {});
+
+  const activeCount = colleges.filter(c => c.isActive).length;
+  const uniqueDistricts = [...new Set(colleges.map(c => c.district))].length;
 
   if (loading) {
     return (
       <AdminLayout title="Manage Colleges">
         <div className="flex items-center justify-center h-64">
-          <FaSpinner className="animate-spin text-4xl text-red-600" />
+          <FaSpinner className="animate-spin text-4xl text-crimson" />
         </div>
       </AdminLayout>
     );
@@ -293,26 +377,18 @@ export default function AdminColleges() {
   return (
     <AdminLayout title="Manage Colleges">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-gray-800">Colleges</h2>
-            <p className="text-gray-500 text-sm">Manage partner colleges and institutions</p>
+            <h2 className="text-2xl font-bold text-gray-800">College Master Catalog</h2>
+            <p className="text-gray-500 text-sm mt-1">
+              Manage partner institutions, autonomous colleges, and universities across Tamil Nadu
+            </p>
           </div>
-          <div className="flex gap-2">
-            {colleges.length === 0 && (
-              <button
-                onClick={seedColleges}
-                disabled={seeding}
-                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition disabled:opacity-50"
-              >
-                {seeding ? <FaSpinner className="animate-spin" /> : <FaSeedling />}
-                Seed Initial Data
-              </button>
-            )}
+          <div className="flex items-center gap-3">
             <button
               onClick={openAddModal}
-              className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+              className="flex items-center gap-2 bg-crimson text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-crimson-dark transition shadow-sm active:scale-95"
             >
               <FaPlus />
               Add College
@@ -321,182 +397,244 @@ export default function AdminColleges() {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mt-6">
-          <div className="relative flex-1">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          <div className="relative">
+            <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Search colleges..."
+              placeholder="Search by name, city, course, TNEA code..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-crimson focus:border-crimson text-sm"
             />
           </div>
-          <select
-            value={districtFilter}
-            onChange={(e) => setDistrictFilter(e.target.value)}
-            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
-          >
-            <option value="all">All Districts</option>
-            {DISTRICTS.map(district => (
-              <option key={district} value={district}>{district}</option>
-            ))}
-          </select>
+          <div>
+            <select
+              value={districtFilter}
+              onChange={(e) => setDistrictFilter(e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-crimson focus:border-crimson text-sm"
+            >
+              <option value="all">All Districts ({colleges.length})</option>
+              {DISTRICTS.map(district => {
+                const count = colleges.filter(c => c.district === district).length;
+                return (
+                  <option key={district} value={district}>
+                    {district} {count > 0 ? `(${count})` : ''}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+          <div>
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-crimson focus:border-crimson text-sm"
+            >
+              <option value="all">All Course Streams / Types</option>
+              {COLLEGE_TYPES.map(t => {
+                const count = colleges.filter(c => (c.type || 'Engineering') === t).length;
+                return (
+                  <option key={t} value={t}>
+                    {t} {count > 0 ? `(${count})` : ''}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-        {DISTRICTS.map(district => (
-          <button
-            key={district}
-            onClick={() => setDistrictFilter(district)}
-            className={`bg-gradient-to-r ${districtColors[district]} text-white rounded-xl p-4 text-left hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden active:scale-95`}
-          >
-            <div className="relative z-10">
-              <p className="text-white/80 text-[10px] font-bold uppercase tracking-wider mb-1">{district}</p>
-              <p className="text-3xl font-black">
-                {colleges.filter(c => c.district === district).length}
-              </p>
-            </div>
-            {/* Visual indicator for active filter */}
-            {districtFilter === district && (
-              <div className="absolute top-2 right-2">
-                <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
-              </div>
-            )}
-            {/* Background decoration */}
-            <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <FaUniversity className="text-6xl -rotate-12" />
-            </div>
-          </button>
-        ))}
+      {/* KPI Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Total Colleges</p>
+          <p className="text-2xl font-black text-gray-900 mt-1">{colleges.length}</p>
+        </div>
+        <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Active Colleges</p>
+          <p className="text-2xl font-black text-forest mt-1">{activeCount}</p>
+        </div>
+        <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Districts Represented</p>
+          <p className="text-2xl font-black text-blue-600 mt-1">{uniqueDistricts}</p>
+        </div>
+        <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Matching Filter</p>
+          <p className="text-2xl font-black text-crimson mt-1">{filteredColleges.length}</p>
+        </div>
       </div>
 
       {/* Colleges by District */}
       {Object.keys(groupedColleges).length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-          <FaUniversity className="text-6xl text-gray-300 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-600 mb-2">No Colleges Found</h3>
-          <p className="text-gray-500 mb-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-12 text-center">
+          <FaUniversity className="text-5xl text-gray-300 mx-auto mb-3" />
+          <h3 className="text-lg font-semibold text-gray-700">No Colleges Found</h3>
+          <p className="text-gray-500 text-sm mt-1">
             {colleges.length === 0
-              ? 'Get started by seeding initial data or adding a new college.'
-              : 'No colleges match your search criteria.'}
+              ? 'No colleges in database. You can add new colleges using the Add College button.'
+              : 'No colleges match your active search and filter criteria.'}
           </p>
         </div>
       ) : (
         Object.entries(groupedColleges).map(([district, districtColleges]) => (
-          <div key={district} className="mb-6">
-            <div className={`bg-gradient-to-r ${districtColors[district] || 'from-gray-500 to-gray-600'} text-white rounded-t-xl p-4`}>
+          <div key={district} className="mb-6 rounded-2xl border border-slate-200/90 bg-white shadow-sm overflow-hidden">
+            <div className="bg-gradient-to-r from-forest to-forest-dark text-white px-5 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FaMapMarkerAlt />
-                <h3 className="font-semibold">{district}</h3>
-                <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">
-                  {districtColleges.length} colleges
-                </span>
+                <FaMapMarkerAlt className="text-gold-300" />
+                <h3 className="font-bold text-base">{district}</h3>
               </div>
+              <span className="bg-white/20 text-white px-2.5 py-0.5 rounded-full text-xs font-semibold">
+                {districtColleges.length} {districtColleges.length === 1 ? 'college' : 'colleges'}
+              </span>
             </div>
-            <div className="bg-white rounded-b-xl shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
-                    <tr>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">College Name</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Location</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">TNEA Code</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Status</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {districtColleges.map((college) => (
-                      <tr key={college._id} className={`hover:bg-gray-50 ${!college.isActive ? 'opacity-50' : ''}`}>
-                        <td className="py-3 px-4">
-                          <div>
-                            <p className="font-medium text-gray-800">{college.name}</p>
-                            {college.note && (
-                              <p className="text-xs text-amber-600 mt-1">{college.note}</p>
-                            )}
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-gray-600">
-                          <div className="flex items-center gap-1">
-                            <FaMapMarkerAlt className="text-red-500 text-xs" />
-                            {college.location}
-                          </div>
-                        </td>
-                        <td className="py-3 px-4">
-                          {college.tneaCode ? (
-                            <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded text-sm">
-                              <FaCode className="text-xs" />
-                              {college.tneaCode}
-                            </span>
-                          ) : (
-                            <span className="text-gray-400">-</span>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-slate-50 border-b border-slate-100 text-xs font-semibold uppercase text-slate-500 tracking-wider">
+                  <tr>
+                    <th className="py-3 px-4">College Name</th>
+                    <th className="py-3 px-4">Stream / Type</th>
+                    <th className="py-3 px-4">Location</th>
+                    <th className="py-3 px-4">TNEA Code</th>
+                    <th className="py-3 px-4">Departments</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {districtColleges.map((college) => (
+                    <tr key={college._id} className={`hover:bg-slate-50/80 transition-colors ${!college.isActive ? 'opacity-60 bg-gray-50/50' : ''}`}>
+                      <td className="py-3.5 px-4 font-medium text-gray-900 max-w-xs">
+                        <div>
+                          <p className="font-semibold">{college.name}</p>
+                          {college.website && (
+                            <a
+                              href={college.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-0.5"
+                            >
+                              <FaGlobe className="text-[10px]" /> Official Website <FaExternalLinkAlt className="text-[9px]" />
+                            </a>
                           )}
-                        </td>
-                        <td className="py-3 px-4">
+                          {college.note && (
+                            <p className="text-xs text-amber-700 mt-0.5 line-clamp-1">{college.note}</p>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <div className="flex flex-col gap-1 items-start">
+                          <span className="inline-block bg-slate-100 text-slate-800 px-2.5 py-0.5 rounded-full text-xs font-medium">
+                            {college.type || 'Engineering'}
+                          </span>
+                          {college.specialization && (
+                            <span className="inline-block bg-blue-50 text-blue-700 border border-blue-200/50 px-2 py-0.5 rounded-full text-[10px] font-semibold">
+                              {college.specialization}
+                            </span>
+                          )}
+                          {college.institutionType && (
+                            <span className="inline-block bg-amber-50 text-amber-700 border border-amber-200/50 px-2 py-0.5 rounded-full text-[10px] font-semibold">
+                              {college.institutionType}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4 text-gray-600">
+                        <div className="flex items-center gap-1.5">
+                          <FaMapMarkerAlt className="text-crimson text-xs shrink-0" />
+                          <span>{college.location}</span>
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        {college.tneaStatus === 'verified' && college.tneaCode ? (
+                          <span className="inline-flex items-center gap-1 bg-gold-100 text-gold-700 px-2 py-0.5 rounded-md font-mono text-xs font-semibold" title={`TNEA Code: ${college.tneaCode} (${college.tneaSourceYear || '2024'})`}>
+                            <FaCode className="text-[10px]" /> {college.tneaCode}
+                          </span>
+                        ) : college.tneaStatus === 'pending_verification' ? (
+                          <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md text-xs font-medium">
+                            Pending
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 text-xs">N/A</span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 text-gray-600">
+                        {Array.isArray(college.departments) && college.departments.length > 0 ? (
+                          <span className="inline-flex items-center gap-1 text-xs text-forest font-semibold bg-forest/10 px-2 py-0.5 rounded-full">
+                            <FaGraduationCap /> {college.departments.length} depts
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 text-xs">0 depts</span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <button
+                          type="button"
+                          onClick={() => toggleActive(college)}
+                          className={`flex items-center gap-1 text-xs font-semibold ${
+                            college.isActive ? 'text-forest' : 'text-gray-400'
+                          }`}
+                        >
+                          {college.isActive ? (
+                            <>
+                              <FaToggleOn className="text-lg text-forest" /> Active
+                            </>
+                          ) : (
+                            <>
+                              <FaToggleOff className="text-lg text-gray-400" /> Inactive
+                            </>
+                          )}
+                        </button>
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
                           <button
-                            onClick={() => toggleActive(college)}
-                            className={`flex items-center gap-1 text-sm ${college.isActive ? 'text-green-600' : 'text-gray-400'}`}
+                            type="button"
+                            onClick={() => openEditModal(college)}
+                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                            title="Edit College"
                           >
-                            {college.isActive ? (
-                              <>
-                                <FaToggleOn className="text-xl" />
-                                Active
-                              </>
-                            ) : (
-                              <>
-                                <FaToggleOff className="text-xl" />
-                                Inactive
-                              </>
-                            )}
+                            <FaEdit className="text-base" />
                           </button>
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => openEditModal(college)}
-                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                              title="Edit"
-                            >
-                              <FaEdit />
-                            </button>
-                            <button
-                              onClick={() => deleteCollege(college._id)}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                              title="Delete"
-                            >
-                              <FaTrash />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                          <button
+                            type="button"
+                            onClick={() => deleteCollege(college._id)}
+                            className="p-1.5 text-crimson hover:bg-crimson/10 rounded-lg transition"
+                            title="Delete College"
+                          >
+                            <FaTrash className="text-sm" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         ))
       )}
 
-      {/* Add/Edit Modal */}
+      {/* Add / Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b flex items-center justify-between">
-              <h3 className="text-xl font-semibold">
-                {editingCollege ? 'Edit College' : 'Add New College'}
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-[2px] flex items-center justify-center z-50 p-3 sm:p-6 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[92dvh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+            <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+              <h3 className="text-lg font-bold">
+                {editingCollege ? `Edit: ${editingCollege.name}` : 'Add New College'}
               </h3>
-              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
-                <FaTimes className="text-xl" />
+              <button
+                type="button"
+                onClick={closeModal}
+                className="text-gray-400 hover:text-white p-1 rounded-lg transition"
+              >
+                <FaTimes className="text-lg" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1 min-h-0 space-y-4 text-sm">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
                   College Name *
                 </label>
                 <input
@@ -504,105 +642,236 @@ export default function AdminColleges() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  placeholder="Enter college name"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson"
+                  placeholder="e.g. College of Engineering, Guindy"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Location *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    required
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    placeholder="City/Town"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
                     District *
                   </label>
                   <select
                     value={formData.district}
                     onChange={(e) => setFormData({ ...formData, district: e.target.value })}
                     required
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson"
                   >
                     {DISTRICTS.map(district => (
                       <option key={district} value={district}>{district}</option>
                     ))}
                   </select>
                 </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                    City / Location *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson"
+                    placeholder="e.g. Guindy, Chennai"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                    Stream / Type *
+                  </label>
+                  <select
+                    value={formData.type}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson"
+                  >
+                    {COLLEGE_TYPES.map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                    Specialization / Stream Focus
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.specialization}
+                    onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson"
+                    placeholder="e.g. Pharmacy, Nursing, Computer Science, Polytechnic"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                    Institution Type
+                  </label>
+                  <select
+                    value={formData.institutionType}
+                    onChange={(e) => setFormData({ ...formData, institutionType: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson"
+                  >
+                    <option value="">Select Institution Type (optional)</option>
+                    <option value="Government">Government</option>
+                    <option value="Government-Aided">Government-Aided</option>
+                    <option value="Autonomous">Autonomous</option>
+                    <option value="Private">Private / Self-Financing</option>
+                    <option value="Deemed / University">Deemed / University</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
                     TNEA Code
                   </label>
                   <input
                     type="text"
                     value={formData.tneaCode}
                     onChange={(e) => setFormData({ ...formData, tneaCode: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    placeholder="e.g., 2607"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson"
+                    placeholder="e.g. 0001 or 2006"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Display Order
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                    TNEA Status
+                  </label>
+                  <select
+                    value={formData.tneaStatus || 'not_applicable'}
+                    onChange={(e) => setFormData({ ...formData, tneaStatus: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson"
+                  >
+                    <option value="verified">Verified (TNEA Participating)</option>
+                    <option value="not_applicable">Not Applicable (Non-TNEA)</option>
+                    <option value="pending_verification">Pending Verification</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                    TNEA Source Year
                   </label>
                   <input
-                    type="number"
-                    value={formData.order}
-                    onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    type="text"
+                    value={formData.tneaSourceYear || ''}
+                    onChange={(e) => setFormData({ ...formData, tneaSourceYear: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson"
+                    placeholder="e.g. 2024"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Note
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                  Display Order
+                </label>
+                <input
+                  type="number"
+                  value={formData.order}
+                  onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value, 10) || 0 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                    Official Website URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.website}
+                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson"
+                    placeholder="https://..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                    Source / Regulatory URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.sourceUrl}
+                    onChange={(e) => setFormData({ ...formData, sourceUrl: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson"
+                    placeholder="https://pci.nic.in / https://nmc.org.in..."
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                  Verification Status
+                </label>
+                <select
+                  value={formData.verificationStatus}
+                  onChange={(e) => setFormData({ ...formData, verificationStatus: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson"
+                >
+                  <option value="Official Regulator Listed">Official Regulator Listed</option>
+                  <option value="Official University Affiliated">Official University Affiliated</option>
+                  <option value="Accredited / Verified Directory">Accredited / Verified Directory</option>
+                  <option value="directory_listed">Directory Listed</option>
+                  <option value="Self-Reported / Pending Verification">Self-Reported / Pending Verification</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                  Departments / Degrees Offered (one per line or comma-separated)
+                </label>
+                <textarea
+                  rows={4}
+                  value={formData.departments}
+                  onChange={(e) => setFormData({ ...formData, departments: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson font-mono text-xs"
+                  placeholder="B.E. Computer Science and Engineering&#10;B.Tech. Information Technology&#10;B.E. Electronics and Communication Engineering"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                  Note / Highlights / Affiliation
                 </label>
                 <input
                   type="text"
                   value={formData.note}
                   onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  placeholder="Any additional notes"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-crimson focus:border-crimson"
+                  placeholder="e.g. Autonomous, NAAC A++, Anna University Affiliate"
                 />
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 pt-1">
                 <input
                   type="checkbox"
                   id="isActive"
                   checked={formData.isActive}
                   onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                  className="w-4 h-4 text-red-600 rounded focus:ring-red-500"
+                  className="w-4 h-4 text-crimson rounded focus:ring-crimson"
                 />
-                <label htmlFor="isActive" className="text-sm text-gray-700">
-                  Active (visible on public page)
+                <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
+                  Active (visible in public directory)
                 </label>
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-3 pt-4 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-50 font-semibold transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition flex items-center justify-center gap-2"
+                  className="flex-1 bg-crimson text-white px-4 py-2.5 rounded-xl font-semibold hover:bg-crimson-dark transition flex items-center justify-center gap-2 shadow-sm"
                 >
                   <FaCheck />
                   {editingCollege ? 'Update College' : 'Add College'}
@@ -612,36 +881,19 @@ export default function AdminColleges() {
           </div>
         </div>
       )}
+
       {/* Toast Notification */}
       <AnimatePresence>
         {toast.show && (
           <motion.div
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100]"
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className={`fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl shadow-lg text-white font-medium text-sm flex items-center gap-2 ${
+              toast.type === 'error' ? 'bg-red-600' : 'bg-emerald-600'
+            }`}
           >
-            <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border backdrop-blur-md ${toast.type === 'success'
-              ? 'bg-green-600/90 border-green-500 text-white'
-              : 'bg-red-600/90 border-red-500 text-white'
-              }`}>
-              {toast.type === 'success' ? (
-                <div className="bg-white/20 p-2 rounded-full">
-                  <FaCheck className="text-sm" />
-                </div>
-              ) : (
-                <div className="bg-white/20 p-2 rounded-full">
-                  <FaTimes className="text-sm" />
-                </div>
-              )}
-              <p className="font-bold tracking-tight">{toast.message}</p>
-              <button
-                onClick={() => setToast({ ...toast, show: false })}
-                className="ml-4 hover:opacity-70 transition-opacity"
-              >
-                <FaTimes />
-              </button>
-            </div>
+            <FaCheck /> {toast.message}
           </motion.div>
         )}
       </AnimatePresence>

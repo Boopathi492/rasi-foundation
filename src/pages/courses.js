@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { FaHospital, FaStethoscope, FaLeaf, FaFlask, FaLaptopCode, FaCog, FaBuilding, FaSeedling, FaChartLine, FaCalculator, FaBalanceScale, FaChalkboardTeacher, FaBook, FaCompass, FaClipboardCheck, FaUniversity, FaSearch, FaCalendarCheck, FaArrowRight, FaClock, FaCheckCircle, FaGraduationCap, FaPhone } from 'react-icons/fa';
+import { FaHospital, FaStethoscope, FaLeaf, FaFlask, FaLaptopCode, FaCog, FaBuilding, FaSeedling, FaChartLine, FaCalculator, FaBalanceScale, FaChalkboardTeacher, FaBook, FaCompass, FaClipboardCheck, FaUniversity, FaSearch, FaCalendarCheck, FaArrowRight, FaClock, FaCheckCircle, FaGraduationCap, FaPhone, FaTimes, FaGlobe, FaExternalLinkAlt, FaMapMarkerAlt } from 'react-icons/fa';
 import Layout from '@/frontend/components/Layout';
 import PageBanner from '@/frontend/components/PageBanner';
 import Faq from '@/frontend/components/Faq';
@@ -719,37 +719,281 @@ const GUIDANCE = [
   { icon: FaUniversity, title: 'Explore colleges', text: 'Browse the colleges in our directory by zone and department, then ask us about the ones you like.', href: '/colleges', cta: 'Browse Colleges' },
 ];
 
-export default function Courses() {
+const CATEGORY_STYLES = {
+  medical: { icon: FaHospital, color: 'red' },
+  engineering: { icon: FaCog, color: 'blue' },
+  management: { icon: FaChartLine, color: 'green' },
+  arts: { icon: FaFlask, color: 'teal' },
+  law: { icon: FaBalanceScale, color: 'purple' },
+  education: { icon: FaChalkboardTeacher, color: 'amber' },
+  agriculture: { icon: FaSeedling, color: 'emerald' },
+};
+
+const QUALIFICATION_LEVELS = [
+  { id: 'all', label: 'All Levels' },
+  { id: 'UG', label: 'UG (Undergraduate)' },
+  { id: 'PG', label: 'PG (Postgraduate)' },
+  { id: 'Diploma', label: 'Diploma / Polytechnic' },
+  { id: 'Doctorate', label: 'Doctorate (Ph.D / MDS)' },
+];
+
+const TN_DISTRICTS = [
+  'Ariyalur', 'Chengalpattu', 'Chennai', 'Coimbatore', 'Cuddalore', 'Dharmapuri', 'Dindigul',
+  'Erode', 'Kallakurichi', 'Kancheepuram', 'Kanniyakumari', 'Karur', 'Krishnagiri', 'Madurai',
+  'Mayiladuthurai', 'Nagapattinam', 'Namakkal', 'Nilgiris', 'Perambalur', 'Pudukkottai',
+  'Ramanathapuram', 'Ranipet', 'Salem', 'Sivaganga', 'Tenkasi', 'Thanjavur', 'Theni',
+  'Thoothukudi', 'Tiruchirappalli', 'Tirunelveli', 'Tirupathur', 'Tiruppur', 'Tiruvallur',
+  'Tiruvannamalai', 'Tiruvarur', 'Vellore', 'Viluppuram', 'Virudhunagar'
+];
+
+function OfferingCollegesModal({ course, onClose, filterDistrict }) {
+  const closeRef = useRef(null);
+  useEffect(() => {
+    const previous = document.activeElement;
+    closeRef.current?.focus();
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = overflow;
+      previous?.focus?.();
+    };
+  }, [onClose]);
+
+  if (!course) return null;
+
+  const allColleges = course.colleges || [];
+  const displayColleges = filterDistrict && filterDistrict !== 'all'
+    ? allColleges.filter((c) => (c.district || '').toLowerCase() === filterDistrict.toLowerCase())
+    : allColleges;
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="offering-dialog-title"
+        className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl bg-white shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative bg-gradient-to-r from-forest to-forest-dark p-6 pr-14 text-white">
+          <button ref={closeRef} type="button" onClick={onClose} aria-label="Close dialog" className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 hover:bg-white/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+            <FaTimes aria-hidden="true" />
+          </button>
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-semibold">{course.level || 'UG'}</span>
+            <span className="rounded-full bg-gold-400 text-forest-dark px-2.5 py-0.5 text-xs font-bold">{course.duration}</span>
+          </div>
+          <h2 id="offering-dialog-title" className="font-heading text-xl font-bold">{course.name}</h2>
+          <p className="mt-1 text-sm text-white/80">{course.fullName}</p>
+        </div>
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-sans text-base font-semibold text-gray-900">
+              Colleges Offering This Programme ({displayColleges.length})
+            </h3>
+            {filterDistrict && filterDistrict !== 'all' && (
+              <span className="text-xs text-forest font-semibold">in {filterDistrict}</span>
+            )}
+          </div>
+          {displayColleges.length > 0 ? (
+            <ul className="space-y-3">
+              {displayColleges.map((col, idx) => (
+                <li key={col._id || col.name || idx} className="rounded-xl border border-gray-100 bg-gray-50/70 p-3 text-sm">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-bold text-gray-900">{col.name}</p>
+                    {col.type && (
+                      <span className="rounded-full bg-emerald-100 text-emerald-800 px-2 py-0.5 text-[10px] font-semibold shrink-0">
+                        {col.type}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1 flex items-center gap-1.5 text-xs text-gray-600">
+                    <FaMapMarkerAlt className="text-crimson shrink-0" aria-hidden="true" />
+                    <span>{col.location ? `${col.location}, ` : ''}{col.district || 'Tamil Nadu'}</span>
+                  </p>
+                  {col.website && (
+                    <div className="mt-2 pt-1 border-t border-gray-200/50 flex justify-between items-center text-xs">
+                      <a href={col.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-600 hover:underline">
+                        <FaGlobe className="text-[10px]" aria-hidden="true" /> Official Website <FaExternalLinkAlt className="text-[9px]" aria-hidden="true" />
+                      </a>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="py-6 text-center text-sm text-gray-600">
+              No offering colleges recorded yet for {filterDistrict && filterDistrict !== 'all' ? `the selected district (${filterDistrict})` : 'this program'}.
+            </p>
+          )}
+        </div>
+        <div className="flex gap-3 border-t border-gray-100 bg-gray-50 p-4">
+          <button type="button" onClick={onClose} className="flex-1 rounded-full border-2 border-gray-300 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-100">Close</button>
+          <Link href={ROUTES.counselling} className="flex-1 rounded-full bg-crimson py-2.5 text-center text-sm font-semibold text-white hover:bg-crimson-dark">Ask a Counsellor</Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function enrichCourse(c) {
+  const cat = (c.category || 'other').toLowerCase();
+  const style = CATEGORY_STYLES[cat] || { icon: FaGraduationCap, color: 'blue' };
+  return {
+    id: c._id || c.id,
+    name: c.name,
+    code: c.code || '',
+    fullName: c.fullName || (c.code ? `${c.name} (${c.code})` : c.name),
+    category: cat,
+    specialization: c.specialization || '',
+    duration: c.duration || '3-4 years',
+    eligibility: c.eligibility || 'Contact counsellor for eligibility',
+    description: c.description || '',
+    level: c.level || 'UG',
+    colleges: Array.isArray(c.colleges) ? c.colleges : [],
+    icon: c.icon || style.icon,
+    color: c.color || style.color,
+  };
+}
+
+export default function Courses({ initialCourses = [] }) {
+  const [coursesList, setCoursesList] = useState(() =>
+    Array.isArray(initialCourses) && initialCourses.length > 0
+      ? initialCourses.map(enrichCourse)
+      : COURSES.map(enrichCourse)
+  );
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [duration, setDuration] = useState('all');
+  const [qualificationLevel, setQualificationLevel] = useState('all');
+  const [specialization, setSpecialization] = useState('all');
+  const [district, setDistrict] = useState('all');
+  const [selectedOfferingCourse, setSelectedOfferingCourse] = useState(null);
   const [visible, setVisible] = useState(PAGE_SIZE);
   const discoveryRef = useRef(null);
 
-  const durations = useMemo(() => [...new Set(COURSES.map((c) => c.duration))], []);
+  // Client hydration from public /api/courses
+  useEffect(() => {
+    let active = true;
+    fetch('/api/courses')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (active && data?.courses && Array.isArray(data.courses) && data.courses.length > 0) {
+          setCoursesList(data.courses.map(enrichCourse));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const durations = useMemo(() => {
+    const set = new Set();
+    for (const c of coursesList) {
+      if (c.duration && c.duration.trim()) {
+        set.add(c.duration.trim());
+      }
+    }
+    return [...set].sort((a, b) => {
+      const numA = parseFloat(a) || 0;
+      const numB = parseFloat(b) || 0;
+      return numB - numA;
+    });
+  }, [coursesList]);
+
+  const availableSpecializations = useMemo(() => {
+    const set = new Set();
+    coursesList.forEach((c) => {
+      if (activeCategory === 'all' || c.category === activeCategory) {
+        if (c.specialization && c.specialization.trim()) {
+          set.add(c.specialization.trim());
+        }
+      }
+    });
+    return Array.from(set).sort();
+  }, [coursesList, activeCategory]);
 
   const filteredCourses = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    return COURSES.filter((course) => {
-      if (activeCategory !== 'all' && course.category !== activeCategory) return false;
-      if (duration !== 'all' && course.duration !== duration) return false;
-      if (!q) return true;
-      return course.name.toLowerCase().includes(q) || course.fullName.toLowerCase().includes(q) || course.eligibility.toLowerCase().includes(q);
-    });
-  }, [activeCategory, searchQuery, duration]);
+    const specLower = specialization.trim().toLowerCase();
 
-  useEffect(() => { setVisible(PAGE_SIZE); }, [activeCategory, searchQuery, duration]);
+    return coursesList.filter((course) => {
+      if (activeCategory !== 'all' && course.category !== activeCategory) return false;
+      if (qualificationLevel !== 'all' && course.level !== qualificationLevel) return false;
+      if (duration !== 'all' && course.duration !== duration) return false;
+      if (specialization !== 'all' && (course.specialization || '').toLowerCase() !== specLower) return false;
+
+      // District filter: check if any offering college is in this district
+      if (district !== 'all') {
+        const hasCollegeInDistrict = (course.colleges || []).some(
+          (col) => (col.district || '').toLowerCase() === district.toLowerCase()
+        );
+        if (!hasCollegeInDistrict) return false;
+      }
+
+      if (!q) return true;
+      return (
+        course.name.toLowerCase().includes(q) ||
+        (course.code || '').toLowerCase().includes(q) ||
+        (course.fullName || '').toLowerCase().includes(q) ||
+        (course.eligibility || '').toLowerCase().includes(q) ||
+        (course.description || '').toLowerCase().includes(q) ||
+        (course.category || '').toLowerCase().includes(q) ||
+        (course.specialization || '').toLowerCase().includes(q)
+      );
+    });
+  }, [coursesList, activeCategory, qualificationLevel, duration, specialization, district, searchQuery]);
+
+  // Calculate dynamic category counts across actual active courses in coursesList
+  const categoryCounts = useMemo(() => {
+    const counts = {};
+    for (const cat of CATEGORIES) {
+      counts[cat.id] = 0;
+    }
+    for (const c of coursesList) {
+      const catKey = (c.category || '').toLowerCase();
+      if (counts[catKey] !== undefined) {
+        counts[catKey]++;
+      }
+    }
+    return counts;
+  }, [coursesList]);
+
+  useEffect(() => {
+    setVisible(PAGE_SIZE);
+  }, [activeCategory, searchQuery, duration, qualificationLevel, specialization, district]);
 
   const chooseCategory = (id) => {
     setActiveCategory(id);
+    setSpecialization('all');
     discoveryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
-  const clearFilters = () => { setActiveCategory('all'); setSearchQuery(''); setDuration('all'); };
-  const filtersActive = activeCategory !== 'all' || searchQuery || duration !== 'all';
+
+  const clearFilters = () => {
+    setActiveCategory('all');
+    setSearchQuery('');
+    setDuration('all');
+    setQualificationLevel('all');
+    setSpecialization('all');
+    setDistrict('all');
+  };
+
+  const filtersActive =
+    activeCategory !== 'all' ||
+    Boolean(searchQuery) ||
+    duration !== 'all' ||
+    qualificationLevel !== 'all' ||
+    specialization !== 'all' ||
+    district !== 'all';
 
   // Answers quote the course data above so they cannot drift from the cards.
-  const mbbs = find('MBBS');
-  const be = COURSES.find((c) => c.category === 'engineering');
+  const findCourse = (name) => coursesList.find((c) => c.name.toLowerCase() === name.toLowerCase()) || find(name);
+  const mbbs = findCourse('MBBS');
+  const be = coursesList.find((c) => c.category === 'engineering') || COURSES.find((c) => c.category === 'engineering');
   const faqs = [
     { q: 'How do I find the right course?', a: 'Use the search and filters on this page to compare courses by category, duration and eligibility. For personal advice, book a counselling session and a counsellor will talk through your marks and interests.' },
     ...(mbbs ? [{ q: 'What does a medical course such as MBBS require?', a: `As listed on this page, ${mbbs.name} (${mbbs.fullName}) takes ${mbbs.duration} and its eligibility is: ${mbbs.eligibility}.` }] : []),
@@ -773,7 +1017,7 @@ export default function Courses() {
         title="Discover the course that fits your future"
         tone="maroon"
         stats={[
-          { value: COURSES.length, label: 'Courses listed' },
+          { value: coursesList.length, label: 'Courses listed' },
           { value: CATEGORIES.length, label: 'Categories' },
         ]}
         actions={
@@ -804,7 +1048,7 @@ export default function Courses() {
           <h2 id="categories-heading" className="font-heading text-3xl font-bold text-gray-900 md:text-4xl">Start with a field you like</h2>
           <ul className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
             {CATEGORIES.map((cat, i) => {
-              const count = COURSES.filter((c) => c.category === cat.id).length;
+              const count = categoryCounts[cat.id] || 0;
               return (
                 <Reveal as="li" key={cat.id} delay={(i % 4) * 0.05}>
                   <button
@@ -835,28 +1079,98 @@ export default function Courses() {
           <p className="rf-eyebrow">Search courses</p>
           <h2 id="discovery-heading" className="font-heading text-3xl font-bold text-gray-900 md:text-4xl">Find a course</h2>
 
-          <div className="mt-6 rounded-3xl border border-gray-100 bg-white p-4 shadow-card">
-            <div className="grid gap-3 md:grid-cols-[1.6fr_1fr]">
+          <div className="mt-6 rounded-3xl border border-gray-100 bg-white p-5 shadow-card space-y-4">
+            <div className="grid gap-3 md:grid-cols-[1.5fr_1fr]">
               <div className="relative">
-                <label htmlFor="course-search" className="sr-only">Search courses by name or eligibility</label>
+                <label htmlFor="course-search" className="sr-only">Search courses by name, eligibility or specialization</label>
                 <FaSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
-                <input id="course-search" type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by course name or eligibility" className={`${field} pl-11`} />
+                <input
+                  id="course-search"
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by course name, degree, eligibility, specialization..."
+                  className={`${field} pl-11`}
+                />
               </div>
+
               <div>
-                <label htmlFor="course-duration" className="sr-only">Filter by duration</label>
-                <select id="course-duration" value={duration} onChange={(e) => setDuration(e.target.value)} className={field}>
-                  <option value="all">Any duration</option>
-                  {durations.map((d) => <option key={d} value={d}>{d}</option>)}
+                <label htmlFor="course-district" className="sr-only">Filter by offering district</label>
+                <select
+                  id="course-district"
+                  value={district}
+                  onChange={(e) => setDistrict(e.target.value)}
+                  className={field}
+                >
+                  <option value="all">Offered in All 38 Districts</option>
+                  {TN_DISTRICTS.map((d) => (
+                    <option key={d} value={d}>
+                      {d} District
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
-            <div role="group" aria-label="Filter by category" className="mt-4 flex flex-wrap gap-2">
-              {[{ id: 'all', name: 'All Courses' }, ...CATEGORIES].map((cat) => (
+
+            <div className="grid gap-3 sm:grid-cols-3 pt-1 border-t border-gray-100">
+              <div>
+                <label htmlFor="course-level" className="sr-only">Filter by qualification level</label>
+                <select
+                  id="course-level"
+                  value={qualificationLevel}
+                  onChange={(e) => setQualificationLevel(e.target.value)}
+                  className={field}
+                >
+                  {QUALIFICATION_LEVELS.map((lvl) => (
+                    <option key={lvl.id} value={lvl.id}>
+                      {lvl.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="course-specialization" className="sr-only">Filter by specialization</label>
+                <select
+                  id="course-specialization"
+                  value={specialization}
+                  onChange={(e) => setSpecialization(e.target.value)}
+                  className={field}
+                >
+                  <option value="all">All Specializations ({availableSpecializations.length})</option>
+                  {availableSpecializations.map((spec) => (
+                    <option key={spec} value={spec}>
+                      {spec}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="course-duration" className="sr-only">Filter by duration</label>
+                <select
+                  id="course-duration"
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                  className={field}
+                >
+                  <option value="all">Any duration</option>
+                  {durations.map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div role="group" aria-label="Filter by category" className="mt-4 flex flex-wrap gap-2 pt-2 border-t border-gray-100">
+              {[{ id: 'all', name: 'All Streams' }, ...CATEGORIES].map((cat) => (
                 <button
                   key={cat.id}
                   type="button"
                   aria-pressed={activeCategory === cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
+                  onClick={() => chooseCategory(cat.id)}
                   className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2 ${activeCategory === cat.id ? 'bg-forest text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-forest/10'}`}
                 >
                   {cat.name}
@@ -867,27 +1181,55 @@ export default function Courses() {
 
           <p className="mt-4 text-sm text-gray-600" aria-live="polite">
             Showing {Math.min(visible, filteredCourses.length)} of {filteredCourses.length} courses
-            {filtersActive && <button type="button" onClick={clearFilters} className="ml-3 font-semibold text-crimson underline">Clear filters</button>}
+            {filtersActive && <button type="button" onClick={clearFilters} className="ml-3 font-semibold text-crimson underline">Clear all filters</button>}
           </p>
 
           {filteredCourses.length > 0 ? (
             <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {filteredCourses.slice(0, visible).map((course, i) => {
                 const Icon = course.icon || FaGraduationCap;
+                const offeringCount = (course.colleges || []).length;
                 return (
                   <Reveal as="li" key={course.id} delay={(i % 3) * 0.05} className="group flex flex-col rounded-2xl border border-gray-100 bg-white p-5 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-gold-300 hover:shadow-card-hover">
                     <div className="flex items-start gap-3">
                       <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-crimson/10 text-xl text-crimson"><Icon aria-hidden="true" /></span>
                       <div className="min-w-0">
-                        <h3 className="font-sans text-lg font-bold leading-tight text-gray-900">{course.name}</h3>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <h3 className="font-sans text-lg font-bold leading-tight text-gray-900">{course.name}</h3>
+                          <span className="rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] font-bold text-slate-700">
+                            {course.level}
+                          </span>
+                        </div>
                         <p className="text-sm text-gray-600">{course.fullName}</p>
                       </div>
                     </div>
+                    {course.specialization && (
+                      <div className="mt-2">
+                        <span className="inline-block rounded-md bg-blue-50 border border-blue-200/50 px-2 py-0.5 text-xs font-semibold text-blue-800">
+                          {course.specialization}
+                        </span>
+                      </div>
+                    )}
                     <p className="mt-3 text-sm text-gray-700">{course.description}</p>
                     <dl className="mt-3 space-y-1.5 text-sm">
                       <div className="flex items-center gap-2"><dt className="sr-only">Duration</dt><FaClock className="text-forest" aria-hidden="true" /><dd className="text-gray-700">{course.duration}</dd></div>
                       <div className="flex items-start gap-2"><dt className="sr-only">Eligibility</dt><FaCheckCircle className="mt-0.5 shrink-0 text-forest" aria-hidden="true" /><dd className="text-gray-700">{course.eligibility}</dd></div>
                     </dl>
+
+                    {offeringCount > 0 && (
+                      <div className="mt-3 pt-2 border-t border-gray-100">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedOfferingCourse(course)}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 hover:bg-blue-100 border border-blue-200/60 px-3 py-1 text-xs font-semibold text-blue-700 transition"
+                        >
+                          <FaUniversity className="text-blue-600 text-xs" />
+                          <span>Offered by {offeringCount} {offeringCount === 1 ? 'college' : 'colleges'} in TN</span>
+                          <FaArrowRight className="text-[10px]" />
+                        </button>
+                      </div>
+                    )}
+
                     <div className="mt-auto flex items-center justify-between pt-4">
                       <span className="rounded-full bg-forest/10 px-2.5 py-1 text-xs font-semibold text-forest">{CATEGORY_NAME[course.category] || course.category}</span>
                       <Link href={ROUTES.counselling} className="inline-flex items-center gap-1.5 text-xs font-semibold text-crimson hover:underline">Ask a counsellor <FaArrowRight aria-hidden="true" /></Link>
@@ -967,6 +1309,80 @@ export default function Courses() {
           </div>
         </div>
       </section>
+
+      {selectedOfferingCourse && (
+        <OfferingCollegesModal
+          course={selectedOfferingCourse}
+          filterDistrict={district}
+          onClose={() => setSelectedOfferingCourse(null)}
+        />
+      )}
     </Layout>
   );
 }
+
+export async function getStaticProps() {
+  try {
+    const dbConnect = (await import('@/backend/lib/mongodb')).default;
+    const Course = (await import('@/backend/models/Course')).default;
+    // ensure College model is registered for populate
+    await import('@/backend/models/College');
+    await dbConnect();
+
+    const dbCourses = await Course.find({ isActive: true })
+      .populate('colleges', 'name location district type specialization institutionType website')
+      .sort({ order: 1, name: 1 })
+      .lean();
+
+    if (!dbCourses || dbCourses.length === 0) {
+      return {
+        props: {
+          initialCourses: [],
+        },
+        revalidate: 60,
+      };
+    }
+
+    const formatted = dbCourses.map((c) => ({
+      id: c._id.toString(),
+      name: c.name,
+      code: c.code || '',
+      fullName: c.code ? `${c.name} (${c.code})` : c.name,
+      category: (c.category || 'other').toLowerCase(),
+      specialization: c.specialization || '',
+      duration: c.duration || '',
+      eligibility: c.eligibility || '',
+      description: c.description || '',
+      level: c.level || 'UG',
+      colleges: Array.isArray(c.colleges)
+        ? c.colleges.map((col) => ({
+            _id: col._id?.toString() || '',
+            name: col.name || '',
+            location: col.location || '',
+            district: col.district || '',
+            type: col.type || '',
+            specialization: col.specialization || '',
+            institutionType: col.institutionType || '',
+            website: col.website || '',
+          }))
+        : [],
+      order: c.order || 0,
+    }));
+
+    return {
+      props: {
+        initialCourses: formatted,
+      },
+      revalidate: 60,
+    };
+  } catch (err) {
+    // If DB is unreachable during build or revalidation, graceful fallback is used
+    return {
+      props: {
+        initialCourses: [],
+      },
+      revalidate: 60,
+    };
+  }
+}
+

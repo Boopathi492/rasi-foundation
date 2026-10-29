@@ -38,7 +38,16 @@ export default async function handler(req, res) {
     return res.status(400).json({ success: false, message: 'A valid student BioData ID is required' });
   }
 
-  const validTypes = ['photo', 'aadhaar', 'marksheet_10', 'marksheet_12', 'community_certificate', 'other'];
+  const validTypes = [
+    'photo',
+    'aadhaar',
+    'marksheet_10',
+    'marksheet_12',
+    'community_certificate',
+    'transfer_certificate',
+    'first_graduate',
+    'other',
+  ];
   if (!documentType || !validTypes.includes(documentType)) {
     return res.status(400).json({ success: false, message: `Invalid document type. Allowed: ${validTypes.join(', ')}` });
   }
@@ -78,11 +87,23 @@ export default async function handler(req, res) {
       verificationStatus: 'pending',
     });
 
-    // Also track document name in student.documents if not already present
+    // Also track document metadata in student.uploadedDocuments & student.documents
+    if (!student.uploadedDocuments) student.uploadedDocuments = [];
+    student.uploadedDocuments.push({
+      documentType: docRecord.documentType,
+      originalName: docRecord.originalName,
+      storageKey: docRecord.storageKey,
+      mime: docRecord.mime,
+      size: docRecord.size,
+      uploadStatus: 'uploaded',
+      uploadedAt: docRecord.createdAt,
+      documentId: docRecord._id,
+    });
+
     if (!student.documents.includes(validation.displayName)) {
       student.documents.push(validation.displayName);
-      await student.save();
     }
+    await student.save();
 
     return res.status(201).json({
       success: true,

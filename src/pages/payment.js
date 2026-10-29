@@ -12,45 +12,47 @@ import {
   FaChevronRight,
   FaShieldAlt,
   FaAngleLeft,
+  FaFileDownload,
+  FaInfoCircle,
 } from 'react-icons/fa';
 import { SiRazorpay } from 'react-icons/si';
 
 const FALLBACK_PURPOSES = [
-  { id: 'counseling', label: 'Career Counseling Fee', amount: 0, isFixed: false },
-  { id: 'admission', label: 'Admission Assistance Fee', amount: 0, isFixed: false },
-  { id: 'scholarship_test', label: 'Scholarship Test Fee', amount: 0, isFixed: false },
+  { id: 'counseling', label: 'Career Counseling Fee', amount: 500, isFixed: false },
+  { id: 'admission', label: 'Admission Assistance Fee', amount: 1000, isFixed: false },
+  { id: 'scholarship_test', label: 'Scholarship Test Fee', amount: 200, isFixed: true },
   { id: 'course_fee', label: 'Course Fee', amount: 0, isFixed: false },
   { id: 'donation', label: 'Donation', amount: 0, isFixed: false },
   { id: 'other', label: 'Other Payment', amount: 0, isFixed: false },
 ];
 
-const TABS = [
-  { id: 'upi', label: 'UPI', icon: FaMobileAlt },
-  { id: 'card', label: 'Card', icon: FaCreditCard },
-  { id: 'netbanking', label: 'Net Banking', icon: FaUniversity },
-  { id: 'wallet', label: 'Wallet', icon: FaWallet },
-];
-
-export default function PaymentPage({ purposes = FALLBACK_PURPOSES, upiVpa = '' }) {
+export default function PaymentPage({ purposes = FALLBACK_PURPOSES, initialStudent = null }) {
   const [step, setStep] = useState('details'); // details | pay | success
-  const [activeTab, setActiveTab] = useState('upi');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [paymentId, setPaymentId] = useState('');
+  const [receiptNumber, setReceiptNumber] = useState('');
 
-
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    amount: '',
-    purpose: '',
-    studentName: '',
-    notes: '',
+  // Pre-fill form from student application if available
+  const [form, setForm] = useState(() => {
+    const defaultPurpose = initialStudent ? 'admission' : (purposes[0]?.id || '');
+    const matched = purposes.find(p => p.id === defaultPurpose);
+    return {
+      name: initialStudent?.name || '',
+      email: initialStudent?.email || '',
+      phone: initialStudent?.phone || '',
+      amount: matched && matched.amount > 0 ? String(matched.amount) : '',
+      purpose: defaultPurpose,
+      studentName: initialStudent?.studentName || '',
+      notes: '',
+    };
   });
 
+  const selectedPurpose = purposes.find(p => p.id === form.purpose);
+
   const handleChange = (e) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
     setError('');
   };
 
@@ -59,58 +61,100 @@ export default function PaymentPage({ purposes = FALLBACK_PURPOSES, upiVpa = '' 
     setForm(prev => ({
       ...prev,
       purpose: purposeId,
-      amount: p && p.amount > 0 ? String(p.amount) : prev.amount,
+      amount: p && p.amount > 0 ? String(p.amount) : (p?.isFixed ? '' : prev.amount),
     }));
     setError('');
   };
 
-  const selectedPurpose = purposes.find(p => p.id === form.purpose);
-
-
-
   const validate = () => {
-    if (!form.name.trim()) return 'Please enter your name';
-    if (!form.email.trim() || !/\S+@\S+\.\S+/.test(form.email)) return 'Please enter a valid email';
-    if (!form.phone.trim() || !/^[6-9]\d{9}$/.test(form.phone)) return 'Please enter a valid 10-digit phone number';
-    if (!form.amount || parseFloat(form.amount) < 1) return 'Please enter a valid amount (minimum ₹1)';
-    if (!form.purpose) return 'Please select a payment purpose';
+    if (!form.purpose) return 'Please select a payment category';
+    if (!form.name.trim()) return 'Please enter your full name';
+    if (!form.email.trim() || !/^\S+@\S+\.\S+$/.test(form.email)) return 'Please enter a valid email address';
+    if (!form.phone.trim() || !/^[6-9]\d{9}$/.test(form.phone.replace(/\D/g, '').slice(-10))) {
+      return 'Please enter a valid 10-digit mobile number';
+    }
+    const amt = parseFloat(form.amount);
+    if (isNaN(amt) || amt < 1) return 'Please enter a valid payment amount (minimum ₹1)';
+    if (selectedPurpose?.isFixed && amt !== selectedPurpose.amount) {
+      return `Fee for ${selectedPurpose.label} is strictly fixed at ₹${selectedPurpose.amount}`;
+    }
     return null;
   };
 
   const handleContinue = (e) => {
     e.preventDefault();
     const err = validate();
-    if (err) { setError(err); return; }
+    if (err) {
+      setError(err);
+      return;
+    }
     setStep('pay');
   };
 
   const handlePayment = async () => {
+    if (loading) return; // Prevent double submit
     setLoading(true);
     setError('');
+
     try {
+      // 1. Create server-side order and persist 'created' payment record
       const orderRes = await fetch('/api/payment/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          purpose: form.purpose,
           amount: parseFloat(form.amount),
-          receipt: `rasi_${Date.now()}`,
-          notes: { name: form.name, email: form.email, phone: form.phone, purpose: form.purpose },
+          name: form.name.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          studentName: form.studentName ? form.studentName.trim() : null,
+          notes: form.notes ? form.notes.trim() : null,
+          bioDataId: initialStudent?.bioDataId || null,
         }),
       });
 
-      const orderData = await orderRes.json();
-      if (!orderRes.ok) throw new Error(orderData.message || 'Failed to create order');
+      let orderData;
+      const responseText = await orderRes.text();
+      try {
+        orderData = JSON.parse(responseText);
+      } catch {
+        throw new Error(
+          orderRes.status === 500
+            ? 'Payment server encountered a temporary error. Please try again in a moment.'
+            : 'Invalid server response. Please try again.'
+        );
+      }
 
+      if (!orderRes.ok) {
+        throw new Error(orderData?.message || 'Failed to create payment order');
+      }
+
+      if (!window.Razorpay) {
+        throw new Error('Payment gateway failed to load. Please refresh and check your internet connection.');
+      }
+
+      // 2. Configure official Razorpay Checkout modal
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        key: orderData.key,
         amount: orderData.order.amount,
         currency: orderData.order.currency,
         name: 'RASI Foundation',
-        description: purposes.find(p => p.id === form.purpose)?.label || 'Payment',
+        description: selectedPurpose?.label || 'Educational Fee',
         image: '/logo.png',
         order_id: orderData.order.id,
+        prefill: {
+          name: form.name.trim(),
+          email: form.email.trim(),
+          contact: form.phone.trim(),
+        },
+        notes: {
+          purpose: form.purpose,
+          receipt: orderData.order.receipt,
+        },
+        theme: { color: '#047857' }, // Emerald forest brand color
         handler: async (response) => {
           try {
+            // 3. Cryptographically verify signature and reconcile on server
             const verifyRes = await fetch('/api/payment/verify', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -118,194 +162,180 @@ export default function PaymentPage({ purposes = FALLBACK_PURPOSES, upiVpa = '' 
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
-                paymentDetails: {
-                  amount: parseFloat(form.amount),
-                  currency: 'INR',
-                  name: form.name,
-                  email: form.email,
-                  phone: form.phone,
-                  purpose: form.purpose,
-                  studentName: form.studentName,
-                  notes: form.notes,
-                },
               }),
             });
-            const verifyData = await verifyRes.json();
-            if (verifyData.success) {
+
+            let verifyData;
+            const vText = await verifyRes.text();
+            try {
+              verifyData = JSON.parse(vText);
+            } catch {
+              throw new Error('Unexpected response verifying transaction.');
+            }
+            if (verifyRes.ok && verifyData.success) {
               setPaymentId(response.razorpay_payment_id);
+              setReceiptNumber(verifyData.receipt || orderData.order.receipt || '');
               setStep('success');
             } else {
-              setError('Payment verification failed. Please contact support.');
+              setError(verifyData.message || 'Payment verification failed. Please contact foundation administration.');
             }
-          } catch {
-            setError('Payment verification failed. Please contact support.');
+          } catch (vErr) {
+            console.error('Verification error:', vErr);
+            setError('Network error verifying transaction. Our automated reconciliation system will verify your payment shortly.');
+          } finally {
+            setLoading(false);
           }
         },
-        prefill: { name: form.name, email: form.email, contact: form.phone },
-        notes: { purpose: form.purpose, studentName: form.studentName },
-        theme: { color: '#528FF0' },
-        modal: { ondismiss: () => setLoading(false) },
+        modal: {
+          ondismiss: () => {
+            setLoading(false);
+          },
+        },
       };
 
       const rzp = new window.Razorpay(options);
-      rzp.on('payment.failed', (response) => {
-        setError(`Payment failed: ${response.error.description}`);
+      rzp.on('payment.failed', (failResponse) => {
+        setError(`Payment failed: ${failResponse.error?.description || 'Transaction declined by issuer'}`);
         setLoading(false);
       });
       rzp.open();
     } catch (err) {
-      setError(err.message || 'Something went wrong. Please try again.');
+      console.error('Payment error:', err);
+      setError(err.message || 'An unexpected error occurred. Please try again.');
       setLoading(false);
     }
   };
 
-  const purposeLabel = purposes.find(p => p.id === form.purpose)?.label || '—';
+  const purposeLabel = selectedPurpose?.label || 'General Payment';
   const amountNum = parseFloat(form.amount) || 0;
-
-  const openUpiApp = (appName) => {
-    if (!upiVpa) { handlePayment(); return; }
-    const ref = `RASI${Date.now()}`;
-    const params = `pa=${encodeURIComponent(upiVpa)}&pn=${encodeURIComponent('RASI Foundation')}&am=${amountNum}&cu=INR&tn=${encodeURIComponent(ref)}`;
-    const schemes = {
-      'Google Pay':   `tez://upi/pay?${params}`,
-      'PhonePe':      `phonepe://pay?${params}`,
-      'Paytm':        `paytmmp://upi/pay?${params}`,
-      'BHIM':         `upi://pay?${params}`,
-      'Amazon Pay':   `amazonpay://pay?${params}`,
-      'Other UPI':    `upi://pay?${params}`,
-    };
-    window.location.href = schemes[appName] || `upi://pay?${params}`;
-  };
-
-  if (step === 'success') {
-    return (
-      <>
-        <Head>
-          <title>Payment Successful — RASI Foundation</title>
-        </Head>
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-10 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <FaCheckCircle className="text-5xl text-green-500" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Payment Successful!</h2>
-            <p className="text-gray-500 mb-6">Your payment has been processed successfully.</p>
-
-            <div className="bg-gray-50 rounded-xl p-5 mb-6 text-left space-y-3">
-              <Row label="Amount Paid" value={`₹${amountNum.toLocaleString('en-IN')}`} bold />
-              <Row label="Purpose" value={purposeLabel} />
-              <Row label="Name" value={form.name} />
-              <Row label="Payment ID" value={paymentId} mono />
-            </div>
-
-            <p className="text-sm text-gray-400 mb-6">
-              A confirmation has been sent to <span className="font-medium text-gray-600">{form.email}</span>
-            </p>
-
-            <Link
-              href="/"
-              className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors text-center"
-            >
-              Back to Home
-            </Link>
-
-            <div className="mt-6 flex items-center justify-center gap-2 text-gray-400 text-xs">
-              <FaShieldAlt />
-              <span>Secured by Razorpay</span>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>
       <Head>
-        <title>Pay — RASI Foundation</title>
-        <meta name="description" content="Secure payment for RASI Foundation services" />
+        <title>Secure Payment Portal — Rasi Foundation</title>
+        <meta name="description" content="Secure online payment for Rasi Foundation educational and counseling services." />
       </Head>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
 
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col md:flex-row">
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 py-8">
+        <div className="bg-white rounded-3xl shadow-xl w-full max-w-4xl overflow-hidden flex flex-col md:flex-row border border-slate-200/80">
 
-          {/* ── Left Panel ── */}
-          <div className="md:w-80 bg-[#1a1a2e] text-white flex flex-col p-8">
-            {/* Logo */}
-            <div className="flex items-center gap-3 mb-10">
-              <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center font-bold text-xl">R</div>
-              <div>
-                <p className="font-bold text-lg leading-tight">RASI Foundation</p>
-                <p className="text-xs text-gray-400">Education & Counseling</p>
+          {/* Left Panel: Summary & Security Credentials */}
+          <div className="md:w-80 bg-gradient-to-b from-[#111827] via-[#1f2937] to-[#0f172a] text-white flex flex-col p-8 justify-between">
+            <div>
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 bg-forest rounded-2xl flex items-center justify-center font-bold text-xl shadow-md border border-white/20">
+                  R
+                </div>
+                <div>
+                  <p className="font-bold text-lg leading-tight">Rasi Foundation</p>
+                  <p className="text-xs text-slate-400">Education & Guidance Portal</p>
+                </div>
               </div>
+
+              {/* Amount Display */}
+              <div className="mb-6 rounded-2xl bg-white/5 border border-white/10 p-5">
+                <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Payable Amount</p>
+                <p className="text-3xl font-black text-white">
+                  ₹{amountNum > 0 ? amountNum.toLocaleString('en-IN') : '0'}
+                </p>
+                {selectedPurpose?.isFixed && (
+                  <span className="inline-block mt-2 text-[11px] font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded-full">
+                    Fixed Institutional Fee
+                  </span>
+                )}
+              </div>
+
+              {/* Review details when on 'pay' step */}
+              {step === 'pay' && (
+                <div className="space-y-3 mb-6 p-4 rounded-xl bg-white/5 border border-white/10 text-xs">
+                  <div>
+                    <span className="text-slate-400">Purpose:</span>
+                    <p className="font-semibold text-slate-100">{purposeLabel}</p>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">Payer Name:</span>
+                    <p className="font-semibold text-slate-100">{form.name}</p>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">Mobile:</span>
+                    <p className="font-semibold text-slate-100">{form.phone}</p>
+                  </div>
+                  {initialStudent && (
+                    <div>
+                      <span className="text-slate-400">Application Linked:</span>
+                      <p className="font-semibold text-emerald-400">BioData Form ID Attached</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Amount */}
-            <div className="mb-8">
-              <p className="text-gray-400 text-sm mb-1">Total Amount</p>
-              <p className="text-4xl font-bold">
-                ₹{amountNum > 0 ? amountNum.toLocaleString('en-IN') : '0'}
-              </p>
-            </div>
-
-            {/* Summary */}
-            {step === 'pay' && (
-              <div className="space-y-3 mb-8">
-                <SummaryRow label="Purpose" value={purposeLabel} />
-                <SummaryRow label="Name" value={form.name} />
-                <SummaryRow label="Email" value={form.email} />
-                <SummaryRow label="Phone" value={form.phone} />
+            {/* Security Guarantee Badges */}
+            <div className="space-y-2.5 pt-6 border-t border-white/10 text-xs text-slate-400">
+              <div className="flex items-center gap-2">
+                <FaLock className="text-emerald-400 shrink-0" />
+                <span>256-Bit SSL Encrypted Checkout</span>
               </div>
-            )}
-
-            {/* Security badges */}
-            <div className="mt-auto space-y-2">
-              <div className="flex items-center gap-2 text-xs text-gray-400">
-                <FaLock className="text-green-400" />
-                <span>256-bit SSL Encrypted</span>
+              <div className="flex items-center gap-2">
+                <FaShieldAlt className="text-emerald-400 shrink-0" />
+                <span>PCI-DSS Level 1 Compliant Security</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-gray-400">
-                <FaShieldAlt className="text-green-400" />
-                <span>PCI DSS Compliant</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-gray-400 mt-4 pt-4 border-t border-white/10">
-                <SiRazorpay className="text-blue-400 text-base" />
-                <span>Powered by Razorpay</span>
+              <div className="flex items-center gap-2 pt-2 text-slate-400">
+                <SiRazorpay className="text-sky-400 text-base shrink-0" />
+                <span>Authorized Razorpay Payment Gateway</span>
               </div>
             </div>
           </div>
 
-          {/* ── Right Panel ── */}
+          {/* Right Panel: Content Form or Success View */}
           <div className="flex-1 flex flex-col">
 
-            {/* Step: Details Form */}
+            {/* STEP 1: Details Entry Form */}
             {step === 'details' && (
-              <div className="flex-1 p-8 overflow-y-auto">
-                <h2 className="text-xl font-bold text-gray-800 mb-6">Payment Details</h2>
+              <div className="flex-1 p-6 md:p-10 overflow-y-auto">
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">Fee & Contribution Payment</h2>
+                <p className="text-sm text-gray-500 mb-6">Complete your payment details to proceed to secure checkout.</p>
+
+                {initialStudent && (
+                  <div className="mb-6 rounded-2xl bg-emerald-50 border border-emerald-200/80 p-4 flex items-start gap-3">
+                    <FaInfoCircle className="text-forest mt-0.5 shrink-0" />
+                    <div className="text-xs text-emerald-900">
+                      <p className="font-bold">Student Application Attached</p>
+                      <p className="mt-0.5">Payment will be automatically synchronized with your admission application for <strong>{initialStudent.studentName}</strong>.</p>
+                    </div>
+                  </div>
+                )}
 
                 <form onSubmit={handleContinue} className="space-y-4">
-                  {/* Purpose */}
+                  {/* Purpose Selector */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Payment Purpose <span className="text-red-500">*</span></label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                      Payment Category <span className="text-crimson">*</span>
+                    </label>
                     <select
                       name="purpose"
                       value={form.purpose}
                       onChange={e => handlePurposeSelect(e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                      className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-forest bg-white"
                     >
-                      <option value="">Select purpose</option>
+                      <option value="">Select Category</option>
                       {purposes.map(p => (
-                        <option key={p.id} value={p.id}>{p.label}</option>
+                        <option key={p.id} value={p.id}>
+                          {p.label} {p.amount > 0 ? `(₹${p.amount}${p.isFixed ? ' - Fixed' : ''})` : ''}
+                        </option>
                       ))}
                     </select>
                   </div>
 
-                  {/* Amount */}
+                  {/* Amount Field */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Amount (₹) <span className="text-red-500">*</span></label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                      Amount (₹ INR) <span className="text-crimson">*</span>
+                    </label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">₹</span>
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">₹</span>
                       <input
                         type="number"
                         name="amount"
@@ -314,45 +344,67 @@ export default function PaymentPage({ purposes = FALLBACK_PURPOSES, upiVpa = '' 
                         placeholder="0.00"
                         min="1"
                         readOnly={selectedPurpose?.isFixed}
-                        className={`w-full border border-gray-200 rounded-xl pl-8 pr-10 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 ${selectedPurpose?.isFixed ? 'cursor-not-allowed opacity-70' : ''}`}
+                        className={`w-full border border-gray-300 rounded-xl pl-8 pr-16 py-3 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-forest bg-white ${
+                          selectedPurpose?.isFixed ? 'bg-slate-50 cursor-not-allowed opacity-80' : ''
+                        }`}
                       />
                       {selectedPurpose?.isFixed && (
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-orange-500 font-medium">Fixed</span>
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-md">
+                          Fixed Fee
+                        </span>
                       )}
                     </div>
                   </div>
 
-                  {/* Name */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Full Name <span className="text-red-500">*</span></label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      placeholder="Enter your full name"
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
-                    />
+                  {/* Payer Name */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                        Payer / Candidate Full Name <span className="text-crimson">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        placeholder="e.g. S. Boopathi"
+                        className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-forest bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                        Candidate / Student Name <span className="text-gray-400 font-normal text-[11px]">(optional)</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="studentName"
+                        value={form.studentName}
+                        onChange={handleChange}
+                        placeholder="Candidate name if different"
+                        className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-forest bg-white"
+                      />
+                    </div>
                   </div>
 
-                  {/* Email */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Email Address <span className="text-red-500">*</span></label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      placeholder="you@example.com"
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
-                    />
-                  </div>
-
-                  {/* Phone */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Phone Number <span className="text-red-500">*</span></label>
-                    <div className="flex gap-2">
-                      <div className="border border-gray-200 rounded-xl px-3 py-3 bg-gray-50 text-gray-500 text-sm font-medium">+91</div>
+                  {/* Email & Phone */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                        Email Address <span className="text-crimson">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        placeholder="student@example.com"
+                        className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-forest bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                        Mobile Number <span className="text-crimson">*</span>
+                      </label>
                       <input
                         type="tel"
                         name="phone"
@@ -360,196 +412,187 @@ export default function PaymentPage({ purposes = FALLBACK_PURPOSES, upiVpa = '' 
                         onChange={handleChange}
                         placeholder="10-digit number"
                         maxLength="10"
-                        className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                        className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-forest bg-white"
                       />
                     </div>
                   </div>
 
-                  {/* Student Name */}
+                  {/* Remarks / Notes */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Student Name <span className="text-gray-400 font-normal">(optional)</span></label>
-                    <input
-                      type="text"
-                      name="studentName"
-                      value={form.studentName}
-                      onChange={handleChange}
-                      placeholder="If different from above"
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
-                    />
-                  </div>
-
-                  {/* Notes */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Notes <span className="text-gray-400 font-normal">(optional)</span></label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                      Notes / Reference Remarks <span className="text-gray-400 font-normal text-[11px]">(optional)</span>
+                    </label>
                     <textarea
                       name="notes"
                       value={form.notes}
                       onChange={handleChange}
                       rows="2"
-                      placeholder="Any additional information"
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 resize-none"
+                      placeholder="Add any specific course or college guidance notes"
+                      className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-forest bg-white resize-none"
                     />
                   </div>
 
                   {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 text-sm">
+                    <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-xs text-red-700 font-medium">
                       {error}
                     </div>
                   )}
 
                   <button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 text-base mt-2"
+                    className="w-full bg-forest hover:bg-forest-dark text-white font-bold py-3.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm mt-4"
                   >
-                    Continue to Pay
-                    <FaChevronRight className="text-sm" />
+                    Continue to Payment Method
+                    <FaChevronRight className="text-xs" />
                   </button>
                 </form>
               </div>
             )}
 
-            {/* Step: Payment Method */}
+            {/* STEP 2: Payment Gateway Prompt */}
             {step === 'pay' && (
-              <div className="flex-1 flex flex-col">
-                {/* Back */}
-                <div className="px-8 pt-6">
+              <div className="flex-1 p-6 md:p-10 flex flex-col justify-between">
+                <div>
                   <button
-                    onClick={() => setStep('details')}
-                    className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-4"
+                    type="button"
+                    onClick={() => { setStep('details'); setError(''); }}
+                    className="inline-flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-800 transition-colors mb-4"
                   >
-                    <FaAngleLeft /> Back
+                    <FaAngleLeft /> Edit Details
                   </button>
-                  <h2 className="text-xl font-bold text-gray-800 mb-1">Choose Payment Method</h2>
-                  <p className="text-sm text-gray-400 mb-6">Select how you&apos;d like to pay ₹{amountNum.toLocaleString('en-IN')}</p>
-                </div>
 
-                {/* Tabs */}
-                <div className="px-8">
-                  <div className="flex border-b border-gray-200 mb-6 gap-1">
-                    {TABS.map(tab => (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px ${
-                          activeTab === tab.id
-                            ? 'border-blue-600 text-blue-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                        }`}
-                      >
-                        <tab.icon />
-                        {tab.label}
-                      </button>
-                    ))}
+                  <h2 className="text-2xl font-bold text-gray-900 mb-1">Confirm and Pay</h2>
+                  <p className="text-sm text-gray-500 mb-6">Review your payment breakdown before launching secure checkout.</p>
+
+                  <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-5 space-y-3 mb-6">
+                    <div className="flex justify-between items-center text-sm pb-3 border-b border-slate-200">
+                      <span className="text-gray-600 font-medium">{purposeLabel}</span>
+                      <span className="font-bold text-gray-900">₹{amountNum.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs text-gray-500">
+                      <span>Gateway Convenience Charges:</span>
+                      <span className="text-emerald-700 font-semibold">Waived / Free</span>
+                    </div>
+                    <div className="flex justify-between items-center text-base pt-2 font-bold text-gray-900">
+                      <span>Total Net Payable:</span>
+                      <span className="text-forest text-lg">₹{amountNum.toLocaleString('en-IN')}</span>
+                    </div>
                   </div>
 
-                  {/* UPI Tab */}
-                  {activeTab === 'upi' && (
-                    <div className="pb-6">
-                      <p className="text-sm text-gray-500 mb-4">Tap an app to open it directly and pay.</p>
-                      <div className="grid grid-cols-3 gap-3">
-                        {[
-                          { name: 'Google Pay',  icon: '/icons/gpay.png' },
-                          { name: 'PhonePe',     icon: '/icons/phonepe.png' },
-                          { name: 'Paytm',       icon: '/icons/paytm.png' },
-                          { name: 'BHIM',        icon: '/icons/bhim.png' },
-                          { name: 'Amazon Pay',  icon: '/icons/amazonpay.png' },
-                          { name: 'Other UPI',   icon: null },
-                        ].map(app => (
-                          <button
-                            key={app.name}
-                            type="button"
-                            onClick={() => openUpiApp(app.name)}
-                            className="border border-gray-200 rounded-xl p-3 text-center text-sm font-medium text-gray-700 hover:border-blue-400 hover:bg-blue-50 active:scale-95 transition-all flex flex-col items-center gap-2"
-                          >
-                            {app.icon ? (
-                              <img src={app.icon} alt={app.name} className="w-8 h-8 object-contain" onError={e => { e.target.style.display='none'; }} />
-                            ) : (
-                              <FaMobileAlt className="text-2xl text-gray-400" />
-                            )}
-                            <span className="text-xs">{app.name}</span>
-                          </button>
-                        ))}
+                  {/* Supported Payment Channels Info */}
+                  <div className="rounded-2xl border border-sky-100 bg-sky-50/60 p-4 mb-6">
+                    <p className="text-xs font-bold uppercase tracking-wider text-sky-900 mb-2">Supported Payment Instruments</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                      <div className="bg-white rounded-lg p-2.5 border border-sky-100 shadow-xs flex flex-col items-center gap-1">
+                        <FaMobileAlt className="text-forest text-base" />
+                        <span className="font-semibold text-gray-800">UPI / QR</span>
+                        <span className="text-[10px] text-gray-400">GPay, PhonePe, Paytm</span>
                       </div>
-                      <p className="text-xs text-gray-400 mt-4">
-                        Or click <strong>Pay ₹{amountNum}</strong> below to choose any payment method via Razorpay.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Card Tab */}
-                  {activeTab === 'card' && (
-                    <div className="space-y-4 pb-6">
-                      <p className="text-sm text-gray-500">Pay using Credit or Debit card.</p>
-                      <div className="space-y-3">
-                        <input type="text" placeholder="Card Number" className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" disabled />
-                        <div className="flex gap-3">
-                          <input type="text" placeholder="MM / YY" className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" disabled />
-                          <input type="text" placeholder="CVV" className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" disabled />
-                        </div>
-                        <p className="text-xs text-gray-400">Card details are handled securely by Razorpay</p>
+                      <div className="bg-white rounded-lg p-2.5 border border-sky-100 shadow-xs flex flex-col items-center gap-1">
+                        <FaCreditCard className="text-blue-600 text-base" />
+                        <span className="font-semibold text-gray-800">Cards</span>
+                        <span className="text-[10px] text-gray-400">Visa, MC, RuPay</span>
+                      </div>
+                      <div className="bg-white rounded-lg p-2.5 border border-sky-100 shadow-xs flex flex-col items-center gap-1">
+                        <FaUniversity className="text-amber-600 text-base" />
+                        <span className="font-semibold text-gray-800">Net Banking</span>
+                        <span className="text-[10px] text-gray-400">50+ Indian Banks</span>
+                      </div>
+                      <div className="bg-white rounded-lg p-2.5 border border-sky-100 shadow-xs flex flex-col items-center gap-1">
+                        <FaWallet className="text-purple-600 text-base" />
+                        <span className="font-semibold text-gray-800">Wallets</span>
+                        <span className="text-[10px] text-gray-400">Amazon, Mobikwik</span>
                       </div>
                     </div>
-                  )}
+                  </div>
 
-                  {/* Net Banking Tab */}
-                  {activeTab === 'netbanking' && (
-                    <div className="space-y-4 pb-6">
-                      <p className="text-sm text-gray-500">Pay through your bank&apos;s internet banking portal.</p>
-                      <div className="grid grid-cols-2 gap-3">
-                        {['SBI', 'HDFC Bank', 'ICICI Bank', 'Axis Bank', 'Kotak Bank', 'Other Banks'].map(bank => (
-                          <div key={bank} className="border border-gray-200 rounded-xl p-3 text-sm text-gray-600 font-medium hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all">
-                            {bank}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Wallet Tab */}
-                  {activeTab === 'wallet' && (
-                    <div className="space-y-4 pb-6">
-                      <p className="text-sm text-gray-500">Pay using your digital wallet.</p>
-                      <div className="grid grid-cols-3 gap-3">
-                        {['Paytm', 'Mobikwik', 'Freecharge', 'Airtel Money', 'Jio Money', 'Other'].map(w => (
-                          <div key={w} className="border border-gray-200 rounded-xl p-3 text-center text-xs text-gray-600 font-medium hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all">
-                            {w}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Pay Button */}
-                <div className="mt-auto px-8 pb-8 pt-4 border-t border-gray-100">
                   {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 text-sm mb-4">
+                    <div className="rounded-xl bg-red-50 border border-red-200 p-3.5 text-xs text-red-700 font-medium mb-4">
                       {error}
                     </div>
                   )}
+                </div>
+
+                {/* Checkout Trigger */}
+                <div className="pt-4 border-t border-slate-100">
                   <button
+                    type="button"
                     onClick={handlePayment}
                     disabled={loading}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 text-base"
+                    className="w-full bg-forest hover:bg-forest-dark disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-base"
                   >
                     {loading ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Processing...
+                        Connecting to Razorpay...
                       </>
                     ) : (
                       <>
                         <FaLock className="text-sm" />
-                        Pay ₹{amountNum.toLocaleString('en-IN')}
+                        Pay ₹{amountNum.toLocaleString('en-IN')} via Razorpay
                       </>
                     )}
                   </button>
-                  <p className="text-center text-xs text-gray-400 mt-3 flex items-center justify-center gap-1">
-                    <FaShieldAlt /> Secured by Razorpay
+                  <p className="text-center text-[11px] text-gray-400 mt-2.5 flex items-center justify-center gap-1">
+                    <FaShieldAlt className="text-emerald-600" /> Transactions are processed securely by Razorpay
                   </p>
                 </div>
               </div>
             )}
+
+            {/* STEP 3: Payment Success Screen */}
+            {step === 'success' && (
+              <div className="flex-1 p-6 md:p-10 flex flex-col items-center justify-center text-center">
+                <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-5 text-forest text-4xl shadow-sm">
+                  <FaCheckCircle />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">Payment Successful!</h2>
+                <p className="text-sm text-gray-500 mb-6">Your transaction has been verified and recorded.</p>
+
+                <div className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6 text-left space-y-2.5 text-xs">
+                  <div className="flex justify-between items-center py-1 border-b border-slate-200">
+                    <span className="text-gray-500">Amount Paid:</span>
+                    <span className="font-bold text-gray-900 text-sm">₹{amountNum.toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-gray-500">Payment Reference:</span>
+                    <span className="font-mono font-bold text-forest">{receiptNumber || 'RCPT_CONFIRMED'}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-gray-500">Gateway Transaction ID:</span>
+                    <span className="font-mono text-gray-700">{paymentId}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-gray-500">Purpose:</span>
+                    <span className="font-semibold text-gray-800">{purposeLabel}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-gray-500">Payer Name:</span>
+                    <span className="font-semibold text-gray-800">{form.name}</span>
+                  </div>
+                </div>
+
+                <div className="w-full max-w-md space-y-3">
+                  <a
+                    href={`/api/payment/receipt?paymentId=${paymentId || receiptNumber}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-forest hover:bg-forest-dark text-white font-bold py-3.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm"
+                  >
+                    <FaFileDownload className="text-sm" />
+                    Download Official Receipt (PDF)
+                  </a>
+
+                  <Link
+                    href="/"
+                    className="block w-full bg-slate-100 hover:bg-slate-200 text-gray-800 font-semibold py-3 rounded-xl transition-colors text-center text-sm"
+                  >
+                    Back to Homepage
+                  </Link>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       </div>
@@ -557,52 +600,36 @@ export default function PaymentPage({ purposes = FALLBACK_PURPOSES, upiVpa = '' 
   );
 }
 
-function Row({ label, value, bold, mono }) {
-  return (
-    <div className="flex justify-between items-start text-sm">
-      <span className="text-gray-500">{label}</span>
-      <span className={`text-right ml-4 ${bold ? 'font-bold text-gray-800 text-base' : 'text-gray-700'} ${mono ? 'font-mono text-xs' : ''}`}>
-        {value}
-      </span>
-    </div>
-  );
-}
-
-function SummaryRow({ label, value }) {
-  return (
-    <div>
-      <p className="text-gray-400 text-xs">{label}</p>
-      <p className="text-white text-sm font-medium truncate">{value || '—'}</p>
-    </div>
-  );
-}
-
 export async function getServerSideProps(context) {
   const { ref } = context.query;
-
-  // Must come from bio data form
-  if (!ref) {
-    return { redirect: { destination: '/biodata', permanent: false } };
-  }
+  let initialStudent = null;
 
   try {
     const dbConnect = (await import('@/backend/lib/mongodb')).default;
     const PaymentSetting = (await import('@/backend/models/PaymentSetting')).default;
-    const SiteSetting = (await import('@/backend/models/SiteSetting')).default;
     const BioData = (await import('@/backend/models/BioData')).default;
 
     await dbConnect();
 
-    // Validate bio data ref
-    const bioRecord = await BioData.findById(ref).lean();
-    if (!bioRecord) {
-      return { redirect: { destination: '/biodata', permanent: false } };
+    // If ref is provided, attempt to prefill from BioData record
+    if (ref) {
+      try {
+        const bioRecord = await BioData.findById(ref).lean();
+        if (bioRecord) {
+          initialStudent = {
+            name: bioRecord.studentName || '',
+            email: bioRecord.studentEmail || '',
+            phone: bioRecord.studentMobile || '',
+            studentName: bioRecord.studentName || '',
+            bioDataId: String(bioRecord._id),
+          };
+        }
+      } catch (err) {
+        console.warn('[payment] Invalid bioData ref format:', ref);
+      }
     }
 
-    const [settings, upiSetting] = await Promise.all([
-      PaymentSetting.find({ isEnabled: true }).sort({ purpose: 1 }).lean(),
-      SiteSetting.findOne({ key: 'upi_vpa' }).lean(),
-    ]);
+    const settings = await PaymentSetting.find({ isEnabled: true }).sort({ purpose: 1 }).lean();
 
     const purposes = settings.map(s => ({
       id: s.purpose,
@@ -611,9 +638,19 @@ export async function getServerSideProps(context) {
       isFixed: s.isFixed,
     }));
 
-    return { props: { purposes, upiVpa: upiSetting?.value || '' } };
+    return {
+      props: {
+        purposes: purposes.length > 0 ? purposes : FALLBACK_PURPOSES,
+        initialStudent,
+      },
+    };
   } catch (err) {
-    console.error('Failed to load payment settings:', err.message);
-    return { redirect: { destination: '/biodata', permanent: false } };
+    console.error('[payment] Failed to load server settings:', err.message);
+    return {
+      props: {
+        purposes: FALLBACK_PURPOSES,
+        initialStudent: null,
+      },
+    };
   }
 }

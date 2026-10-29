@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaPhoneAlt, FaGraduationCap, FaUserTie, FaChevronDown, FaChevronUp, FaAward } from 'react-icons/fa';
 import Reveal from '@/frontend/components/home/Reveal';
 
@@ -35,7 +35,31 @@ const LEADERS = [
 ];
 
 export default function FounderDirector() {
+  const [leaders, setLeaders] = useState(LEADERS);
   const [expanded, setExpanded] = useState({});
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/site-settings')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!active || !data?.settings) return;
+        const s = data.settings;
+        if (s.founder_bio || s.director_bio) {
+          setLeaders((prev) =>
+            prev.map((l, i) => {
+              if (i === 0 && s.founder_bio) return { ...l, bio: s.founder_bio };
+              if (i === 1 && s.director_bio) return { ...l, bio: s.director_bio };
+              return l;
+            })
+          );
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const toggleBio = (idx) => {
     setExpanded((prev) => ({ ...prev, [idx]: !prev[idx] }));
@@ -64,7 +88,7 @@ export default function FounderDirector() {
 
         {/* Two-Profile Premium Layout */}
         <div className="grid gap-8 md:grid-cols-2 lg:gap-10">
-          {LEADERS.map((leader, idx) => {
+          {leaders.map((leader, idx) => {
             const isBioOpen = Boolean(expanded[idx]);
             return (
               <Reveal key={leader.name} delay={idx * 0.1}>
