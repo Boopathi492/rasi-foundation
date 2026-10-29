@@ -4,7 +4,7 @@ import Razorpay from 'razorpay';
  * Clean and unquote environment variable strings (handling cases where
  * quotes or trailing spaces were inadvertently pasted in deployment settings).
  */
-function sanitizeEnv(val) {
+export function sanitizeEnv(val) {
   if (!val || typeof val !== 'string') return '';
   return val.trim().replace(/^['"](.*)['"]$/, '$1').trim();
 }
@@ -34,6 +34,9 @@ export function getRazorpayCredentials() {
     ((isTest && pubIsLive) || (isLive && pubIsTest))
   );
 
+  // Safe prefix for diagnostics without exposing the full key
+  const keyPrefix = keyId ? `${keyId.slice(0, 8)}****` : 'none';
+
   return {
     configured: Boolean(keyId && keySecret),
     hasKeyId: Boolean(keyId),
@@ -41,6 +44,7 @@ export function getRazorpayCredentials() {
     keyId,
     publicKeyId,
     keySecret,
+    keyPrefix,
     isTest,
     isLive,
     modeMismatch,
@@ -63,12 +67,6 @@ export function getRazorpayClient() {
     throw err;
   }
 
-  if (creds.modeMismatch) {
-    console.warn(
-      '[Razorpay Security] Warning: Server RAZORPAY_KEY_ID and NEXT_PUBLIC_RAZORPAY_KEY_ID appear to use different environments (test vs live).'
-    );
-  }
-
   return new Razorpay({
     key_id: creds.keyId,
     key_secret: creds.keySecret,
@@ -76,25 +74,52 @@ export function getRazorpayClient() {
 }
 
 /**
- * Normalizes errors thrown by Razorpay SDK or network layers.
- * The Razorpay SDK throws object literals ({ statusCode, error: { code, description } }),
- * not standard Error instances.
+ * Normalizes errors thrown by Razorpay SDK, network layers, or database operations.
+ * The Razorpay SDK throws plain object literals ({ statusCode, error: { code, description } }),
+ * not standard Error instances. It can also throw TypeErrors if Axios receives no response.
  */
 export function parseRazorpayError(err) {
-  // 1. Razorpay API response errors
+  // 1. Razorpay SDK normalizeError bug where Axios received no response (network/DNS/timeout)
+  if (
+    err &&
+    err.name === 'TypeError' &&
+    (err.message?.includes("reading 'status'") || err.message?.includes("reading 'data'"))
+  ) {
+    return {
+      statusCode: 504,
+      code: 'GATEWAY_NETWORK_FAILURE',
+      description: 'Payment gateway connection or network unreachable',
+      field: null,
+      source: 'network',
+    };
+  }
+
+  // 2. Razorpay API response errors ({ statusCode, error })
   if (err && typeof err === 'object' && (err.statusCode || err.error)) {
     const statusCode = err.statusCode || 500;
     const rzpErr = err.error || {};
+    const description = typeof rzpErr === 'string'
+      ? rzpErr
+      : rzpErr.description || rzpErr.message || 'Razorpay payment gateway rejected request';
+    const code = typeof rzpErr === 'object' && rzpErr.code
+      ? rzpErr.code
+      : statusCode === 401
+      ? 'AUTHENTICATION_ERROR'
+      : statusCode === 400
+      ? 'BAD_REQUEST_ERROR'
+      : 'GATEWAY_ERROR';
+    const field = (typeof rzpErr === 'object' && rzpErr.field) || null;
+
     return {
       statusCode,
-      code: rzpErr.code || (statusCode === 401 ? 'AUTHENTICATION_ERROR' : 'GATEWAY_ERROR'),
-      description: rzpErr.description || 'Razorpay payment gateway rejected request',
-      field: rzpErr.field || null,
+      code,
+      description,
+      field,
       source: 'razorpay_api',
     };
   }
 
-  // 2. Network / connection timeout errors
+  // 3. Network / connection timeout errors
   if (err && (err.code === 'ECONNRESET' || err.code === 'ENOTFOUND' || err.code === 'ETIMEDOUT' || err.code === 'ECONNREFUSED')) {
     return {
       statusCode: 504,
@@ -105,7 +130,38 @@ export function parseRazorpayError(err) {
     };
   }
 
-  // 3. Application or Database Errors
+  // 4. MongoDB / Mongoose database errors
+  if (err && (err.name === 'MongooseServerSelectionError' || err.name === 'MongoNetworkError' || err.name === 'MongoServerSelectionError')) {
+    return {
+      statusCode: 500,
+      code: 'DB_CONNECTION_ERROR',
+      description: 'Database connection failed or timed out',
+      field: null,
+      source: 'database',
+    };
+  }
+
+  if (err && err.code === 11000) {
+    return {
+      statusCode: 500,
+      code: 'DB_DUPLICATE_KEY',
+      description: 'Database unique constraint violation',
+      field: null,
+      source: 'database',
+    };
+  }
+
+  if (err && err.name === 'ValidationError') {
+    return {
+      statusCode: 400,
+      code: 'DB_VALIDATION_ERROR',
+      description: err.message,
+      field: null,
+      source: 'database',
+    };
+  }
+
+  // 5. Application / internal error
   return {
     statusCode: err?.statusCode || 500,
     code: err?.code || 'INTERNAL_ERROR',
@@ -115,19 +171,45 @@ export function parseRazorpayError(err) {
   };
 }
 
+const REDACT_KEYS = new Set([
+  'keysecret', 'key_secret', 'secret', 'password', 'authorization', 'cookie',
+  'token', 'phone', 'email', 'name', 'studentname', 'payername', 'contact',
+  'notes', 'address', 'razorpay_key_secret'
+]);
+
 /**
- * Safe diagnostic logger that redacts PII, card numbers, and secret keys.
+ * Recursively cleans and redacts any sensitive keys from log objects.
+ */
+function redactObject(obj) {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(redactObject);
+
+  const clean = {};
+  for (const [k, v] of Object.entries(obj)) {
+    const lowerKey = k.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    if (REDACT_KEYS.has(lowerKey)) {
+      continue; // completely omit sensitive key
+    }
+    if (v && typeof v === 'object') {
+      clean[k] = redactObject(v);
+    } else {
+      clean[k] = v;
+    }
+  }
+  return clean;
+}
+
+/**
+ * Structured diagnostic logger that redacts PII, card numbers, and secret keys.
  */
 export function safePaymentLog(step, details = {}) {
-  const cleanDetails = { ...details };
-  // Redact any potential sensitive keys
-  delete cleanDetails.keySecret;
-  delete cleanDetails.password;
-  delete cleanDetails.authorization;
-  delete cleanDetails.cookie;
-  delete cleanDetails.phone;
-  delete cleanDetails.email;
-  delete cleanDetails.name;
+  const cleanDetails = redactObject(details);
+  const logPayload = {
+    tag: 'PaymentDiagnostic',
+    step,
+    timestamp: new Date().toISOString(),
+    ...cleanDetails,
+  };
 
-  console.error(`[Payment Diagnostic] Step: "${step}" | Details:`, cleanDetails);
+  console.error(JSON.stringify(logPayload));
 }

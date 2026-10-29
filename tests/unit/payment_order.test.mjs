@@ -11,6 +11,7 @@ import dbConnect from '../../src/backend/lib/mongodb.js';
 import {
   getRazorpayCredentials,
   parseRazorpayError,
+  safePaymentLog,
 } from '../../src/backend/lib/razorpay.js';
 import Razorpay from 'razorpay';
 
@@ -66,6 +67,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
       assert.equal(creds.isTest, true);
       assert.equal(creds.isLive, false);
       assert.equal(creds.modeMismatch, false);
+      assert.equal(creds.keyPrefix, 'rzp_test****');
 
       // Test B: Detect mode mismatch
       process.env.RAZORPAY_KEY_ID = 'rzp_live_1234567890';
@@ -92,7 +94,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
       const res = createMockRes();
       await createOrderHandler({
         method: 'POST',
-        headers: { 'x-forwarded-for': '127.0.0.99' },
+        headers: { 'x-forwarded-for': '127.0.0.99', 'x-request-id': 'req_test_creds_missing' },
         body: {
           purpose: 'counseling',
           amount: 500,
@@ -104,6 +106,9 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
 
       assert.equal(res.statusCode, 500);
       assert.equal(res.data.success, false);
+      assert.equal(res.data.stage, 'credentials_check');
+      assert.equal(res.data.code, 'CONFIG_MISSING');
+      assert.equal(res.data.requestId, 'req_test_creds_missing');
       assert.match(res.data.message, /temporarily unavailable/i);
     } finally {
       if (origKeyId) process.env.RAZORPAY_KEY_ID = origKeyId;
@@ -128,6 +133,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
     }, res);
     assert.equal(res.statusCode, 400);
     assert.match(res.data.message, /minimum ₹1/i);
+    assert.equal(res.data.code, 'INVALID_AMOUNT');
 
     // Subtest B: Negative amount
     res = createMockRes();
@@ -144,6 +150,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
     }, res);
     assert.equal(res.statusCode, 400);
     assert.match(res.data.message, /minimum ₹1/i);
+    assert.equal(res.data.code, 'INVALID_AMOUNT');
 
     // Subtest C: Exceeding maximum limit ₹5,00,000
     res = createMockRes();
@@ -160,6 +167,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
     }, res);
     assert.equal(res.statusCode, 400);
     assert.match(res.data.message, /cannot exceed ₹5,00,000/i);
+    assert.equal(res.data.code, 'AMOUNT_EXCEEDS_MAX');
   });
 
   await t.test('4. Payload Input Validation (Missing purpose, invalid email, invalid phone)', async () => {
@@ -172,6 +180,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
     }, res);
     assert.equal(res.statusCode, 400);
     assert.match(res.data.message, /purpose is required/i);
+    assert.equal(res.data.code, 'MISSING_PURPOSE');
 
     // Invalid email
     res = createMockRes();
@@ -182,6 +191,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
     }, res);
     assert.equal(res.statusCode, 400);
     assert.match(res.data.message, /valid email/i);
+    assert.equal(res.data.code, 'INVALID_EMAIL');
 
     // Invalid phone
     res = createMockRes();
@@ -192,6 +202,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
     }, res);
     assert.equal(res.statusCode, 400);
     assert.match(res.data.message, /10-digit mobile number/i);
+    assert.equal(res.data.code, 'INVALID_PHONE');
 
     // Invalid BioData ObjectId
     res = createMockRes();
@@ -209,6 +220,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
     }, res);
     assert.equal(res.statusCode, 400);
     assert.match(res.data.message, /invalid student application reference/i);
+    assert.equal(res.data.code, 'INVALID_BIODATA_REF');
   });
 
   await t.test('5. Successful Order Creation and Database Persistence Simulation', async () => {
@@ -242,7 +254,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
       const res = createMockRes();
       await createOrderHandler({
         method: 'POST',
-        headers: { 'x-forwarded-for': '127.0.0.108' },
+        headers: { 'x-forwarded-for': '127.0.0.108', 'x-request-id': 'req_succ_test' },
         body: {
           purpose: 'counseling',
           amount: 500,
@@ -259,6 +271,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
       assert.equal(res.data.order.id, mockOrderId);
       assert.equal(res.data.order.amount, 50000);
       assert.equal(res.data.order.currency, 'INR');
+      assert.equal(res.data.requestId, 'req_succ_test');
       assert.ok(res.data.receipt.startsWith('RCPT_'));
       assert.ok(res.data.key);
       assert.ok(res.data.internalPaymentId);
@@ -285,7 +298,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
     }
   });
 
-  await t.test('6. Razorpay API Failure Normalization (401 Auth Failure, 400 Bad Request, Timeout)', async () => {
+  await t.test('6. Razorpay API Failure Normalization (401 Auth Failure, 400 Bad Request, Timeout, Axios TypeError)', async () => {
     const origAddResources = Razorpay.prototype.addResources;
 
     try {
@@ -320,6 +333,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
 
       assert.equal(res.statusCode, 502);
       assert.equal(res.data.success, false);
+      assert.equal(res.data.stage, 'razorpay_order_create');
       assert.match(res.data.message, /gateway authentication failed/i);
 
       // Test B: 400 Bad Request from Razorpay (e.g. invalid parameter)
@@ -353,6 +367,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
 
       assert.equal(res.statusCode, 400);
       assert.equal(res.data.success, false);
+      assert.equal(res.data.stage, 'razorpay_order_create');
       assert.match(res.data.message, /exceeds maximum permitted limit/i);
 
       // Test C: Network Timeout
@@ -382,6 +397,36 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
 
       assert.equal(res.statusCode, 504);
       assert.equal(res.data.success, false);
+      assert.equal(res.data.stage, 'razorpay_order_create');
+      assert.match(res.data.message, /timed out/i);
+
+      // Test D: Axios normalizeError TypeError crash when response is undefined
+      Razorpay.prototype.addResources = function () {
+        origAddResources.call(this);
+        this.orders = {
+          create: async () => {
+            const typeErr = new TypeError("Cannot read properties of undefined (reading 'status')");
+            throw typeErr;
+          },
+        };
+      };
+
+      res = createMockRes();
+      await createOrderHandler({
+        method: 'POST',
+        headers: { 'x-forwarded-for': '127.0.0.112' },
+        body: {
+          purpose: 'counseling',
+          amount: 500,
+          name: 'Student One',
+          email: 'student@example.com',
+          phone: '9876543210',
+        },
+      }, res);
+
+      assert.equal(res.statusCode, 504);
+      assert.equal(res.data.success, false);
+      assert.equal(res.data.code, 'GATEWAY_NETWORK_FAILURE');
       assert.match(res.data.message, /timed out/i);
     } finally {
       Razorpay.prototype.addResources = origAddResources;
@@ -389,7 +434,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
   });
 
   await t.test('7. PaymentSetting Auto-Seeding When Collection is Empty', async () => {
-    // Temporarily rename or clear settings
+    // Temporarily clear settings
     const currentSettings = await PaymentSetting.find().lean();
     await PaymentSetting.deleteMany({});
 
@@ -410,7 +455,7 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
       const res = createMockRes();
       await createOrderHandler({
         method: 'POST',
-        headers: { 'x-forwarded-for': '127.0.0.112' },
+        headers: { 'x-forwarded-for': '127.0.0.113' },
         body: {
           purpose: 'counseling',
           amount: 500,
@@ -431,9 +476,52 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
       await Payment.deleteOne({ receipt: res.data.receipt });
       Razorpay.prototype.addResources = origAddResources;
     } finally {
-      // Restore previous settings if needed
+      // Restore previous settings
       await PaymentSetting.deleteMany({});
       await PaymentSetting.insertMany(currentSettings);
+    }
+  });
+
+  await t.test('8. Strict Redaction of Secrets and PII in safePaymentLog', () => {
+    let lastLog = null;
+    const origConsoleError = console.error;
+    console.error = (msg) => {
+      lastLog = JSON.parse(msg);
+    };
+
+    try {
+      safePaymentLog('test_stage', {
+        requestId: 'req_12345',
+        keySecret: 'super_secret_razorpay_secret_key',
+        password: 'admin_password_123',
+        authorization: 'Bearer secret_token',
+        cookie: 'session=123',
+        phone: '9876543210',
+        email: 'student@example.com',
+        name: 'Boopathi Ramasamy',
+        studentName: 'Boopathi Ramasamy',
+        orderId: 'order_123',
+        amountPaise: 50000,
+      });
+
+      assert.ok(lastLog);
+      assert.equal(lastLog.tag, 'PaymentDiagnostic');
+      assert.equal(lastLog.step, 'test_stage');
+      assert.equal(lastLog.requestId, 'req_12345');
+      assert.equal(lastLog.orderId, 'order_123');
+      assert.equal(lastLog.amountPaise, 50000);
+
+      // Verify all sensitive keys are omitted
+      assert.equal(lastLog.keySecret, undefined);
+      assert.equal(lastLog.password, undefined);
+      assert.equal(lastLog.authorization, undefined);
+      assert.equal(lastLog.cookie, undefined);
+      assert.equal(lastLog.phone, undefined);
+      assert.equal(lastLog.email, undefined);
+      assert.equal(lastLog.name, undefined);
+      assert.equal(lastLog.studentName, undefined);
+    } finally {
+      console.error = origConsoleError;
     }
   });
 
