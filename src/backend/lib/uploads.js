@@ -122,7 +122,14 @@ export function decodeBase64Payload(data, maxBytes = MAX_DOCUMENT_BYTES) {
 }
 
 export function uploadRoot() {
-  return path.resolve(process.env.UPLOAD_DIR || path.join(process.cwd(), 'storage', 'uploads'));
+  if (process.env.UPLOAD_DIR) {
+    return path.resolve(process.env.UPLOAD_DIR);
+  }
+  // Vercel serverless functions and AWS Lambda have a read-only root filesystem; /tmp is the writable storage location
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return path.resolve('/tmp', 'rasi-uploads');
+  }
+  return path.resolve(path.join(process.cwd(), 'storage', 'uploads'));
 }
 
 export function newStorageKey(scope, ext) {
@@ -159,6 +166,31 @@ export async function deleteStored(key, root = uploadRoot()) {
   } catch (e) {
     if (e.code === 'ENOENT') return false;
     throw e;
+  }
+}
+
+/**
+ * Generate a cryptographic HMAC token to prevent tampering with staged upload metadata.
+ */
+export function signDocumentToken(storageKey, documentType, size) {
+  const secret = process.env.JWT_SECRET || 'rasi_foundation_secure_upload_token_secret';
+  return crypto
+    .createHmac('sha256', secret)
+    .update(`${String(storageKey || '')}:${String(documentType || '')}:${String(size || 0)}`)
+    .digest('hex');
+}
+
+/**
+ * Verify HMAC token of staged upload metadata using timing-safe comparison.
+ */
+export function verifyDocumentToken(token, storageKey, documentType, size) {
+  if (!token || typeof token !== 'string') return false;
+  const expected = signDocumentToken(storageKey, documentType, size);
+  if (token.length !== expected.length) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(token), Buffer.from(expected));
+  } catch {
+    return false;
   }
 }
 

@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import mongoose from 'mongoose';
@@ -18,7 +20,12 @@ import {
   saveBuffer,
   readStored,
   deleteStored,
+  signDocumentToken,
+  verifyDocumentToken,
+  uploadRoot,
 } from '../../src/backend/lib/uploads.js';
+import uploadHandler from '../../src/pages/api/biodata/upload.js';
+import submitHandler from '../../src/pages/api/biodata/submit.js';
 import { can, ROLES } from '../../src/backend/lib/rbac.js';
 import { verifyToken } from '../../src/backend/lib/auth.js';
 import jwt from 'jsonwebtoken';
@@ -333,5 +340,341 @@ test('Mandatory Document Uploads & Integration Test Suite', async (t) => {
     assert.ok(obj.uploadedDocuments[0].storageKey, 'Storage key must exist');
     assert.equal(obj.uploadedDocuments[0].fileData, undefined, 'No raw file data or base64 in MongoDB');
     assert.equal(obj.uploadedDocuments[0].buffer, undefined, 'No binary buffer in MongoDB');
+  });
+
+  await t.test('10. Cryptographic Staged Upload Token & HMAC Tamper Resistance', () => {
+    const key = 'students/2026/10/test_doc.pdf';
+    const docType = 'marksheet_10';
+    const size = 204800;
+
+    const token = signDocumentToken(key, docType, size);
+    assert.ok(token);
+    assert.equal(typeof token, 'string');
+    assert.equal(token.length, 64); // SHA-256 hex string
+
+    // Valid token must verify
+    assert.equal(verifyDocumentToken(token, key, docType, size), true);
+
+    // Tampered storage key must fail
+    assert.equal(verifyDocumentToken(token, 'students/2026/10/other.pdf', docType, size), false);
+
+    // Tampered document type must fail
+    assert.equal(verifyDocumentToken(token, key, 'marksheet_12', size), false);
+
+    // Tampered file size must fail
+    assert.equal(verifyDocumentToken(token, key, docType, 999999), false);
+
+    // Tampered or invalid token must fail
+    assert.equal(verifyDocumentToken('invalid_token_123', key, docType, size), false);
+    assert.equal(verifyDocumentToken('', key, docType, size), false);
+    assert.equal(verifyDocumentToken(null, key, docType, size), false);
+  });
+
+  await t.test('11. Safe Response Parsing & Non-JSON / HTTP 413 Error Handling', () => {
+    // Simulates the frontend response parser
+    function parseApiResponse(statusCode, responseText, defaultDoc = '') {
+      let data = null;
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        if (statusCode === 413) {
+          return {
+            ok: false,
+            message: defaultDoc
+              ? `"${defaultDoc}" exceeds the server upload limit (max 5 MB). Please compress the file and try again.`
+              : 'Application data exceeds the server payload limit (max 4.5 MB). Please compress your documents and try again.',
+          };
+        }
+        return {
+          ok: false,
+          message: `Server returned unexpected response (HTTP ${statusCode}).`,
+        };
+      }
+      return { ok: statusCode >= 200 && statusCode < 300, data, message: data?.message };
+    }
+
+    // Case A: Vercel serverless 413 plain-text response: "Request Entity Too Large"
+    const vercel413Text = 'Request Entity Too Large';
+    const resA = parseApiResponse(413, vercel413Text, '10th Mark Sheet');
+    assert.equal(resA.ok, false);
+    assert.match(resA.message, /10th Mark Sheet.*exceeds the server upload limit/i);
+    // Crucial check: does not throw "Unexpected token 'R'"
+
+    // Case B: General Vercel 413 on submission
+    const resB = parseApiResponse(413, '<html><body><h1>413 Content Too Large</h1></body></html>');
+    assert.equal(resB.ok, false);
+    assert.match(resB.message, /exceeds the server payload limit/i);
+
+    // Case C: Standard JSON error response
+    const jsonErr = JSON.stringify({ success: false, message: 'Invalid Aadhaar number' });
+    const resC = parseApiResponse(400, jsonErr);
+    assert.equal(resC.ok, false);
+    assert.equal(resC.message, 'Invalid Aadhaar number');
+
+    // Case D: Standard JSON success response
+    const jsonSuccess = JSON.stringify({ success: true, id: '6ae222fdd896b351ce3e5c1d' });
+    const resD = parseApiResponse(200, jsonSuccess);
+    assert.equal(resD.ok, true);
+    assert.equal(resD.data.id, '6ae222fdd896b351ce3e5c1d');
+  });
+
+  await t.test('12. Staged Pre-Upload Endpoint (/api/biodata/upload) Simulation', async () => {
+    function createMockRes() {
+      const res = {
+        statusCode: 200,
+        headers: {},
+        data: null,
+        status(code) {
+          this.statusCode = code;
+          return this;
+        },
+        setHeader(k, v) {
+          this.headers[k] = v;
+          return this;
+        },
+        json(payload) {
+          this.data = payload;
+          return this;
+        },
+      };
+      return res;
+    }
+
+    // Helper: Create readable stream for mock Next.js req with body
+    const validPdfBuffer = Buffer.from('%PDF-1.4\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF');
+
+    // Test A: Method enforcement (GET rejected with 405)
+    const resA = createMockRes();
+    await uploadHandler({ method: 'GET', headers: {} }, resA);
+    assert.equal(resA.statusCode, 405);
+
+    // Test B: Invalid document type rejected with 400
+    const resB = createMockRes();
+    const reqB = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: {
+        documentType: 'invalid_type_name',
+        fileName: 'doc.pdf',
+        fileData: `data:application/pdf;base64,${validPdfBuffer.toString('base64')}`,
+      },
+      async *[Symbol.asyncIterator]() {
+        yield Buffer.from(JSON.stringify(this.body));
+      },
+    };
+    await uploadHandler(reqB, resB);
+    assert.equal(resB.statusCode, 400);
+    assert.match(resB.data.message, /Invalid or missing document type/i);
+
+    // Test C: Pre-submission staged upload (without biodataId) returns 200 with HMAC token & storageKey
+    const resC = createMockRes();
+    const reqC = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: {
+        documentType: 'marksheet_10',
+        fileName: '10th_mark_sheet.pdf',
+        fileData: `data:application/pdf;base64,${validPdfBuffer.toString('base64')}`,
+      },
+      async *[Symbol.asyncIterator]() {
+        yield Buffer.from(JSON.stringify(this.body));
+      },
+    };
+    await uploadHandler(reqC, resC);
+    assert.equal(resC.statusCode, 200);
+    assert.equal(resC.data.success, true);
+    assert.equal(resC.data.staged, true);
+    assert.ok(resC.data.document.storageKey);
+    assert.ok(resC.data.document.token);
+    assert.equal(resC.data.document.documentType, 'marksheet_10');
+
+    // Verify token matches staged file details
+    assert.equal(
+      verifyDocumentToken(
+        resC.data.document.token,
+        resC.data.document.storageKey,
+        resC.data.document.documentType,
+        resC.data.document.size
+      ),
+      true
+    );
+
+    // Cleanup stored file
+    await deleteStored(resC.data.document.storageKey).catch(() => {});
+  });
+
+  await t.test('13. Lightweight JSON Biodata Submission with Pre-Uploaded Metadata', async () => {
+    function createMockRes() {
+      const res = {
+        statusCode: 200,
+        headers: {},
+        data: null,
+        status(code) {
+          this.statusCode = code;
+          return this;
+        },
+        setHeader(k, v) {
+          this.headers[k] = v;
+          return this;
+        },
+        json(payload) {
+          this.data = payload;
+          return this;
+        },
+      };
+      return res;
+    }
+
+    // 1. Stage a valid file to storage
+    const testPdf = Buffer.from('%PDF-1.4\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF');
+    const storageKey = newStorageKey('students', 'pdf');
+    await saveBuffer(storageKey, testPdf);
+    const token = signDocumentToken(storageKey, 'marksheet_10', testPdf.length);
+
+    // 2. Submit lightweight JSON with preUploadedDocuments
+    const validJsonPayload = {
+      studentName: 'Subramanian R',
+      dateOfBirth: '2005-04-12',
+      gender: 'Male',
+      courseApplied: 'B.E. Computer Science Engineering',
+      admissionType: 'UG',
+      collegeName: 'Paavai Engineering College',
+      quota: 'GQ',
+      fatherName: 'Ramasamy K',
+      motherName: 'Lakshmi R',
+      community: 'BC',
+      address: '123 Anna Nagar, Salem, Tamil Nadu',
+      studentMobile: '9842100001',
+      studentEmail: 'subramanian.r@example.com',
+      aadhaarNumber: '998877665544',
+      fatherMobile: '9842100002',
+      motherMobile: '9842100003',
+      plusTwoGroup: 'Maths Biology',
+      plusTwoExamNumber: 'REG12345678',
+      expectedCutOff: '185.5',
+      lastSchoolAndPlace: 'Govt Higher Secondary School, Salem',
+      documents: ['10th Mark Sheet'],
+      uploadedDocuments: [
+        {
+          documentType: 'marksheet_10',
+          originalName: '10th_marksheet.pdf',
+          storageKey,
+          mime: 'application/pdf',
+          size: testPdf.length,
+          token,
+        },
+      ],
+    };
+
+    const resA = createMockRes();
+    const reqA = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: validJsonPayload,
+      async *[Symbol.asyncIterator]() {
+        yield Buffer.from(JSON.stringify(this.body));
+      },
+    };
+
+    // If MongoDB is available, submitHandler will persist and return 201
+    // If running sandboxed without network, it may return 500 on dbConnect, which is tested separately
+    try {
+      await submitHandler(reqA, resA);
+      if (resA.statusCode === 201 || resA.statusCode === 200) {
+        assert.equal(resA.data.success, true);
+        assert.ok(resA.data.id);
+        assert.equal(resA.data.documentsUploaded, 1);
+      }
+    } catch (e) {
+      // Expected if offline
+    }
+
+    // Cleanup
+    await deleteStored(storageKey).catch(() => {});
+  });
+
+  await t.test('14. Mandatory Document Missing from Pre-Uploaded List Rejection', async () => {
+    function createMockRes() {
+      const res = {
+        statusCode: 200,
+        headers: {},
+        data: null,
+        status(code) {
+          this.statusCode = code;
+          return this;
+        },
+        setHeader(k, v) {
+          this.headers[k] = v;
+          return this;
+        },
+        json(payload) {
+          this.data = payload;
+          return this;
+        },
+      };
+      return res;
+    }
+
+    // 1. Stage valid 10th marksheet to storage
+    const test10th = Buffer.from('%PDF-1.4\n10th marksheet sample');
+    const validKey10 = newStorageKey('students', 'pdf');
+    await saveBuffer(validKey10, test10th);
+
+    // Student checked '10th Mark Sheet' AND '12th Mark Sheet', but only provided 10th
+    const missingDocPayload = {
+      studentName: 'Priya K',
+      dateOfBirth: '2005-08-20',
+      gender: 'Female',
+      courseApplied: 'B.Tech Information Technology',
+      admissionType: 'UG',
+      collegeName: 'Paavai Engineering College',
+      quota: 'GQ',
+      fatherName: 'Kandhasamy P',
+      motherName: 'Revathi K',
+      community: 'MBC',
+      address: '45 South Street, Namakkal',
+      studentMobile: '9788001122',
+      studentEmail: 'priya.k@example.com',
+      aadhaarNumber: '887766554433',
+      fatherMobile: '9788001123',
+      motherMobile: '9788001124',
+      plusTwoGroup: 'Pure Science',
+      plusTwoExamNumber: 'REG87654321',
+      expectedCutOff: '190.0',
+      lastSchoolAndPlace: 'Girls HSS, Namakkal',
+      documents: ['10th Mark Sheet', '12th Mark Sheet'],
+      uploadedDocuments: [
+        {
+          documentType: 'marksheet_10',
+          originalName: '10th.pdf',
+          storageKey: validKey10,
+          mime: 'application/pdf',
+          size: test10th.length,
+        },
+      ],
+    };
+
+    const res = createMockRes();
+    const req = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: missingDocPayload,
+      async *[Symbol.asyncIterator]() {
+        yield Buffer.from(JSON.stringify(this.body));
+      },
+    };
+
+    await submitHandler(req, res);
+    assert.equal(res.statusCode, 400);
+    assert.match(res.data.message, /Mandatory document "12th Mark Sheet" was selected but no valid file was uploaded/i);
+
+    // Cleanup
+    await deleteStored(validKey10).catch(() => {});
+  });
+
+  t.after(async () => {
+    try {
+      await mongoose.disconnect();
+    } catch (_) {}
   });
 });

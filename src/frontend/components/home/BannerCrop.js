@@ -7,13 +7,35 @@ const GRID_W = 2000;
 
 export default function BannerCrop({
   src,
-  alt,
+  alt = '',
   region,
   fill = false,
   sizes = '(min-width: 1024px) 40vw, 90vw',
   className = '',
   priority = false,
 }) {
+  // Standalone mode: when region is omitted, render clean responsive Next.js Image
+  if (!region) {
+    return (
+      <div
+        className={`relative overflow-hidden bg-brand-100 ${className}`}
+        style={fill ? undefined : { aspectRatio: '4 / 3' }}
+      >
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes={sizes}
+          priority={priority}
+          loading={priority ? undefined : 'lazy'}
+          quality={85}
+          className="h-full w-full object-cover"
+        />
+      </div>
+    );
+  }
+
+  // Cropped region mode: 2000x750 reference grid crop
   const { x, y, w, h } = region;
   return (
     <div

@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { FaHospital, FaStethoscope, FaLeaf, FaFlask, FaLaptopCode, FaCog, FaBuilding, FaSeedling, FaChartLine, FaCalculator, FaBalanceScale, FaChalkboardTeacher, FaBook, FaCompass, FaClipboardCheck, FaUniversity, FaSearch, FaCalendarCheck, FaArrowRight, FaClock, FaCheckCircle, FaGraduationCap, FaPhone, FaTimes, FaGlobe, FaExternalLinkAlt, FaMapMarkerAlt } from 'react-icons/fa';
 import Layout from '@/frontend/components/Layout';
 import PageBanner from '@/frontend/components/PageBanner';
@@ -1028,13 +1029,16 @@ export default function Courses({ initialCourses = [] }) {
         }
         aside={
           <Reveal>
-            <BannerCrop
-              src="/images/banners/hero-3-explore-perfect-course.png"
-              alt="A smiling student holding books on a college campus"
-              region={{ x: 930, y: 30, w: 360, h: 432 }}
-              sizes="(min-width: 1024px) 35vw, 90vw"
-              className="mx-auto aspect-[5/6] max-h-[420px] rounded-[3rem] shadow-card-hover ring-8 ring-white/20"
-            />
+            <div className="relative mx-auto aspect-[5/6] max-h-[420px] w-full overflow-hidden rounded-[3rem] shadow-card-hover ring-8 ring-white/20">
+              <Image
+                src="/images/courses/courses-header-student.webp"
+                alt="A smiling student holding books on a university campus"
+                fill
+                sizes="(min-width: 1024px) 35vw, 90vw"
+                className="h-full w-full object-cover object-top"
+                priority
+              />
+            </div>
           </Reveal>
         }
       >

@@ -120,12 +120,71 @@ const INITIAL = {
   documents: ['10th Mark Sheet', '12th Mark Sheet'],
 };
 
+async function compressImageIfLarge(file) {
+  if (typeof window === 'undefined') return file;
+  if (!file || !file.type || !file.type.startsWith('image/')) return file;
+  // If file is an image and > 1.2 MB, compress client-side to ensure smooth upload
+  if (file.size < 1.2 * 1024 * 1024) return file;
+
+  return new Promise((resolve) => {
+    try {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const MAX_DIM = 1920;
+        let { width, height } = img;
+        if (width > MAX_DIM || height > MAX_DIM) {
+          if (width > height) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          } else {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return resolve(file);
+
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (blob && blob.size < file.size) {
+              const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
+                type: 'image/jpeg',
+                lastModified: Date.now(),
+              });
+              resolve(compressedFile);
+            } else {
+              resolve(file);
+            }
+          },
+          'image/jpeg',
+          0.82
+        );
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(file);
+      };
+      img.src = url;
+    } catch {
+      resolve(file);
+    }
+  });
+}
+
 export default function BioDataPage() {
   const router = useRouter();
   const [form, setForm] = useState(INITIAL);
   const [selectedFiles, setSelectedFiles] = useState({});
+  const [uploadedDocs, setUploadedDocs] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [uploadProgressText, setUploadProgressText] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [consent, setConsent] = useState(false);
@@ -170,11 +229,22 @@ export default function BioDataPage() {
         type: file.type,
       },
     }));
+    // Invalidate any previously staged upload for this document so the newly selected file gets uploaded
+    setUploadedDocs((prev) => {
+      const copy = { ...prev };
+      delete copy[docId];
+      return copy;
+    });
     setError('');
   };
 
   const handleRemoveFile = (docId) => {
     setSelectedFiles((prev) => {
+      const copy = { ...prev };
+      delete copy[docId];
+      return copy;
+    });
+    setUploadedDocs((prev) => {
       const copy = { ...prev };
       delete copy[docId];
       return copy;
@@ -283,7 +353,62 @@ export default function BioDataPage() {
 
     setSubmitting(true);
     setError('');
+    setUploadProgressText('Verifying documents…');
+
     try {
+      // 1. Upload mandatory selected documents individually to the dedicated upload endpoint.
+      // This prevents exceeding Vercel's 4.5 MB request payload limit and isolates upload retries.
+      const activeDocs = DOCUMENT_OPTIONS.filter((doc) => form.documents.includes(doc.name));
+      const stagedDocsMap = { ...uploadedDocs };
+
+      for (let i = 0; i < activeDocs.length; i++) {
+        const doc = activeDocs[i];
+        if (!stagedDocsMap[doc.id] || !stagedDocsMap[doc.id].storageKey) {
+          const fileEntry = selectedFiles[doc.id];
+          if (!fileEntry || !fileEntry.file) {
+            throw new Error(`Required document "${doc.name}" is missing an uploaded file.`);
+          }
+
+          setUploadProgressText(`Uploading document ${i + 1} of ${activeDocs.length}: ${doc.name}…`);
+
+          // Apply client-side image compression if the selected file is a large mobile camera photo
+          const fileToUpload = await compressImageIfLarge(fileEntry.file);
+
+          const formData = new FormData();
+          formData.append('file', fileToUpload, fileToUpload.name || fileEntry.name);
+          formData.append('documentType', doc.id);
+          formData.append('documentName', doc.name);
+
+          const uploadRes = await fetch('/api/biodata/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const rawText = await uploadRes.text();
+          let uploadJson;
+          try {
+            uploadJson = JSON.parse(rawText);
+          } catch {
+            if (uploadRes.status === 413) {
+              throw new Error(
+                `"${doc.name}" exceeds the server upload limit (max 5 MB). Please compress the file and try again.`
+              );
+            }
+            throw new Error(`Upload failed for "${doc.name}" (Server responded with HTTP ${uploadRes.status}).`);
+          }
+
+          if (!uploadRes.ok || !uploadJson?.success || !uploadJson.document) {
+            throw new Error(uploadJson?.message || `Failed to upload "${doc.name}". Please try again.`);
+          }
+
+          stagedDocsMap[doc.id] = uploadJson.document;
+          setUploadedDocs((prev) => ({ ...prev, [doc.id]: uploadJson.document }));
+        }
+      }
+
+      setUploadProgressText('Submitting application details…');
+
+      // 2. Prepare lightweight JSON payload referencing verified uploaded documents (~5-10 KB total payload)
       const payload = {
         ...form,
         isGovtSchool: form.isGovtSchool === 'yes',
@@ -292,36 +417,32 @@ export default function BioDataPage() {
         studentMobile: form.studentMobile.replace(/[\s-]/g, '').replace(/^(\+91|91|0)(?=\d{10}$)/, ''),
         fatherMobile: form.fatherMobile.replace(/[\s-]/g, '').replace(/^(\+91|91|0)(?=\d{10}$)/, ''),
         motherMobile: form.motherMobile.replace(/[\s-]/g, '').replace(/^(\+91|91|0)(?=\d{10}$)/, ''),
+        documents: form.documents,
+        uploadedDocuments: Object.values(stagedDocsMap),
       };
-
-      const formData = new FormData();
-      for (const [key, value] of Object.entries(payload)) {
-        if (key === 'documents') {
-          for (const doc of value) {
-            formData.append('documents', doc);
-          }
-        } else {
-          formData.append(key, value);
-        }
-      }
-
-      // Attach all selected mandatory document files
-      for (const doc of DOCUMENT_OPTIONS) {
-        if (form.documents.includes(doc.name)) {
-          const fileEntry = selectedFiles[doc.id];
-          if (fileEntry && fileEntry.file) {
-            formData.append(`file_${doc.id}`, fileEntry.file, fileEntry.name);
-          }
-        }
-      }
 
       const res = await fetch('/api/biodata/submit', {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Submission failed');
+      const resText = await res.text();
+      let data;
+      try {
+        data = JSON.parse(resText);
+      } catch {
+        if (res.status === 413) {
+          throw new Error('Application payload exceeds allowed size limit. Please try again.');
+        }
+        throw new Error(`Submission failed (Server responded with HTTP ${res.status}).`);
+      }
+
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.message || 'Submission failed. Please check the form and try again.');
+      }
 
       setSubmitted(true);
       router.push(`/payment?ref=${data.id}`);
@@ -329,6 +450,7 @@ export default function BioDataPage() {
       setError(err.message || 'An unexpected error occurred. Please try again.');
     } finally {
       setSubmitting(false);
+      setUploadProgressText('');
     }
   };
 
@@ -1056,7 +1178,7 @@ export default function BioDataPage() {
                     {submitting ? (
                       <>
                         <FaSpinner className="animate-spin text-sm" />
-                        <span>Submitting BioData…</span>
+                        <span>{uploadProgressText || 'Submitting BioData…'}</span>
                       </>
                     ) : (
                       <>

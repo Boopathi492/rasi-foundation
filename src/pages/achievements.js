@@ -183,12 +183,13 @@ export default function Achievements() {
 
                 <div className="relative overflow-hidden rounded-3xl border border-white/80 bg-white p-3 shadow-[0_20px_50px_rgba(7,85,68,0.14)] backdrop-blur-md">
                   <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-brand-50">
-                    <BannerCrop
-                      src="/images/banners/hero-5-students-today-leaders-tomorrow.png"
-                      alt="Students celebrating their educational admissions with Rasi Foundation"
-                      region={{ x: 1250, y: 80, w: 520, h: 390 }}
+                    <Image
+                      src="/images/achievements/achievements-hero-celebration.webp"
+                      alt="A radiant student celebrating graduation with diploma"
+                      fill
                       sizes="(min-width: 1024px) 30vw, 90vw"
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover object-center"
+                      priority
                     />
                     <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-forest shadow">

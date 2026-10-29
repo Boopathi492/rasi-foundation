@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   FaMapMarkerAlt, FaUniversity, FaCode, FaGraduationCap, FaFemale, FaArrowRight, FaTimes, FaSearch, FaCalendarCheck, FaGlobe, FaExternalLinkAlt
 } from 'react-icons/fa';
@@ -1141,13 +1142,16 @@ export default function Colleges({ collegesData }) {
         }
         aside={
           <Reveal className="relative">
-            <BannerCrop
-              src="/images/banners/hero-5-students-today-leaders-tomorrow.png"
-              alt="Students walking together on a college campus"
-              region={{ x: 900, y: 80, w: 640, h: 560 }}
-              sizes="(min-width: 1024px) 40vw, 90vw"
-              className="aspect-[8/7] rounded-[2.5rem] shadow-card-hover ring-8 ring-white/20"
-            />
+            <div className="relative aspect-[8/7] w-full overflow-hidden rounded-[2.5rem] shadow-card-hover ring-8 ring-white/20">
+              <Image
+                src="/images/colleges/colleges-header-campus.webp"
+                alt="Students walking on a premier college campus"
+                fill
+                sizes="(min-width: 1024px) 40vw, 90vw"
+                className="h-full w-full object-cover object-center"
+                priority
+              />
+            </div>
           </Reveal>
         }
       >

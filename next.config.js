@@ -41,9 +41,26 @@ const nextConfig = {
   // Powered by header removal for security
   poweredByHeader: false,
   
-  // Cache headers for static assets
+  // Cache headers for static assets and CORS headers for web manifest
   async headers() {
     return [
+      {
+        source: '/site.webmanifest',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, OPTIONS',
+          },
+          {
+            key: 'Content-Type',
+            value: 'application/manifest+json; charset=utf-8',
+          },
+        ],
+      },
       {
         source: '/:all*(svg|jpg|jpeg|png|webp|gif|ico|woff|woff2)',
         headers: [
@@ -55,6 +72,6 @@ const nextConfig = {
       },
     ];
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
