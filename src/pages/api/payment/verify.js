@@ -4,6 +4,7 @@ import dbConnect from '../../../backend/lib/mongodb.js';
 import Payment from '../../../backend/models/Payment.js';
 import BioData from '../../../backend/models/BioData.js';
 import { rateLimiter } from '../../../backend/lib/rateLimit.js';
+import { getRazorpayCredentials } from '../../../backend/lib/razorpay.js';
 
 const limiter = rateLimiter({ windowMs: 60_000, max: 30 });
 
@@ -39,7 +40,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, message: 'Razorpay signature is required' });
     }
 
-    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    const creds = getRazorpayCredentials();
+    const keySecret = creds.keySecret;
     if (!keySecret) {
       console.error('[Payment Verify] RAZORPAY_KEY_SECRET is not configured');
       return res.status(500).json({ success: false, message: 'Payment gateway configuration error' });

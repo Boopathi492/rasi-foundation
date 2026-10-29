@@ -1,7 +1,7 @@
-import Razorpay from 'razorpay';
 import dbConnect from './mongodb.js';
 import Payment from '../models/Payment.js';
 import BioData from '../models/BioData.js';
+import { getRazorpayClient, getRazorpayCredentials } from './razorpay.js';
 
 /**
  * Reconciles a single payment record against Razorpay gateway status.
@@ -19,13 +19,12 @@ export async function reconcilePaymentOrder(razorpayOrderId) {
     return { success: true, message: 'Already marked completed', payment };
   }
 
-  const keyId = process.env.RAZORPAY_KEY_ID;
-  const keySecret = process.env.RAZORPAY_KEY_SECRET;
-  if (!keyId || !keySecret) {
+  const creds = getRazorpayCredentials();
+  if (!creds.configured) {
     return { success: false, message: 'Razorpay credentials not configured' };
   }
 
-  const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
+  const razorpay = getRazorpayClient();
 
   try {
     const orderData = await razorpay.orders.fetch(razorpayOrderId);

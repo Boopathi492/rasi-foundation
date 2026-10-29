@@ -1,10 +1,10 @@
-import Razorpay from 'razorpay';
 import dbConnect from '../../../../backend/lib/mongodb.js';
 import { withAuth } from '../../../../backend/lib/auth.js';
 import { can } from '../../../../backend/lib/rbac.js';
 import { recordAudit } from '../../../../backend/lib/apiHandler.js';
 import Payment from '../../../../backend/models/Payment.js';
 import { rateLimiter } from '../../../../backend/lib/rateLimit.js';
+import { getRazorpayClient, getRazorpayCredentials } from '../../../../backend/lib/razorpay.js';
 
 const limiter = rateLimiter({ windowMs: 60_000, max: 20 });
 
@@ -71,13 +71,12 @@ async function handler(req, res) {
       });
     }
 
-    const keyId = process.env.RAZORPAY_KEY_ID;
-    const keySecret = process.env.RAZORPAY_KEY_SECRET;
-    if (!keyId || !keySecret) {
+    const creds = getRazorpayCredentials();
+    if (!creds.configured) {
       return res.status(500).json({ message: 'Razorpay gateway credentials are not configured' });
     }
 
-    const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
+    const razorpay = getRazorpayClient();
 
     // 3. Initiate Refund via official Razorpay SDK
     const refundPayload = {
