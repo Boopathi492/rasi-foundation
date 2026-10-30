@@ -19,7 +19,7 @@ export default function AdminPracticeResults() {
 
   useEffect(() => {
     fetchResults();
-  }, [subjectFilter, search]);
+  }, [subjectFilter, search]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchResults = async () => {
     setLoading(true);

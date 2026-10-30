@@ -121,6 +121,7 @@ export default function Testimonials({ data = TESTIMONIALS, showEmptyState = fal
                       src={item.photo}
                       alt={item.name}
                       loading="lazy"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                       className="h-10 w-10 rounded-full object-cover ring-1 ring-gray-200"
                     />
                   ) : (

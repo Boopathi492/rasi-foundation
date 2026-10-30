@@ -60,7 +60,6 @@ function PageTransitionLoader({ visible, showBadge }) {
                   alt="Rasi Foundation"
                   width={44}
                   height={44}
-                  priority
                   className="h-full w-full rounded-full object-contain"
                 />
               </span>

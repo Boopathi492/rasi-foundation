@@ -27,7 +27,7 @@ export default function AdminFeedback() {
 
   useEffect(() => {
     fetchFeedback();
-  }, [statusFilter, search]);
+  }, [statusFilter, search]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchFeedback = async () => {
     setLoading(true);

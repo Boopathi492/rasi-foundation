@@ -26,7 +26,7 @@ const WomenCollegesScroller = () => {
                 if (womenData) {
                     const formattedColleges = womenData.colleges.map((college, idx) => ({
                         ...college,
-                        color: colors[idx % colors.length]
+                        color: COLORS[idx % COLORS.length]
                     }));
                     setColleges(formattedColleges);
                 }

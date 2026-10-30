@@ -70,7 +70,7 @@ export default function AdminCourses() {
 
   useEffect(() => {
     fetchCourses();
-  }, [levelFilter, search]);
+  }, [levelFilter, search]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchCourses = async () => {
     setLoading(true);

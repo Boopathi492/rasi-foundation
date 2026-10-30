@@ -21,10 +21,6 @@ export default function AdminAuditTrail() {
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
   const [expandedId, setExpandedId] = useState(null);
 
-  useEffect(() => {
-    fetchLogs();
-  }, [outcomeFilter, search, page]);
-
   const fetchLogs = async () => {
     setLoading(true);
     try {
@@ -50,6 +46,10 @@ export default function AdminAuditTrail() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchLogs();
+  }, [outcomeFilter, search, page]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);

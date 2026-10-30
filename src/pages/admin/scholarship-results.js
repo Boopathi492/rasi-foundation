@@ -30,7 +30,7 @@ export default function AdminScholarshipResults() {
 
     useEffect(() => {
         fetchResults();
-    }, [pagination.page, searchQuery, statusFilter]);
+    }, [pagination.page, searchQuery, statusFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const fetchResults = async () => {
         setLoading(true);

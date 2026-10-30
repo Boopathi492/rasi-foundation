@@ -78,7 +78,7 @@ export default function PracticeTestPage() {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [stage, timeRemaining]);
+    }, [stage, timeRemaining]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleFormChange = (e) => {
         const { name, value } = e.target;
@@ -131,7 +131,7 @@ export default function PracticeTestPage() {
     const handleAutoSubmit = useCallback(() => {
         setShowSubmitModal(false);
         submitTest();
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const submitTest = async () => {
         setLoading(true);

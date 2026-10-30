@@ -4,7 +4,7 @@ import dbConnect from '../../../backend/lib/mongodb.js';
 import Payment from '../../../backend/models/Payment.js';
 import BioData from '../../../backend/models/BioData.js';
 import { rateLimiter } from '../../../backend/lib/rateLimit.js';
-import { getRazorpayCredentials } from '../../../backend/lib/razorpay.js';
+import { getRazorpayCredentials, getRazorpayClient } from '../../../backend/lib/razorpay.js';
 
 const limiter = rateLimiter({ windowMs: 60_000, max: 30 });
 
@@ -79,11 +79,10 @@ export default async function handler(req, res) {
     }
 
     // 4. Query authoritative payment state from Razorpay API
-    const keyId = process.env.RAZORPAY_KEY_ID;
-    const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
     let rzpPayment = null;
 
     try {
+      const razorpay = getRazorpayClient();
       rzpPayment = await razorpay.payments.fetch(razorpay_payment_id);
     } catch (fetchErr) {
       console.error('[Payment Verify] Failed to fetch payment from Razorpay API:', fetchErr.message);

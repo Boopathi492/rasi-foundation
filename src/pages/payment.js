@@ -134,13 +134,20 @@ export default function PaymentPage({ purposes = FALLBACK_PURPOSES, initialStude
       }
 
       // 2. Configure official Razorpay Checkout modal
+      // In production HTTPS, supply the absolute public URL with CORS headers.
+      // In local development (HTTP), omit image so Razorpay uses the dashboard logo
+      // without triggering mixed-content or CORS issues on http://localhost.
+      const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+      const origin = typeof window !== 'undefined' && window.location.origin ? window.location.origin : '';
+      const checkoutImage = isHttps && origin ? `${origin}/rasi-logo.png` : undefined;
+
       const options = {
         key: orderData.key,
         amount: orderData.order.amount,
         currency: orderData.order.currency,
         name: 'RASI Foundation',
         description: selectedPurpose?.label || 'Educational Fee',
-        image: '/logo.png',
+        ...(checkoutImage ? { image: checkoutImage } : {}),
         order_id: orderData.order.id,
         prefill: {
           name: form.name.trim(),
@@ -215,7 +222,7 @@ export default function PaymentPage({ purposes = FALLBACK_PURPOSES, initialStude
         <title>Secure Payment Portal — Rasi Foundation</title>
         <meta name="description" content="Secure online payment for Rasi Foundation educational and counseling services." />
       </Head>
-      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
 
       <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 py-8">
         <div className="bg-white rounded-3xl shadow-xl w-full max-w-4xl overflow-hidden flex flex-col md:flex-row border border-slate-200/80">

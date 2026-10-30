@@ -525,6 +525,54 @@ test('Razorpay Payment Order Creation — Comprehensive Robustness Suite', async
     }
   });
 
+  await t.test('9. Database Persistence Failure Handling during Order Creation', async () => {
+    const origCreate = Payment.create;
+    const origAddResources = Razorpay.prototype.addResources;
+
+    Razorpay.prototype.addResources = function () {
+      origAddResources.call(this);
+      this.orders = {
+        create: async (opts) => ({
+          id: `order_DBFAIL_${Date.now()}`,
+          amount: opts.amount,
+          currency: opts.currency,
+          receipt: opts.receipt,
+        }),
+      };
+    };
+
+    // Simulate database failure during payment document persistence
+    Payment.create = async () => {
+      const err = new Error('Database server selection timed out');
+      err.name = 'MongooseServerSelectionError';
+      throw err;
+    };
+
+    try {
+      const res = createMockRes();
+      await createOrderHandler({
+        method: 'POST',
+        headers: { 'x-forwarded-for': '127.0.0.115' },
+        body: {
+          purpose: 'counseling',
+          amount: 500,
+          name: 'Student Db Fail',
+          email: 'student@example.com',
+          phone: '9876543210',
+        },
+      }, res);
+
+      assert.equal(res.statusCode, 500);
+      assert.equal(res.data.success, false);
+      assert.equal(res.data.stage, 'db_payment_persist');
+      assert.equal(res.data.code, 'DB_CONNECTION_ERROR');
+      assert.match(res.data.message, /Database service error/i);
+    } finally {
+      Payment.create = origCreate;
+      Razorpay.prototype.addResources = origAddResources;
+    }
+  });
+
   t.after(async () => {
     try {
       await mongoose.disconnect();

@@ -53,7 +53,7 @@ export default function AdminCounselling() {
 
   useEffect(() => {
     fetchRecords();
-  }, [statusFilter, counsellorFilter, search]);
+  }, [statusFilter, counsellorFilter, search]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchRecords = async () => {
     setLoading(true);

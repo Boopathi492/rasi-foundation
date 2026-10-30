@@ -65,6 +65,14 @@ const nextConfig = {
         source: '/:all*(svg|jpg|jpeg|png|webp|gif|ico|woff|woff2)',
         headers: [
           {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, OPTIONS',
+          },
+          {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
           },

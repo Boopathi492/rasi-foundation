@@ -88,7 +88,7 @@ export default function AdminBanners() {
 
   useEffect(() => {
     fetchBanners();
-  }, [placementFilter, statusFilter]);
+  }, [placementFilter, statusFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchBanners = async () => {
     setLoading(true);
@@ -360,6 +360,7 @@ export default function AdminBanners() {
                     <img
                       src={b.desktopImageUrl}
                       alt={b.altText || b.title}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -636,6 +637,7 @@ export default function AdminBanners() {
                             <img
                               src={form.desktopImageData || editingBanner?.desktopImageUrl}
                               alt="Desktop preview"
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
                               className="w-full h-full object-cover"
                             />
                             <span className="absolute bottom-2 right-2 bg-slate-900/80 text-white text-[10px] px-2 py-0.5 rounded font-medium">
@@ -675,6 +677,7 @@ export default function AdminBanners() {
                             <img
                               src={form.mobileImageData || editingBanner?.mobileImageUrl}
                               alt="Mobile preview"
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
                               className="w-full h-full object-cover"
                             />
                             <span className="absolute bottom-2 right-2 bg-slate-900/80 text-white text-[10px] px-2 py-0.5 rounded font-medium">

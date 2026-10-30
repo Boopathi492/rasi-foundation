@@ -565,4 +565,5 @@ export const zoologyQuestions = [
     },
 ];
 
-export default { botanyQuestions, zoologyQuestions };
+const biologyQuestions = { botanyQuestions, zoologyQuestions };
+export default biologyQuestions;

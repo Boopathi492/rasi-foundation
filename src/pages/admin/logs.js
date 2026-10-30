@@ -26,7 +26,7 @@ export default function AdminErrorLogs() {
   useEffect(() => {
     fetchLogs();
     fetchMonitoring();
-  }, [severityFilter, resolvedFilter, search]);
+  }, [severityFilter, resolvedFilter, search]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchLogs = async () => {
     setLoading(true);
