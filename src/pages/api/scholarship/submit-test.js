@@ -1,5 +1,6 @@
 import dbConnect from '@/lib/mongodb';
 import ScholarshipStudent from '@/models/ScholarshipStudent';
+import ScholarshipQuestion from '@/models/ScholarshipQuestion';
 import TestSession from '@/models/TestSession';
 
 export default async function handler(req, res) {
@@ -29,39 +30,121 @@ export default async function handler(req, res) {
             });
         }
 
-        // Check if already submitted
+        // If already submitted, return current result idempotently
         if (testSession.status === 'completed') {
-            return res.status(400).json({
-                success: false,
-                message: 'Examination has already been submitted',
+            const subjectScores = [];
+            testSession.subjects.forEach(subject => {
+                const subjectQuestions = testSession.questions.filter(q => q.subject === subject).length || 20;
+                const correctCount = testSession.subjectWiseScore?.[subject] || 0;
+                subjectScores.push({
+                    subject,
+                    correct: correctCount,
+                    total: subjectQuestions,
+                    percentage: subjectQuestions > 0 ? Math.round((correctCount / subjectQuestions) * 100) : 0,
+                });
+            });
+
+            return res.status(200).json({
+                success: true,
+                message: 'Examination already submitted',
+                data: {
+                    sessionId: testSession._id,
+                    totalQuestions: testSession.totalQuestions || 60,
+                    attemptedQuestions: testSession.attemptedQuestions,
+                    unattemptedQuestions: testSession.unattemptedQuestions || ((testSession.totalQuestions || 60) - testSession.attemptedQuestions),
+                    correctAnswers: testSession.correctAnswers,
+                    wrongAnswers: testSession.wrongAnswers || (testSession.attemptedQuestions - testSession.correctAnswers),
+                    score: testSession.score,
+                    percentage: testSession.percentage || Math.round((testSession.score / (testSession.totalQuestions || 60)) * 100),
+                    subjectWiseScores: subjectScores,
+                    timeTaken: {
+                        start: testSession.startTime,
+                        end: testSession.endTime,
+                        durationMinutes: Math.round(((testSession.endTime || new Date()) - testSession.startTime) / 60000),
+                    },
+                },
             });
         }
+
+        // Authoritative re-evaluation of all answers
+        const questionIds = testSession.questions.map(q => q.questionId);
+        const questionsInDb = await ScholarshipQuestion.find({ _id: { $in: questionIds } });
+        const questionMap = new Map(questionsInDb.map(q => [q._id.toString(), q]));
+
+        let calculatedScore = 0;
+        let calculatedCorrect = 0;
+        let calculatedAttempted = 0;
+        const subjectWiseMap = {};
+
+        testSession.subjects.forEach(s => {
+            subjectWiseMap[s] = 0;
+        });
+
+        testSession.answers.forEach(ans => {
+            if (ans.selectedAnswer) {
+                calculatedAttempted++;
+                const fullQ = questionMap.get(ans.questionId.toString());
+                const sessionQ = testSession.questions.find(sq => sq.questionId.toString() === ans.questionId.toString());
+
+                if (fullQ) {
+                    let originalSelected = ans.selectedAnswer;
+                    if (sessionQ && Array.isArray(sessionQ.shuffledOptions) && sessionQ.shuffledOptions.length === 4) {
+                        const perm = sessionQ.shuffledOptions.find(o => o.displayLabel === ans.selectedAnswer);
+                        if (perm) {
+                            originalSelected = perm.originalLabel;
+                        }
+                    }
+
+                    const isCorrect = originalSelected === fullQ.correctAnswer;
+                    ans.isCorrect = isCorrect;
+
+                    if (isCorrect) {
+                        calculatedCorrect++;
+                        calculatedScore += (fullQ.marks || 1);
+                        const sub = ans.subject || fullQ.subject;
+                        subjectWiseMap[sub] = (subjectWiseMap[sub] || 0) + 1;
+                    }
+                }
+            } else {
+                ans.isCorrect = false;
+            }
+        });
+
+        const totalQ = testSession.totalQuestions || testSession.questions.length || 60;
+        const calculatedUnattempted = Math.max(0, totalQ - calculatedAttempted);
+        const calculatedWrong = Math.max(0, calculatedAttempted - calculatedCorrect);
+        const calculatedPercentage = totalQ > 0 ? Math.round((calculatedScore / totalQ) * 100) : 0;
 
         // Mark test as completed
         testSession.status = 'completed';
         testSession.endTime = new Date();
+        testSession.score = calculatedScore;
+        testSession.correctAnswers = calculatedCorrect;
+        testSession.attemptedQuestions = calculatedAttempted;
+        testSession.unattemptedQuestions = calculatedUnattempted;
+        testSession.wrongAnswers = calculatedWrong;
+        testSession.percentage = calculatedPercentage;
+        testSession.subjectWiseScore = subjectWiseMap;
 
-        // Score calculation happens in pre-save hook
         await testSession.save();
 
         // Update student record
         await ScholarshipStudent.findByIdAndUpdate(testSession.studentId, {
             testStatus: 'completed',
             testEndTime: new Date(),
+            testScore: calculatedScore,
         });
 
         // Prepare subject scores
         const subjectScores = [];
         testSession.subjects.forEach(subject => {
-            const subjectQuestions = testSession.questions.filter(q => q.subject === subject).length;
-            const correctCount = testSession.subjectWiseScore?.[subject] || 0;
+            const subjectQuestions = testSession.questions.filter(q => q.subject === subject).length || 20;
+            const correctCount = subjectWiseMap[subject] || 0;
             subjectScores.push({
                 subject,
                 correct: correctCount,
-                total: subjectQuestions || 20,
-                percentage: subjectQuestions > 0
-                    ? Math.round((correctCount / subjectQuestions) * 100)
-                    : 0,
+                total: subjectQuestions,
+                percentage: subjectQuestions > 0 ? Math.round((correctCount / subjectQuestions) * 100) : 0,
             });
         });
 
@@ -69,20 +152,19 @@ export default async function handler(req, res) {
             success: true,
             message: 'Examination submitted successfully!',
             data: {
-                totalQuestions: testSession.totalQuestions || 60,
-                attemptedQuestions: testSession.attemptedQuestions,
-                correctAnswers: testSession.correctAnswers,
-                score: testSession.score,
-                percentage: testSession.totalQuestions > 0
-                    ? Math.round((testSession.score / testSession.totalQuestions) * 100)
-                    : 0,
+                sessionId: testSession._id,
+                totalQuestions: totalQ,
+                attemptedQuestions: calculatedAttempted,
+                unattemptedQuestions: calculatedUnattempted,
+                correctAnswers: calculatedCorrect,
+                wrongAnswers: calculatedWrong,
+                score: calculatedScore,
+                percentage: calculatedPercentage,
                 subjectWiseScores: subjectScores,
                 timeTaken: {
                     start: testSession.startTime,
                     end: testSession.endTime,
-                    durationMinutes: Math.round(
-                        (testSession.endTime - testSession.startTime) / 60000
-                    ),
+                    durationMinutes: Math.round((testSession.endTime - testSession.startTime) / 60000),
                 },
             },
         });

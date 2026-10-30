@@ -70,9 +70,9 @@ export default async function handler(req, res) {
             questionMap[q._id.toString()] = q;
         });
 
-        const isTamil = testSession.language === 'Tamil';
+        const isTamil = (testSession.medium || testSession.language) === 'Tamil';
 
-        // Build ordered question list
+        // Build ordered question list with server-mapped randomized options
         const orderedQuestions = testSession.questions.map((q, index) => {
             const fullQuestion = questionMap[q.questionId?.toString()];
             if (!fullQuestion) return null;
@@ -84,16 +84,34 @@ export default async function handler(req, res) {
             // Select language-specific content
             const useTamil = isTamil && fullQuestion.questionTextTamil && fullQuestion.optionsTamil && fullQuestion.optionsTamil.length === 4;
             const questionText = useTamil ? fullQuestion.questionTextTamil : fullQuestion.questionText;
-            const options = useTamil ? fullQuestion.optionsTamil : fullQuestion.options;
+            const rawOptions = useTamil ? fullQuestion.optionsTamil : fullQuestion.options;
+
+            // Map options using stored session option permutation
+            let mappedOptions = [];
+            if (Array.isArray(q.shuffledOptions) && q.shuffledOptions.length === 4) {
+                mappedOptions = q.shuffledOptions.map(perm => {
+                    const foundOpt = rawOptions.find(o => o.label === perm.originalLabel);
+                    return {
+                        label: perm.displayLabel, // 'A', 'B', 'C', 'D'
+                        text: foundOpt ? foundOpt.text : '',
+                    };
+                });
+            } else {
+                mappedOptions = rawOptions.map(o => ({ label: o.label, text: o.text }));
+            }
 
             return {
                 index: index + 1,
                 id: fullQuestion._id,
+                code: fullQuestion.code,
                 subject: q.subject || fullQuestion.subject,
+                topic: fullQuestion.topic,
+                difficulty: fullQuestion.difficulty,
                 questionText,
-                options,
+                options: mappedOptions,
                 isTamil: Boolean(useTamil),
                 selectedAnswer: existingAnswer?.selectedAnswer || null,
+                markedForReview: Boolean(q.markedForReview),
             };
         }).filter(Boolean);
 
@@ -108,7 +126,7 @@ export default async function handler(req, res) {
             data: {
                 sessionId: testSession._id,
                 subjects: testSession.subjects,
-                language: testSession.language || 'English',
+                language: testSession.medium || testSession.language || 'English',
                 pageSize: testSession.pageSize || 5,
                 totalQuestions: orderedQuestions.length,
                 questions: orderedQuestions,
@@ -122,6 +140,7 @@ export default async function handler(req, res) {
                 },
                 progress: {
                     answered: testSession.answers.filter(a => a.selectedAnswer !== null && a.selectedAnswer !== '').length,
+                    markedForReview: testSession.questions.filter(q => q.markedForReview).length,
                     total: orderedQuestions.length,
                 },
             },

@@ -1,12 +1,13 @@
 import dbConnect from '@/lib/mongodb';
 import PracticeTestResult from '@/models/PracticeTestResult';
+import ScholarshipQuestion from '@/models/ScholarshipQuestion';
 import { physicsQuestions } from '@/data/practiceQuestions';
 import { chemistryQuestions } from '@/data/chemistryQuestions';
 import { mathematicsQuestions } from '@/data/mathematicsQuestions';
 import { botanyQuestions, zoologyQuestions } from '@/data/biologyQuestions';
 
-// Combined question map for all subjects
-const allQuestions = [
+// Combined question map for static fallback
+const allStaticQuestions = [
     ...physicsQuestions,
     ...chemistryQuestions,
     ...mathematicsQuestions,
@@ -20,6 +21,8 @@ export default async function handler(req, res) {
     }
 
     try {
+        await dbConnect();
+
         const {
             studentName,
             email,
@@ -37,10 +40,21 @@ export default async function handler(req, res) {
             });
         }
 
-        // Create a map of questions for quick lookup
-        const questionMap = {};
-        allQuestions.forEach(q => {
-            questionMap[q.id] = q;
+        // Map static questions
+        const staticMap = {};
+        allStaticQuestions.forEach(q => {
+            staticMap[q.id] = q;
+        });
+
+        // Also query DB questions for any question IDs passed in answers
+        const questionIds = answers.map(a => a.questionId).filter(Boolean);
+        const dbQuestions = await ScholarshipQuestion.find({
+            _id: { $in: questionIds.filter(id => id.length === 24) }
+        }).lean();
+
+        const dbMap = {};
+        dbQuestions.forEach(q => {
+            dbMap[q._id.toString()] = q;
         });
 
         // Calculate results
@@ -49,7 +63,7 @@ export default async function handler(req, res) {
         let unansweredCount = 0;
 
         const processedAnswers = answers.map(answer => {
-            const question = questionMap[answer.questionId];
+            const question = dbMap[answer.questionId] || staticMap[answer.questionId];
             if (!question) {
                 return null;
             }
@@ -76,9 +90,6 @@ export default async function handler(req, res) {
         const score = correctCount;
         const percentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
 
-        // Connect to database and save result
-        await dbConnect();
-
         const practiceResult = await PracticeTestResult.create({
             studentName,
             email: email.toLowerCase(),
@@ -97,13 +108,14 @@ export default async function handler(req, res) {
 
         // Generate detailed result for response
         const detailedResults = processedAnswers.map(ans => {
-            const question = questionMap[ans.questionId];
+            const question = dbMap[ans.questionId] || staticMap[ans.questionId];
             return {
                 questionText: question?.questionText || '',
                 topic: question?.topic || '',
                 selectedAnswer: ans.selectedAnswer,
                 correctAnswer: ans.correctAnswer,
                 isCorrect: ans.isCorrect,
+                explanation: question?.explanation || '',
                 options: question?.options || [],
             };
         });
@@ -123,8 +135,7 @@ export default async function handler(req, res) {
                 score,
                 percentage,
                 timeTaken,
-                grade: getGrade(percentage),
-                details: detailedResults,
+                detailedResults,
             },
         });
 
@@ -136,14 +147,4 @@ export default async function handler(req, res) {
             error: process.env.NODE_ENV === 'development' ? error.message : undefined,
         });
     }
-}
-
-function getGrade(percentage) {
-    if (percentage >= 90) return { grade: 'A+', label: 'Excellent!', color: 'green' };
-    if (percentage >= 80) return { grade: 'A', label: 'Very Good!', color: 'green' };
-    if (percentage >= 70) return { grade: 'B+', label: 'Good!', color: 'blue' };
-    if (percentage >= 60) return { grade: 'B', label: 'Above Average', color: 'blue' };
-    if (percentage >= 50) return { grade: 'C', label: 'Average', color: 'yellow' };
-    if (percentage >= 40) return { grade: 'D', label: 'Below Average', color: 'orange' };
-    return { grade: 'F', label: 'Needs Improvement', color: 'red' };
 }

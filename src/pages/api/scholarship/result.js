@@ -102,6 +102,8 @@ export default async function handler(req, res) {
                         ? Math.round((testSession.score / testSession.totalQuestions) * 100)
                         : 0,
                     subjectWiseScores: subjectScores,
+                    optionalSubject: testSession.optionalSubject || student.thirdSubject,
+                    feedbackSubmitted: Boolean(testSession.feedbackSubmitted),
                     completedAt: testSession.endTime,
                     timeTaken: Math.round(
                         (testSession.endTime - testSession.startTime) / 60000

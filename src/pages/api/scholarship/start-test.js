@@ -7,6 +7,80 @@ import TestSession from '@/models/TestSession';
 const QUESTIONS_PER_SUBJECT = 20;
 const TEST_DURATION_MINUTES = 90;
 
+// Target difficulty distribution per 20 questions: 7 easy, 9 medium, 4 hard
+const DIFFICULTY_TARGETS = {
+    easy: 7,
+    medium: 9,
+    hard: 4,
+};
+
+// Fisher-Yates array shuffle helper
+function shuffleArray(arr) {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+}
+
+// Generate randomized option mapping (A, B, C, D)
+function generateShuffledOptions() {
+    const originalLabels = ['A', 'B', 'C', 'D'];
+    const shuffled = shuffleArray(originalLabels);
+    return [
+        { displayLabel: 'A', originalLabel: shuffled[0] },
+        { displayLabel: 'B', originalLabel: shuffled[1] },
+        { displayLabel: 'C', originalLabel: shuffled[2] },
+        { displayLabel: 'D', originalLabel: shuffled[3] },
+    ];
+}
+
+// Select balanced 20 questions for a subject
+async function selectBalancedQuestions(subjectName) {
+    const matchQuery = {
+        isActive: true,
+        subject: subjectName === 'Biology'
+            ? { $in: ['Biology', 'Botany', 'Zoology'] }
+            : subjectName,
+    };
+
+    const selected = [];
+    const selectedIds = new Set();
+
+    // Fetch by difficulty buckets
+    for (const [diff, targetCount] of Object.entries(DIFFICULTY_TARGETS)) {
+        const diffQuestions = await ScholarshipQuestion.aggregate([
+            { $match: { ...matchQuery, difficulty: diff, _id: { $nin: Array.from(selectedIds) } } },
+            { $sample: { size: targetCount } },
+            { $project: { _id: 1, subject: 1, difficulty: 1, code: 1 } },
+        ]);
+
+        diffQuestions.forEach(q => {
+            selected.push(q);
+            selectedIds.add(q._id.toString());
+        });
+    }
+
+    // If any bucket fell short, fill remaining from available active questions
+    if (selected.length < QUESTIONS_PER_SUBJECT) {
+        const remainingNeeded = QUESTIONS_PER_SUBJECT - selected.length;
+        const fillQuestions = await ScholarshipQuestion.aggregate([
+            { $match: { ...matchQuery, _id: { $nin: Array.from(selectedIds) } } },
+            { $sample: { size: remainingNeeded } },
+            { $project: { _id: 1, subject: 1, difficulty: 1, code: 1 } },
+        ]);
+
+        fillQuestions.forEach(q => {
+            selected.push(q);
+            selectedIds.add(q._id.toString());
+        });
+    }
+
+    // Shuffle question order within the subject
+    return shuffleArray(selected).slice(0, QUESTIONS_PER_SUBJECT);
+}
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, message: 'Method not allowed' });
@@ -31,19 +105,19 @@ export default async function handler(req, res) {
             });
         }
 
-        // Validate elective subject
-        const validSubjects = ['Mathematics', 'Biology', 'Botany', 'Zoology'];
-        if (!validSubjects.includes(thirdSubject)) {
+        // Validate elective subject: strictly Mathematics OR Biology
+        const normalizedElective = thirdSubject === 'Mathematics' ? 'Mathematics' : (thirdSubject === 'Biology' ? 'Biology' : null);
+        if (!normalizedElective) {
             return res.status(400).json({
                 success: false,
-                message: 'Invalid elective subject selected. Choose Mathematics or Biology.',
+                message: 'Invalid elective subject selected. You must choose either Mathematics or Biology.',
             });
         }
 
         const validLanguage = language === 'Tamil' ? 'Tamil' : 'English';
         const validPageSize = Number(pageSize) === 10 ? 10 : 5;
 
-        // Find student
+        // Find candidate student
         const student = await ScholarshipStudent.findOne({ registrationToken });
         if (!student) {
             return res.status(404).json({
@@ -53,7 +127,7 @@ export default async function handler(req, res) {
         }
 
         // Vocational students can only select Mathematics
-        if (student.plus2Group === 'Vocational' && thirdSubject !== 'Mathematics') {
+        if (student.plus2Group === 'Vocational' && normalizedElective !== 'Mathematics') {
             return res.status(400).json({
                 success: false,
                 message: 'Vocational group students must select Mathematics as elective subject',
@@ -72,7 +146,7 @@ export default async function handler(req, res) {
         let testSession = await TestSession.findOne({ registrationToken });
 
         if (testSession) {
-            // If test is in progress and not expired, return existing session
+            // If test is in progress and not expired, resume existing session idempotently
             if (testSession.status === 'in_progress') {
                 const endTime = new Date(testSession.startTime);
                 endTime.setMinutes(endTime.getMinutes() + testSession.duration);
@@ -86,6 +160,9 @@ export default async function handler(req, res) {
                             resuming: true,
                             language: testSession.language,
                             pageSize: testSession.pageSize || 5,
+                            subjects: testSession.subjects,
+                            startTime: testSession.startTime,
+                            totalQuestions: testSession.totalQuestions,
                         },
                     });
                 } else {
@@ -107,52 +184,40 @@ export default async function handler(req, res) {
             }
         }
 
-        // Update student's choice
-        student.thirdSubject = thirdSubject;
-        student.selectedElective = thirdSubject;
+        // Update student record
+        student.thirdSubject = normalizedElective;
+        student.selectedElective = normalizedElective;
         student.examLanguage = validLanguage;
         student.testStatus = 'in_progress';
         student.testStartTime = new Date();
         await student.save();
 
         // 3 examination subjects: Physics (20), Chemistry (20), Elective (20)
-        const subjects = ['Physics', 'Chemistry', thirdSubject];
+        const subjects = ['Physics', 'Chemistry', normalizedElective];
         const allQuestions = [];
+        const questionIdsToIncrement = [];
 
         for (const subject of subjects) {
-            let matchQuery = { isActive: true };
+            const subjectQuestions = await selectBalancedQuestions(subject);
 
-            if (subject === 'Biology') {
-                matchQuery.subject = { $in: ['Biology', 'Botany', 'Zoology'] };
-            } else {
-                matchQuery.subject = subject;
-            }
-
-            // Sample exactly 20 questions
-            let questions = await ScholarshipQuestion.aggregate([
-                { $match: matchQuery },
-                { $sample: { size: QUESTIONS_PER_SUBJECT } },
-                { $project: { _id: 1, subject: 1 } },
-            ]);
-
-            // Fallback: If not enough questions under specific match, get available questions
-            if (questions.length < QUESTIONS_PER_SUBJECT) {
-                const existingIds = questions.map(q => q._id);
-                const additional = await ScholarshipQuestion.find(
-                    { ...matchQuery, _id: { $nin: existingIds } },
-                    { _id: 1, subject: 1 }
-                ).limit(QUESTIONS_PER_SUBJECT - questions.length);
-                questions = [...questions, ...additional];
-            }
-
-            // Add order index
-            questions.forEach((q) => {
+            subjectQuestions.forEach((q) => {
+                questionIdsToIncrement.push(q._id);
                 allQuestions.push({
                     questionId: q._id,
-                    subject: subject, // normalize subject name
+                    subject: subject,
                     orderIndex: allQuestions.length,
+                    markedForReview: false,
+                    shuffledOptions: generateShuffledOptions(),
                 });
             });
+        }
+
+        // Track question usage count
+        if (questionIdsToIncrement.length > 0) {
+            ScholarshipQuestion.updateMany(
+                { _id: { $in: questionIdsToIncrement } },
+                { $inc: { usageCount: 1 } }
+            ).catch(err => console.error('Error incrementing usage count:', err));
         }
 
         // Create test session with authoritative server-side timing
@@ -160,6 +225,8 @@ export default async function handler(req, res) {
             studentId: student._id,
             registrationToken,
             subjects,
+            optionalSubject: normalizedElective,
+            medium: validLanguage,
             language: validLanguage,
             pageSize: validPageSize,
             questions: allQuestions,

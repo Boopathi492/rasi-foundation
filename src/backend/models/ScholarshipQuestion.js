@@ -1,19 +1,34 @@
 import mongoose from 'mongoose';
 
 const ScholarshipQuestionSchema = new mongoose.Schema({
+    code: {
+        type: String,
+        unique: true,
+        sparse: true,
+        trim: true,
+        index: true,
+    },
     subject: {
         type: String,
         required: [true, 'Please provide subject'],
         enum: ['Physics', 'Chemistry', 'Mathematics', 'Botany', 'Zoology', 'Biology'],
         index: true,
     },
+    topic: {
+        type: String,
+        default: 'General',
+        trim: true,
+        index: true,
+    },
     questionText: {
         type: String,
         required: [true, 'Please provide question text'],
+        trim: true,
     },
     questionTextTamil: {
         type: String,
         default: '',
+        trim: true,
     },
     options: {
         type: [{
@@ -25,6 +40,7 @@ const ScholarshipQuestionSchema = new mongoose.Schema({
             text: {
                 type: String,
                 required: true,
+                trim: true,
             }
         }],
         validate: {
@@ -44,6 +60,7 @@ const ScholarshipQuestionSchema = new mongoose.Schema({
             text: {
                 type: String,
                 required: true,
+                trim: true,
             }
         }],
         default: [],
@@ -57,28 +74,37 @@ const ScholarshipQuestionSchema = new mongoose.Schema({
         type: String,
         enum: ['easy', 'medium', 'hard'],
         default: 'medium',
+        index: true,
     },
     source: {
         type: String,
-        default: 'RASI Foundation',
+        default: 'RASI Foundation Question Bank (TN State Board / Higher Secondary)',
     },
     explanation: {
         type: String,
         default: '',
+        trim: true,
     },
     explanationTamil: {
         type: String,
         default: '',
+        trim: true,
     },
     language: {
         type: String,
         enum: ['English', 'Tamil', 'Bilingual'],
-        default: 'English',
+        default: 'Bilingual',
+        index: true,
+    },
+    usageCount: {
+        type: Number,
+        default: 0,
         index: true,
     },
     isActive: {
         type: Boolean,
         default: true,
+        index: true,
     },
     createdAt: {
         type: Date,
@@ -90,8 +116,14 @@ const ScholarshipQuestionSchema = new mongoose.Schema({
     },
 });
 
-// Index for efficient question selection
+// Indexes for efficient, fast randomized question selection and admin queries
 ScholarshipQuestionSchema.index({ subject: 1, isActive: 1, difficulty: 1 });
-ScholarshipQuestionSchema.index({ subject: 1, language: 1, isActive: 1 });
+ScholarshipQuestionSchema.index({ subject: 1, topic: 1, isActive: 1 });
+ScholarshipQuestionSchema.index({ subject: 1, usageCount: 1 });
+
+ScholarshipQuestionSchema.pre('save', function (next) {
+    this.updatedAt = new Date();
+    next();
+});
 
 export default mongoose.models.ScholarshipQuestion || mongoose.model('ScholarshipQuestion', ScholarshipQuestionSchema);

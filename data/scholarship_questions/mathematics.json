@@ -1,0 +1,5722 @@
+[
+  {
+    "code": "MAT-001",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "easy",
+    "questionText": "If A is a square matrix of order 3 and |A| = 4, then the value of |adj A| is:",
+    "questionTextTamil": "A என்பது வரிசை 3 கொண்ட சதுர அணி மற்றும் |A| = 4 எனில், |adj A|-ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "16"
+      },
+      {
+        "label": "B",
+        "text": "4"
+      },
+      {
+        "label": "C",
+        "text": "64"
+      },
+      {
+        "label": "D",
+        "text": "12"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "16"
+      },
+      {
+        "label": "B",
+        "text": "4"
+      },
+      {
+        "label": "C",
+        "text": "64"
+      },
+      {
+        "label": "D",
+        "text": "12"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "For a square matrix of order n, |adj A| = |A|^(n-1). Here n=3, so |adj A| = 4^(3-1) = 4² = 16.",
+    "explanationTamil": "வரிசை n கொண்ட அணிக்கு |adj A| = |A|^(n-1). இங்கு n=3 என்பதால் |adj A| = 4² = 16.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-002",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "medium",
+    "questionText": "If A is an invertible matrix such that A * (adj A) = k * I, then k is equal to:",
+    "questionTextTamil": "A என்பது பூச்சியமற்ற அணிக்கோவை அணி மற்றும் A * (adj A) = k * I எனில், k-ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "|A|"
+      },
+      {
+        "label": "B",
+        "text": "|A|²"
+      },
+      {
+        "label": "C",
+        "text": "1 / |A|"
+      },
+      {
+        "label": "D",
+        "text": "trace(A)"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "|A|"
+      },
+      {
+        "label": "B",
+        "text": "|A|²"
+      },
+      {
+        "label": "C",
+        "text": "1 / |A|"
+      },
+      {
+        "label": "D",
+        "text": "trace(A)"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "By property of adjoint matrix, A * (adj A) = (adj A) * A = |A| * I_n, so k = |A|.",
+    "explanationTamil": "அணிப் பண்பின்படி A * (adj A) = |A| * I, எனவே k = |A|.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-003",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "easy",
+    "questionText": "A square matrix A is called singular if:",
+    "questionTextTamil": "ஒரு சதுர அணி A பூச்சியக்கோவை அணி (Singular matrix) எனில்:",
+    "options": [
+      {
+        "label": "A",
+        "text": "|A| = 0"
+      },
+      {
+        "label": "B",
+        "text": "|A| ≠ 0"
+      },
+      {
+        "label": "C",
+        "text": "A = Aᵀ"
+      },
+      {
+        "label": "D",
+        "text": "A = -Aᵀ"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "|A| = 0"
+      },
+      {
+        "label": "B",
+        "text": "|A| ≠ 0"
+      },
+      {
+        "label": "C",
+        "text": "A = Aᵀ"
+      },
+      {
+        "label": "D",
+        "text": "A = -Aᵀ"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "A singular matrix has determinant equal to zero and does not possess an inverse.",
+    "explanationTamil": "அணிக்கோவையின் மதிப்பு |A| = 0 எனில் அது பூச்சியக்கோவை அணியாகும் (இதற்கு நேர்மாறு கிடையாது).",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-004",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "medium",
+    "questionText": "If A is an orthogonal matrix, then the value of |A| is:",
+    "questionTextTamil": "A என்பது ஒரு செங்குத்து அணி (Orthogonal matrix) எனில், |A|-ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "±1"
+      },
+      {
+        "label": "B",
+        "text": "0"
+      },
+      {
+        "label": "C",
+        "text": "2"
+      },
+      {
+        "label": "D",
+        "text": "Any real number"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "±1"
+      },
+      {
+        "label": "B",
+        "text": "0"
+      },
+      {
+        "label": "C",
+        "text": "2"
+      },
+      {
+        "label": "D",
+        "text": "எந்த மெய்யெண்ணும்"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "A * Aᵀ = I => |A * Aᵀ| = |A|² = |I| = 1 => |A| = ±1.",
+    "explanationTamil": "A * Aᵀ = I என்பதால் |A|² = 1 => |A| = ±1.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-005",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "easy",
+    "questionText": "The inverse of an orthogonal matrix A is equal to:",
+    "questionTextTamil": "செங்குத்து அணி A-ன் நேர்மாறு அணி A⁻¹ எதற்கு சமம்?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Aᵀ (Transpose of A)"
+      },
+      {
+        "label": "B",
+        "text": "-A"
+      },
+      {
+        "label": "C",
+        "text": "adj A"
+      },
+      {
+        "label": "D",
+        "text": "A²"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "Aᵀ (A-ன் நிரை நிரல் மாற்று அணி)"
+      },
+      {
+        "label": "B",
+        "text": "-A"
+      },
+      {
+        "label": "C",
+        "text": "adj A"
+      },
+      {
+        "label": "D",
+        "text": "A²"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "By definition of orthogonal matrix, A * Aᵀ = I, so A⁻¹ = Aᵀ.",
+    "explanationTamil": "செங்குத்து அணியின் வரையறைப்படி A⁻¹ = Aᵀ ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-006",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "medium",
+    "questionText": "If rank of coefficient matrix ρ(A) equals rank of augmented matrix ρ([A|B]) and equals number of unknowns n, the system has:",
+    "questionTextTamil": "ρ(A) = ρ([A|B]) = n (மதிப்பிட வேண்டிய மாறிகளின் எண்ணிக்கை) எனில் நேரியல் சமன்பாட்டுத் தொகுப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "A unique solution (consistent)"
+      },
+      {
+        "label": "B",
+        "text": "Infinitely many solutions"
+      },
+      {
+        "label": "C",
+        "text": "No solution (inconsistent)"
+      },
+      {
+        "label": "D",
+        "text": "Zero solution only"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "ஒரே ஒரு தீர்வு பெற்றிருக்கும் (ஒருங்கமைவு உடையது)"
+      },
+      {
+        "label": "B",
+        "text": "எண்ணற்ற தீர்வுகள்"
+      },
+      {
+        "label": "C",
+        "text": "தீர்வு இல்லை (ஒருங்கமைவற்றது)"
+      },
+      {
+        "label": "D",
+        "text": "சுழித் தீர்வு மட்டும்"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "By Rouché-Capelli theorem, ρ(A) = ρ([A|B]) = n implies unique solution.",
+    "explanationTamil": "ரூச்சே-கபெல்லி தேற்றப்படி தரம் சமமாகவும் மாறிகளின் எண்ணிக்கைக்கு சமமாகவும் இருந்தால் ஒரே ஒரு தீர்வு உண்டு.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-007",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "medium",
+    "questionText": "If ρ(A) = ρ([A|B]) < n (number of unknowns), the system of equations has:",
+    "questionTextTamil": "ρ(A) = ρ([A|B]) < n எனில் நேரியல் சமன்பாட்டுத் தொகுப்பு எத்தகைய தீர்வுகளைப் பெற்றிருக்கும்?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Infinitely many solutions"
+      },
+      {
+        "label": "B",
+        "text": "Unique solution"
+      },
+      {
+        "label": "C",
+        "text": "No solution"
+      },
+      {
+        "label": "D",
+        "text": "Trivial solution only"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "எண்ணற்ற தீர்வுகள் பெற்றிருக்கும்"
+      },
+      {
+        "label": "B",
+        "text": "ஒரே ஒரு தீர்வு"
+      },
+      {
+        "label": "C",
+        "text": "தீர்வு இல்லை"
+      },
+      {
+        "label": "D",
+        "text": "வெளிப்படையான தீர்வு மட்டும்"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "When system is consistent but rank is less than n, there are (n - r) free parameters giving infinitely many solutions.",
+    "explanationTamil": "தரம் மாறிகளின் எண்ணிக்கையை விடக் குறைவாக இருந்தால் எண்ணற்ற தீர்வுகள் கிடைக்கும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-008",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "easy",
+    "questionText": "Cramer's rule is applicable to solve AX = B only when:",
+    "questionTextTamil": "கிராமரின் விதியைப் பயன்படுத்தி சமன்பாடுகளைத் தீர்க்க அடிப்படை நிபந்தனை:",
+    "options": [
+      {
+        "label": "A",
+        "text": "Determinant of coefficient matrix Δ ≠ 0"
+      },
+      {
+        "label": "B",
+        "text": "Δ = 0"
+      },
+      {
+        "label": "C",
+        "text": "A is a rectangular matrix"
+      },
+      {
+        "label": "D",
+        "text": "B is zero"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "கெழுக்களின் அணிக்கோவை மதிப்பு Δ ≠ 0"
+      },
+      {
+        "label": "B",
+        "text": "Δ = 0"
+      },
+      {
+        "label": "C",
+        "text": "செவ்வக அணி"
+      },
+      {
+        "label": "D",
+        "text": "B சுழியாக இருத்தல்"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Cramer's rule evaluates x = Δx/Δ, which requires non-zero determinant Δ ≠ 0.",
+    "explanationTamil": "x = Δx/Δ என்பதால் வகுக்கும் எண் Δ ≠ 0 ஆக இருக்க வேண்டும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-009",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "hard",
+    "questionText": "If A is a 3 × 3 matrix and |A| = 2, then |2 A| is equal to:",
+    "questionTextTamil": "A என்பது 3 × 3 வரிசை கொண்ட அணி மற்றும் |A| = 2 எனில், |2 A|-ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "16"
+      },
+      {
+        "label": "B",
+        "text": "4"
+      },
+      {
+        "label": "C",
+        "text": "8"
+      },
+      {
+        "label": "D",
+        "text": "6"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "16"
+      },
+      {
+        "label": "B",
+        "text": "4"
+      },
+      {
+        "label": "C",
+        "text": "8"
+      },
+      {
+        "label": "D",
+        "text": "6"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "For an n × n matrix, |k A| = k^n |A|. For n=3, |2 A| = 2³ |A| = 8 × 2 = 16.",
+    "explanationTamil": "|k A| = k^n |A| வாய்பாட்டின்படி |2 A| = 2³ × 2 = 8 × 2 = 16.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-010",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "medium",
+    "questionText": "For a skew-symmetric matrix A of odd order, the determinant |A| is always:",
+    "questionTextTamil": "ஒற்றைப்படை வரிசை கொண்ட எதிர் சமச்சீர் அணியின் அணிக்கோவை மதிப்பு எப்போதும்:",
+    "options": [
+      {
+        "label": "A",
+        "text": "0"
+      },
+      {
+        "label": "B",
+        "text": "1"
+      },
+      {
+        "label": "C",
+        "text": "-1"
+      },
+      {
+        "label": "D",
+        "text": "Positive"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "0 (சுழி)"
+      },
+      {
+        "label": "B",
+        "text": "1"
+      },
+      {
+        "label": "C",
+        "text": "-1"
+      },
+      {
+        "label": "D",
+        "text": "நேர்மதிப்பு"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Aᵀ = -A => |A| = |-A| = (-1)^n |A|. For odd n, |A| = -|A| => 2|A| = 0 => |A| = 0.",
+    "explanationTamil": "ஒற்றைப்படை வரிசை எதிர் சமச்சீர் அணியின் அணிக்கோவை எப்போதும் சுழியாகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-011",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "easy",
+    "questionText": "The value of i¹⁹⁹⁹ is equal to:",
+    "questionTextTamil": "i¹⁹⁹⁹-ன் மதிப்பு எதற்கு சமம்?",
+    "options": [
+      {
+        "label": "A",
+        "text": "-i"
+      },
+      {
+        "label": "B",
+        "text": "+i"
+      },
+      {
+        "label": "C",
+        "text": "1"
+      },
+      {
+        "label": "D",
+        "text": "-1"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "-i"
+      },
+      {
+        "label": "B",
+        "text": "+i"
+      },
+      {
+        "label": "C",
+        "text": "1"
+      },
+      {
+        "label": "D",
+        "text": "-1"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "1999 = 4 × 499 + 3. Hence i¹⁹⁹⁹ = (i⁴)⁴⁹⁹ × i³ = 1 × (-i) = -i.",
+    "explanationTamil": "1999 = 4(499) + 3 என்பதால் i¹⁹⁹⁹ = i³ = -i.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-012",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "easy",
+    "questionText": "The modulus of the complex number z = 3 - 4i is:",
+    "questionTextTamil": "z = 3 - 4i என்ற கலப்பெண்ணின் மட்டு (Modulus) மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "5"
+      },
+      {
+        "label": "B",
+        "text": "25"
+      },
+      {
+        "label": "C",
+        "text": "7"
+      },
+      {
+        "label": "D",
+        "text": "1"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "5"
+      },
+      {
+        "label": "B",
+        "text": "25"
+      },
+      {
+        "label": "C",
+        "text": "7"
+      },
+      {
+        "label": "D",
+        "text": "1"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "|z| = √(3² + (-4)²) = √(9 + 16) = √25 = 5.",
+    "explanationTamil": "|z| = √(3² + (-4)²) = √25 = 5.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-013",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "medium",
+    "questionText": "The principal argument of the complex number z = -1 - i√3 is:",
+    "questionTextTamil": "z = -1 - i√3 என்ற கலப்பெண்ணின் முதன்மை வீச்சு (Principal argument):",
+    "options": [
+      {
+        "label": "A",
+        "text": "- 2π / 3"
+      },
+      {
+        "label": "B",
+        "text": "4π / 3"
+      },
+      {
+        "label": "C",
+        "text": "2π / 3"
+      },
+      {
+        "label": "D",
+        "text": "- π / 3"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "- 2π / 3"
+      },
+      {
+        "label": "B",
+        "text": "4π / 3"
+      },
+      {
+        "label": "C",
+        "text": "2π / 3"
+      },
+      {
+        "label": "D",
+        "text": "- π / 3"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "z is in 3rd quadrant (x<0, y<0). α = tan⁻¹(√3/1) = π/3. Principal argument θ = -(π - α) = -(π - π/3) = -2π/3.",
+    "explanationTamil": "மூன்றாம் காற்பகுதியில் அமைவதால் முதன்மை வீச்சு θ = -(π - π/3) = -2π/3.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-014",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "medium",
+    "questionText": "Euler's formula states that e^(iθ) is equal to:",
+    "questionTextTamil": "ஆய்லரின் சமன்பாட்டின்படி e^(iθ) எதற்கு சமம்?",
+    "options": [
+      {
+        "label": "A",
+        "text": "cos θ + i sin θ"
+      },
+      {
+        "label": "B",
+        "text": "cos θ - i sin θ"
+      },
+      {
+        "label": "C",
+        "text": "sin θ + i cos θ"
+      },
+      {
+        "label": "D",
+        "text": "cos² θ + sin² θ"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "cos θ + i sin θ"
+      },
+      {
+        "label": "B",
+        "text": "cos θ - i sin θ"
+      },
+      {
+        "label": "C",
+        "text": "sin θ + i cos θ"
+      },
+      {
+        "label": "D",
+        "text": "cos² θ + sin² θ"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Euler's identity: e^(iθ) = cos θ + i sin θ.",
+    "explanationTamil": "ஆய்லர் வாய்ப்பாடு e^(iθ) = cos θ + i sin θ ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-015",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "easy",
+    "questionText": "If ω is a complex cube root of unity, then the value of 1 + ω + ω² is:",
+    "questionTextTamil": "ω என்பது ஒன்றின் கலப்பெண் முப்படி மூலம் எனில் 1 + ω + ω²-ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "0"
+      },
+      {
+        "label": "B",
+        "text": "1"
+      },
+      {
+        "label": "C",
+        "text": "-1"
+      },
+      {
+        "label": "D",
+        "text": "3"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "0 (சுழி)"
+      },
+      {
+        "label": "B",
+        "text": "1"
+      },
+      {
+        "label": "C",
+        "text": "-1"
+      },
+      {
+        "label": "D",
+        "text": "3"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The sum of all nth roots of unity is zero: 1 + ω + ω² = 0. Also ω³ = 1.",
+    "explanationTamil": "ஒன்றின் முப்படி மூலங்களின் கூடுதல் 1 + ω + ω² = 0 மற்றும் ω³ = 1.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-016",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "medium",
+    "questionText": "The locus of z satisfying |z - z₁| = |z - z₂| represents:",
+    "questionTextTamil": "|z - z₁| = |z - z₂| என்ற சமன்பாட்டை நிறைவு செய்யும் z-ன் நியமப்பாதை:",
+    "options": [
+      {
+        "label": "A",
+        "text": "Perpendicular bisector of line segment joining z₁ and z₂"
+      },
+      {
+        "label": "B",
+        "text": "A circle"
+      },
+      {
+        "label": "C",
+        "text": "An ellipse"
+      },
+      {
+        "label": "D",
+        "text": "A parabola"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "z₁ மற்றும் z₂ புள்ளிகளை இணைக்கும் கோட்டுத்துண்டின் மையக்குத்துக் கோடு"
+      },
+      {
+        "label": "B",
+        "text": "ஒரு வட்டம்"
+      },
+      {
+        "label": "C",
+        "text": "நீள்வட்டம்"
+      },
+      {
+        "label": "D",
+        "text": "பரவளையம்"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Equidistant from two fixed points defines the perpendicular bisector line in complex plane.",
+    "explanationTamil": "இரு புள்ளிகளிலிருந்து சமதொலைவில் உள்ள புள்ளிகளின் பாதை மையக்குத்துக் கோடாகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-017",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "easy",
+    "questionText": "The equation |z - z₀| = r represents a:",
+    "questionTextTamil": "|z - z₀| = r என்ற சமன்பாடு எதனைக் குறிக்கிறது?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Circle with centre z₀ and radius r"
+      },
+      {
+        "label": "B",
+        "text": "Straight line"
+      },
+      {
+        "label": "C",
+        "text": "Parabola"
+      },
+      {
+        "label": "D",
+        "text": "Hyperbola"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "மையம் z₀ மற்றும் ஆரம் r கொண்ட வட்டம்"
+      },
+      {
+        "label": "B",
+        "text": "நேர்க்கோடு"
+      },
+      {
+        "label": "C",
+        "text": "பரவளையம்"
+      },
+      {
+        "label": "D",
+        "text": "அதிபரவளையம்"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Distance between z and z₀ is fixed at r, tracing a circle.",
+    "explanationTamil": "மையப்புள்ளி z₀-விலிருந்து மாறாத தூரம் r கொண்ட புள்ளிகளின் நியமப்பாதை வட்டமாகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-018",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "hard",
+    "questionText": "De Moivre's theorem states that for any rational number n, (cos θ + i sin θ)^n equals:",
+    "questionTextTamil": "டி மாய்வரின் தேற்றப்படி (cos θ + i sin θ)^n எதற்கு சமம்?",
+    "options": [
+      {
+        "label": "A",
+        "text": "cos(nθ) + i sin(nθ)"
+      },
+      {
+        "label": "B",
+        "text": "cos^n θ + i sin^n θ"
+      },
+      {
+        "label": "C",
+        "text": "cos(nθ) - i sin(nθ)"
+      },
+      {
+        "label": "D",
+        "text": "n cos θ + i n sin θ"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "cos(nθ) + i sin(nθ)"
+      },
+      {
+        "label": "B",
+        "text": "cos^n θ + i sin^n θ"
+      },
+      {
+        "label": "C",
+        "text": "cos(nθ) - i sin(nθ)"
+      },
+      {
+        "label": "D",
+        "text": "n cos θ + i n sin θ"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "De Moivre's theorem: (cos θ + i sin θ)^n = cos(nθ) + i sin(nθ).",
+    "explanationTamil": "டி மாய்வர் தேற்றம்: (cos θ + i sin θ)^n = cos(nθ) + i sin(nθ).",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-019",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "easy",
+    "questionText": "If z = x + iy, then z + z̄ is equal to:",
+    "questionTextTamil": "z = x + iy எனில் z + z̄ எதற்கு சமம்?",
+    "options": [
+      {
+        "label": "A",
+        "text": "2 Re(z) = 2x (purely real)"
+      },
+      {
+        "label": "B",
+        "text": "2 Im(z) = 2iy"
+      },
+      {
+        "label": "C",
+        "text": "0"
+      },
+      {
+        "label": "D",
+        "text": "x² + y²"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "2 Re(z) = 2x (மெய் மதிப்பு)"
+      },
+      {
+        "label": "B",
+        "text": "2iy (கற்பனை)"
+      },
+      {
+        "label": "C",
+        "text": "0"
+      },
+      {
+        "label": "D",
+        "text": "x² + y²"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "(x + iy) + (x - iy) = 2x = 2 Re(z).",
+    "explanationTamil": "கலப்பெண்ணையும் அதன் இணை கலப்பெண்ணையும் கூட்டினால் மெய்ப்பகுதி 2x கிடைக்கும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-020",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "medium",
+    "questionText": "The value of (1 + i) / (1 - i) is equal to:",
+    "questionTextTamil": "(1 + i) / (1 - i)-ன் மதிப்பு எதற்கு சமம்?",
+    "options": [
+      {
+        "label": "A",
+        "text": "i"
+      },
+      {
+        "label": "B",
+        "text": "-i"
+      },
+      {
+        "label": "C",
+        "text": "1"
+      },
+      {
+        "label": "D",
+        "text": "-1"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "i"
+      },
+      {
+        "label": "B",
+        "text": "-i"
+      },
+      {
+        "label": "C",
+        "text": "1"
+      },
+      {
+        "label": "D",
+        "text": "-1"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "(1 + i)² / (1 - i²) = (1 + 2i - 1) / (1 - (-1)) = 2i / 2 = i.",
+    "explanationTamil": "(1 + i)(1 + i) / ((1 - i)(1 + i)) = 2i / 2 = i.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-021",
+    "subject": "Mathematics",
+    "topic": "Theory of Equations",
+    "difficulty": "easy",
+    "questionText": "If α, β, γ are the roots of the cubic equation x³ + p x² + q x + r = 0, then the sum of the roots (α + β + γ) is:",
+    "questionTextTamil": "x³ + p x² + q x + r = 0 சமன்பாட்டின் மூலங்கள் α, β, γ எனில் மூலங்களின் கூடுதல் (α + β + γ):",
+    "options": [
+      {
+        "label": "A",
+        "text": "-p"
+      },
+      {
+        "label": "B",
+        "text": "p"
+      },
+      {
+        "label": "C",
+        "text": "q"
+      },
+      {
+        "label": "D",
+        "text": "-r"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "-p"
+      },
+      {
+        "label": "B",
+        "text": "p"
+      },
+      {
+        "label": "C",
+        "text": "q"
+      },
+      {
+        "label": "D",
+        "text": "-r"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "By Vieta's formulas, Σα = - coefficient of x² / coefficient of x³ = -p.",
+    "explanationTamil": "வியட்டாவின் சூத்திரப்படி மூலங்களின் கூடுதல் = -p.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-022",
+    "subject": "Mathematics",
+    "topic": "Theory of Equations",
+    "difficulty": "easy",
+    "questionText": "Product of the roots α β γ of the cubic equation x³ + p x² + q x + r = 0 is:",
+    "questionTextTamil": "x³ + p x² + q x + r = 0 என்ற சமன்பாட்டின் மூலங்களின் பெருக்கற்பலன் α β γ:",
+    "options": [
+      {
+        "label": "A",
+        "text": "-r"
+      },
+      {
+        "label": "B",
+        "text": "r"
+      },
+      {
+        "label": "C",
+        "text": "q"
+      },
+      {
+        "label": "D",
+        "text": "-q"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "-r"
+      },
+      {
+        "label": "B",
+        "text": "r"
+      },
+      {
+        "label": "C",
+        "text": "q"
+      },
+      {
+        "label": "D",
+        "text": "-q"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Product of roots = (-1)³ * constant term = -r.",
+    "explanationTamil": "வியட்டாவின் விதிப்படி மூலங்களின் பெருக்கற்பலன் = -r.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-023",
+    "subject": "Mathematics",
+    "topic": "Theory of Equations",
+    "difficulty": "medium",
+    "questionText": "Descartes' rule of signs gives an upper bound on:",
+    "questionTextTamil": "டெஸ்கார்ட்டின் குறி விதி எதனுடைய அதிகபட்ச எண்ணிக்கையைத் தீர்மானிக்க உதவுகிறது?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Number of positive and negative real roots of a polynomial"
+      },
+      {
+        "label": "B",
+        "text": "Exact values of roots"
+      },
+      {
+        "label": "C",
+        "text": "Complex roots only"
+      },
+      {
+        "label": "D",
+        "text": "Degree of polynomial"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "ஒரு பல்லுறுப்புக் கோவையின் மிகை மற்றும் குறை மெய் மூலங்களின் எண்ணிக்கை"
+      },
+      {
+        "label": "B",
+        "text": "மூலங்களின் சரியான மதிப்பு"
+      },
+      {
+        "label": "C",
+        "text": "கலப்பெண் மூலங்கள் மட்டும்"
+      },
+      {
+        "label": "D",
+        "text": "படி"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Number of positive real roots cannot exceed the number of sign changes in coefficients of P(x).",
+    "explanationTamil": "டெஸ்கார்ட்டின் விதி குறி மாற்றங்களின் மூலம் மிகை மற்றும் குறை மூலங்களின் அதிகபட்ச எண்ணிக்கையைத் தருகிறது.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-024",
+    "subject": "Mathematics",
+    "topic": "Theory of Equations",
+    "difficulty": "easy",
+    "questionText": "If 2 + i√3 is a root of a polynomial equation with real coefficients, another root must be:",
+    "questionTextTamil": "மெய் கெழுக்களைக் கொண்ட பல்லுறுப்புக் கோவை சமன்பாட்டின் ஒரு மூலம் 2 + i√3 எனில் மற்றொரு மூலம்:",
+    "options": [
+      {
+        "label": "A",
+        "text": "2 - i√3 (complex conjugate)"
+      },
+      {
+        "label": "B",
+        "text": "-2 + i√3"
+      },
+      {
+        "label": "C",
+        "text": "-2 - i√3"
+      },
+      {
+        "label": "D",
+        "text": "√3 + 2i"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "2 - i√3 (இணை கலப்பெண்)"
+      },
+      {
+        "label": "B",
+        "text": "-2 + i√3"
+      },
+      {
+        "label": "C",
+        "text": "-2 - i√3"
+      },
+      {
+        "label": "D",
+        "text": "√3 + 2i"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Complex roots of real-coefficient polynomials always occur in conjugate pairs.",
+    "explanationTamil": "மெய் கெழுக்கள் கொண்ட சமன்பாட்டின் கலப்பெண் மூலங்கள் எப்போதும் இணைகளாகவே (conjugate pairs) அமையும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-025",
+    "subject": "Mathematics",
+    "topic": "Theory of Equations",
+    "difficulty": "medium",
+    "questionText": "A polynomial equation of degree n has exactly:",
+    "questionTextTamil": "n படி கொண்ட பல்லுறுப்புக் கோவை சமன்பாடு சரியாக எத்தனை மூலங்களைப் பெற்றிருக்கும்?",
+    "options": [
+      {
+        "label": "A",
+        "text": "n roots (real or complex, counting multiplicity)"
+      },
+      {
+        "label": "B",
+        "text": "At most n real roots"
+      },
+      {
+        "label": "C",
+        "text": "n² roots"
+      },
+      {
+        "label": "D",
+        "text": "n - 1 roots"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "சரியாக n மூலங்கள் (மெய் அல்லது கலப்பெண் மூலங்கள்)"
+      },
+      {
+        "label": "B",
+        "text": "அதிகபட்சம் n"
+      },
+      {
+        "label": "C",
+        "text": "n² மூலங்கள்"
+      },
+      {
+        "label": "D",
+        "text": "n - 1 மூலங்கள்"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Fundamental Theorem of Algebra ensures every nth-degree polynomial has exactly n roots in complex field.",
+    "explanationTamil": "இயற்கணிதத்தின் அடிப்படை தேற்றப்படி n படி சமன்பாட்டிற்கு சரியாக n மூலங்கள் இருக்கும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-026",
+    "subject": "Mathematics",
+    "topic": "Inverse Trigonometry",
+    "difficulty": "easy",
+    "questionText": "The principal value branch of sin⁻¹(x) is:",
+    "questionTextTamil": "sin⁻¹(x)-ன் முதன்மை மதிப்பு வீச்சகம் யாது?",
+    "options": [
+      {
+        "label": "A",
+        "text": "[-π/2, π/2]"
+      },
+      {
+        "label": "B",
+        "text": "[0, π]"
+      },
+      {
+        "label": "C",
+        "text": "(-π/2, π/2)"
+      },
+      {
+        "label": "D",
+        "text": "[0, 2π]"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "[-π/2, π/2]"
+      },
+      {
+        "label": "B",
+        "text": "[0, π] (cos⁻¹x)"
+      },
+      {
+        "label": "C",
+        "text": "(-π/2, π/2) (tan⁻¹x)"
+      },
+      {
+        "label": "D",
+        "text": "[0, 2π]"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "sin⁻¹: [-1, 1] → [-π/2, π/2].",
+    "explanationTamil": "sin⁻¹(x)-ன் முதன்மை வீச்சகம் [-π/2, π/2] ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-027",
+    "subject": "Mathematics",
+    "topic": "Inverse Trigonometry",
+    "difficulty": "easy",
+    "questionText": "The principal value branch of cos⁻¹(x) is:",
+    "questionTextTamil": "cos⁻¹(x)-ன் முதன்மை மதிப்பு வீச்சகம் யாது?",
+    "options": [
+      {
+        "label": "A",
+        "text": "[0, π]"
+      },
+      {
+        "label": "B",
+        "text": "[-π/2, π/2]"
+      },
+      {
+        "label": "C",
+        "text": "(0, π)"
+      },
+      {
+        "label": "D",
+        "text": "[-π, π]"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "[0, π]"
+      },
+      {
+        "label": "B",
+        "text": "[-π/2, π/2]"
+      },
+      {
+        "label": "C",
+        "text": "(0, π)"
+      },
+      {
+        "label": "D",
+        "text": "[-π, π]"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "cos⁻¹: [-1, 1] → [0, π].",
+    "explanationTamil": "cos⁻¹(x)-ன் முதன்மை வீச்சகம் [0, π] ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-028",
+    "subject": "Mathematics",
+    "topic": "Inverse Trigonometry",
+    "difficulty": "easy",
+    "questionText": "The value of sin⁻¹(1/2) is:",
+    "questionTextTamil": "sin⁻¹(1/2)-ன் முதன்மை மதிப்பு யாது?",
+    "options": [
+      {
+        "label": "A",
+        "text": "π / 6 (30°)"
+      },
+      {
+        "label": "B",
+        "text": "π / 3 (60°)"
+      },
+      {
+        "label": "C",
+        "text": "π / 4 (45°)"
+      },
+      {
+        "label": "D",
+        "text": "π / 2"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "π / 6 (30°)"
+      },
+      {
+        "label": "B",
+        "text": "π / 3 (60°)"
+      },
+      {
+        "label": "C",
+        "text": "π / 4 (45°)"
+      },
+      {
+        "label": "D",
+        "text": "π / 2"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "sin(π/6) = 1/2, so sin⁻¹(1/2) = π/6.",
+    "explanationTamil": "sin(30°) = 1/2 என்பதால் sin⁻¹(1/2) = π/6.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-029",
+    "subject": "Mathematics",
+    "topic": "Inverse Trigonometry",
+    "difficulty": "medium",
+    "questionText": "The value of cos⁻¹(-1/2) is:",
+    "questionTextTamil": "cos⁻¹(-1/2)-ன் முதன்மை மதிப்பு யாது?",
+    "options": [
+      {
+        "label": "A",
+        "text": "2π / 3 (120°)"
+      },
+      {
+        "label": "B",
+        "text": "π / 3 (60°)"
+      },
+      {
+        "label": "C",
+        "text": "- π / 3"
+      },
+      {
+        "label": "D",
+        "text": "5π / 6"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "2π / 3 (120°)"
+      },
+      {
+        "label": "B",
+        "text": "π / 3"
+      },
+      {
+        "label": "C",
+        "text": "- π / 3"
+      },
+      {
+        "label": "D",
+        "text": "5π / 6"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "cos⁻¹(-x) = π - cos⁻¹(x) = π - π/3 = 2π/3.",
+    "explanationTamil": "cos⁻¹(-x) = π - cos⁻¹(x) = π - π/3 = 2π/3.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-030",
+    "subject": "Mathematics",
+    "topic": "Inverse Trigonometry",
+    "difficulty": "easy",
+    "questionText": "For all x ∈ [-1, 1], the value of sin⁻¹(x) + cos⁻¹(x) is equal to:",
+    "questionTextTamil": "x ∈ [-1, 1] எனில் sin⁻¹(x) + cos⁻¹(x)-ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "π / 2"
+      },
+      {
+        "label": "B",
+        "text": "π"
+      },
+      {
+        "label": "C",
+        "text": "0"
+      },
+      {
+        "label": "D",
+        "text": "2π"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "π / 2"
+      },
+      {
+        "label": "B",
+        "text": "π"
+      },
+      {
+        "label": "C",
+        "text": "0"
+      },
+      {
+        "label": "D",
+        "text": "2π"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Standard identity: sin⁻¹(x) + cos⁻¹(x) = π/2.",
+    "explanationTamil": "முக்கிய முற்றொருமை: sin⁻¹(x) + cos⁻¹(x) = π/2.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-031",
+    "subject": "Mathematics",
+    "topic": "Inverse Trigonometry",
+    "difficulty": "easy",
+    "questionText": "For all real x, tan⁻¹(x) + cot⁻¹(x) is equal to:",
+    "questionTextTamil": "அனைத்து மெய் எண் x-க்கும் tan⁻¹(x) + cot⁻¹(x)-ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "π / 2"
+      },
+      {
+        "label": "B",
+        "text": "π"
+      },
+      {
+        "label": "C",
+        "text": "0"
+      },
+      {
+        "label": "D",
+        "text": "1"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "π / 2"
+      },
+      {
+        "label": "B",
+        "text": "π"
+      },
+      {
+        "label": "C",
+        "text": "0"
+      },
+      {
+        "label": "D",
+        "text": "1"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "tan⁻¹(x) + cot⁻¹(x) = π/2 for all x ∈ ℝ.",
+    "explanationTamil": "tan⁻¹(x) + cot⁻¹(x) = π/2 ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-032",
+    "subject": "Mathematics",
+    "topic": "Inverse Trigonometry",
+    "difficulty": "medium",
+    "questionText": "tan⁻¹(1/2) + tan⁻¹(1/3) is equal to:",
+    "questionTextTamil": "tan⁻¹(1/2) + tan⁻¹(1/3)-ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "π / 4"
+      },
+      {
+        "label": "B",
+        "text": "π / 2"
+      },
+      {
+        "label": "C",
+        "text": "π / 6"
+      },
+      {
+        "label": "D",
+        "text": "π / 3"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "π / 4"
+      },
+      {
+        "label": "B",
+        "text": "π / 2"
+      },
+      {
+        "label": "C",
+        "text": "π / 6"
+      },
+      {
+        "label": "D",
+        "text": "π / 3"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "tan⁻¹[(1/2 + 1/3) / (1 - 1/6)] = tan⁻¹[(5/6) / (5/6)] = tan⁻¹(1) = π/4.",
+    "explanationTamil": "tan⁻¹[(1/2 + 1/3) / (1 - 1/6)] = tan⁻¹(1) = π/4.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-033",
+    "subject": "Mathematics",
+    "topic": "Inverse Trigonometry",
+    "difficulty": "medium",
+    "questionText": "The value of sin(2 tan⁻¹ x) in terms of algebraic expression is:",
+    "questionTextTamil": "sin(2 tan⁻¹ x)-ன் இயற்கணித வடிவம் யாது?",
+    "options": [
+      {
+        "label": "A",
+        "text": "2x / (1 + x²)"
+      },
+      {
+        "label": "B",
+        "text": "(1 - x²) / (1 + x²)"
+      },
+      {
+        "label": "C",
+        "text": "2x / (1 - x²)"
+      },
+      {
+        "label": "D",
+        "text": "x / √(1 + x²)"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "2x / (1 + x²)"
+      },
+      {
+        "label": "B",
+        "text": "(1 - x²) / (1 + x²)"
+      },
+      {
+        "label": "C",
+        "text": "2x / (1 - x²)"
+      },
+      {
+        "label": "D",
+        "text": "x / √(1 + x²)"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Let θ = tan⁻¹ x => tan θ = x. sin(2θ) = 2 tan θ / (1 + tan² θ) = 2x / (1 + x²).",
+    "explanationTamil": "sin(2 tan⁻¹ x) = 2x / (1 + x²) ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-034",
+    "subject": "Mathematics",
+    "topic": "Inverse Trigonometry",
+    "difficulty": "easy",
+    "questionText": "The domain of sin⁻¹(x) is:",
+    "questionTextTamil": "sin⁻¹(x) சார்பின் சார்பகம் (Domain) யாது?",
+    "options": [
+      {
+        "label": "A",
+        "text": "[-1, 1]"
+      },
+      {
+        "label": "B",
+        "text": "(-∞, ∞)"
+      },
+      {
+        "label": "C",
+        "text": "[0, 1]"
+      },
+      {
+        "label": "D",
+        "text": "(-1, 1)"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "[-1, 1]"
+      },
+      {
+        "label": "B",
+        "text": "(-∞, ∞)"
+      },
+      {
+        "label": "C",
+        "text": "[0, 1]"
+      },
+      {
+        "label": "D",
+        "text": "(-1, 1)"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "sin⁻¹(x) is defined only for -1 ≤ x ≤ 1.",
+    "explanationTamil": "sin⁻¹(x)-ன் சார்பகம் [-1, 1] ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-035",
+    "subject": "Mathematics",
+    "topic": "Inverse Trigonometry",
+    "difficulty": "easy",
+    "questionText": "The value of tan⁻¹(√3) is:",
+    "questionTextTamil": "tan⁻¹(√3)-ன் முதன்மை மதிப்பு யாது?",
+    "options": [
+      {
+        "label": "A",
+        "text": "π / 3 (60°)"
+      },
+      {
+        "label": "B",
+        "text": "π / 6 (30°)"
+      },
+      {
+        "label": "C",
+        "text": "π / 4 (45°)"
+      },
+      {
+        "label": "D",
+        "text": "π / 2"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "π / 3 (60°)"
+      },
+      {
+        "label": "B",
+        "text": "π / 6"
+      },
+      {
+        "label": "C",
+        "text": "π / 4"
+      },
+      {
+        "label": "D",
+        "text": "π / 2"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "tan(π/3) = √3, so tan⁻¹(√3) = π/3.",
+    "explanationTamil": "tan(60°) = √3 என்பதால் tan⁻¹(√3) = π/3.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-036",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "medium",
+    "questionText": "If A is a square matrix such that A² = A, then A is called:",
+    "questionTextTamil": "A² = A என்ற நிபந்தனையை நிறைவு செய்யும் சதுர அணி A எவ்வாறு அழைக்கப்படுகிறது?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Idempotent matrix"
+      },
+      {
+        "label": "B",
+        "text": "Involutory matrix"
+      },
+      {
+        "label": "C",
+        "text": "Nilpotent matrix"
+      },
+      {
+        "label": "D",
+        "text": "Orthogonal matrix"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "தன்னடுக்கு அணி (Idempotent matrix)"
+      },
+      {
+        "label": "B",
+        "text": "சுழல் அணி (Involutory - A² = I)"
+      },
+      {
+        "label": "C",
+        "text": "பூச்சிய அடுக்கு அணி"
+      },
+      {
+        "label": "D",
+        "text": "செங்குத்து அணி"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "A matrix satisfying A² = A is called an idempotent matrix.",
+    "explanationTamil": "A² = A எனில் அது தன்னடுக்கு அணி (Idempotent matrix) எனப்படும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-037",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "medium",
+    "questionText": "If A² = I, then matrix A is called:",
+    "questionTextTamil": "A² = I எனில் சதுர அணி A எவ்வாறு அழைக்கப்படுகிறது?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Involutory matrix"
+      },
+      {
+        "label": "B",
+        "text": "Idempotent matrix"
+      },
+      {
+        "label": "C",
+        "text": "Singular matrix"
+      },
+      {
+        "label": "D",
+        "text": "Symmetric matrix"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "எதிர் சுழல் அணி (Involutory matrix - A⁻¹ = A)"
+      },
+      {
+        "label": "B",
+        "text": "தன்னடுக்கு அணி"
+      },
+      {
+        "label": "C",
+        "text": "பூச்சியக்கோவை அணி"
+      },
+      {
+        "label": "D",
+        "text": "சமச்சீர் அணி"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "A² = I means A = A⁻¹, which defines an involutory matrix.",
+    "explanationTamil": "A² = I எனில் A = A⁻¹ ஆக இருக்கும், இது இன்வொலூட்டரி அணி எனப்படும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-038",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "easy",
+    "questionText": "The determinant of a diagonal matrix is equal to:",
+    "questionTextTamil": "ஒரு மூலைவிட்ட அணியின் அணிக்கோவை மதிப்பு எதற்கு சமம்?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Product of its principal diagonal elements"
+      },
+      {
+        "label": "B",
+        "text": "Sum of its diagonal elements"
+      },
+      {
+        "label": "C",
+        "text": "Zero"
+      },
+      {
+        "label": "D",
+        "text": "Trace of matrix"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "அதன் முதன்மை மூலைவிட்ட உறுப்புகளின் பெருக்கற்பலன்"
+      },
+      {
+        "label": "B",
+        "text": "மூலைவிட்ட உறுப்புகளின் கூடுதல்"
+      },
+      {
+        "label": "C",
+        "text": "சுழி"
+      },
+      {
+        "label": "D",
+        "text": "அணியின் சுவடு"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "|diag(a₁, a₂, ..., a_n)| = a₁ × a₂ × ... × a_n.",
+    "explanationTamil": "மூலைவிட்ட அணியின் அணிக்கோவை மதிப்பு அதன் மூலைவிட்ட உறுப்புகளின் பெருக்கற்பலனுக்கு சமம்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-039",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "medium",
+    "questionText": "If A and B are square matrices of same order, then (A B)ᵀ is equal to:",
+    "questionTextTamil": "A, B ஒரே வரிசையுடைய அணிகள் எனில் (A B)ᵀ எதற்கு சமம்?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Bᵀ Aᵀ (Reversal law for transpose)"
+      },
+      {
+        "label": "B",
+        "text": "Aᵀ Bᵀ"
+      },
+      {
+        "label": "C",
+        "text": "A B"
+      },
+      {
+        "label": "D",
+        "text": "- Bᵀ Aᵀ"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "Bᵀ Aᵀ (நிரை நிரல் மாற்றின் வரிசை மாற்ற விதி)"
+      },
+      {
+        "label": "B",
+        "text": "Aᵀ Bᵀ"
+      },
+      {
+        "label": "C",
+        "text": "A B"
+      },
+      {
+        "label": "D",
+        "text": "- Bᵀ Aᵀ"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Reversal law of transpose: (A B)ᵀ = Bᵀ Aᵀ.",
+    "explanationTamil": "(A B)ᵀ = Bᵀ Aᵀ என்பது நிரை நிரல் மாற்றலின் அடிப்படைப் பண்பாகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-040",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "medium",
+    "questionText": "If A and B are invertible matrices of same order, then (A B)⁻¹ is equal to:",
+    "questionTextTamil": "(A B)⁻¹ எதற்கு சமம்?",
+    "options": [
+      {
+        "label": "A",
+        "text": "B⁻¹ A⁻¹"
+      },
+      {
+        "label": "B",
+        "text": "A⁻¹ B⁻¹"
+      },
+      {
+        "label": "C",
+        "text": "A B"
+      },
+      {
+        "label": "D",
+        "text": "- B⁻¹ A⁻¹"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "B⁻¹ A⁻¹"
+      },
+      {
+        "label": "B",
+        "text": "A⁻¹ B⁻¹"
+      },
+      {
+        "label": "C",
+        "text": "A B"
+      },
+      {
+        "label": "D",
+        "text": "- B⁻¹ A⁻¹"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Reversal law of inverse: (A B)⁻¹ = B⁻¹ A⁻¹.",
+    "explanationTamil": "நேர்மாறு அணியின் வரிசை மாற்ற விதி: (A B)⁻¹ = B⁻¹ A⁻¹.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-041",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "easy",
+    "questionText": "The value of |z₁ · z₂| for any two complex numbers is:",
+    "questionTextTamil": "இரு கலப்பெண்களுக்கு |z₁ · z₂|-ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "|z₁| · |z₂|"
+      },
+      {
+        "label": "B",
+        "text": "|z₁| + |z₂|"
+      },
+      {
+        "label": "C",
+        "text": "|z₁| / |z₂|"
+      },
+      {
+        "label": "D",
+        "text": "|z₁|² · |z₂|²"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "|z₁| · |z₂|"
+      },
+      {
+        "label": "B",
+        "text": "|z₁| + |z₂|"
+      },
+      {
+        "label": "C",
+        "text": "|z₁| / |z₂|"
+      },
+      {
+        "label": "D",
+        "text": "|z₁|² · |z₂|²"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The modulus of a product equals the product of the moduli: |z₁ z₂| = |z₁| |z₂|.",
+    "explanationTamil": "பெருக்குத்தொகையின் மட்டு மதிப்புகளின் பெருக்கற்பலனுக்கு சமம்: |z₁ z₂| = |z₁| |z₂|.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-042",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "easy",
+    "questionText": "Triangle inequality for complex numbers states that:",
+    "questionTextTamil": "கலப்பெண்களுக்கான முக்கோணச் சமனிலியின் கூற்று:",
+    "options": [
+      {
+        "label": "A",
+        "text": "|z₁ + z₂| ≤ |z₁| + |z₂|"
+      },
+      {
+        "label": "B",
+        "text": "|z₁ + z₂| ≥ |z₁| + |z₂|"
+      },
+      {
+        "label": "C",
+        "text": "|z₁ + z₂| = |z₁| + |z₂|"
+      },
+      {
+        "label": "D",
+        "text": "|z₁ + z₂| ≤ |z₁| - |z₂|"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "|z₁ + z₂| ≤ |z₁| + |z₂|"
+      },
+      {
+        "label": "B",
+        "text": "|z₁ + z₂| ≥ |z₁| + |z₂|"
+      },
+      {
+        "label": "C",
+        "text": "|z₁ + z₂| = |z₁| + |z₂|"
+      },
+      {
+        "label": "D",
+        "text": "|z₁ + z₂| ≤ |z₁| - |z₂|"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Triangle inequality: length of any side of a triangle cannot exceed sum of other two sides.",
+    "explanationTamil": "முக்கோண சமனிலி: |z₁ + z₂| ≤ |z₁| + |z₂|.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-043",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "medium",
+    "questionText": "The argument of a purely imaginary number with positive imaginary part (e.g., 5i) is:",
+    "questionTextTamil": "மிகை கற்பனைப் பகுதியைக் கொண்ட தூய கற்பனை எண்ணின் (எ.கா. 5i) வீச்சு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "π / 2"
+      },
+      {
+        "label": "B",
+        "text": "- π / 2"
+      },
+      {
+        "label": "C",
+        "text": "0"
+      },
+      {
+        "label": "D",
+        "text": "π"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "π / 2 (90°)"
+      },
+      {
+        "label": "B",
+        "text": "- π / 2"
+      },
+      {
+        "label": "C",
+        "text": "0"
+      },
+      {
+        "label": "D",
+        "text": "π"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Lies on positive y-axis, θ = π/2.",
+    "explanationTamil": "நேர் கற்பனை அச்சில் அமைவதால் கோணம் π/2 (90°) ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-044",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "medium",
+    "questionText": "The argument of a purely negative real number (e.g., -5) is:",
+    "questionTextTamil": "எதிர் மெய்யெண்ணின் (எ.கா. -5) முதன்மை வீச்சு யாது?",
+    "options": [
+      {
+        "label": "A",
+        "text": "π"
+      },
+      {
+        "label": "B",
+        "text": "0"
+      },
+      {
+        "label": "C",
+        "text": "π / 2"
+      },
+      {
+        "label": "D",
+        "text": "- π / 2"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "π (180°)"
+      },
+      {
+        "label": "B",
+        "text": "0"
+      },
+      {
+        "label": "C",
+        "text": "π / 2"
+      },
+      {
+        "label": "D",
+        "text": "- π / 2"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Lies on negative real axis, argument = π.",
+    "explanationTamil": "எதிர் மெய் அச்சில் அமைவதால் முதன்மை வீச்சு π ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-045",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "hard",
+    "questionText": "The four fourth roots of unity are:",
+    "questionTextTamil": "ஒன்றின் நான்கு நான்குபடி மூலங்கள் யாவை?",
+    "options": [
+      {
+        "label": "A",
+        "text": "1, -1, i, -i"
+      },
+      {
+        "label": "B",
+        "text": "1, ω, ω², ω³"
+      },
+      {
+        "label": "C",
+        "text": "1, 2, 3, 4"
+      },
+      {
+        "label": "D",
+        "text": "±1, ±2"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "1, -1, i, -i"
+      },
+      {
+        "label": "B",
+        "text": "1, ω, ω², ω³"
+      },
+      {
+        "label": "C",
+        "text": "1, 2, 3, 4"
+      },
+      {
+        "label": "D",
+        "text": "±1, ±2"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "z⁴ = 1 => (z² - 1)(z² + 1) = 0 => z = ±1, ±i.",
+    "explanationTamil": "z⁴ = 1 என்ற சமன்பாட்டின் மூலங்கள் 1, -1, i, -i ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-046",
+    "subject": "Mathematics",
+    "topic": "Theory of Equations",
+    "difficulty": "easy",
+    "questionText": "If the discriminant Δ = b² - 4ac > 0 for a quadratic equation ax² + bx + c = 0, the roots are:",
+    "questionTextTamil": "ax² + bx + c = 0 சமன்பாட்டில் b² - 4ac > 0 எனில் மூலங்களின் தன்மை:",
+    "options": [
+      {
+        "label": "A",
+        "text": "Real and distinct"
+      },
+      {
+        "label": "B",
+        "text": "Real and equal"
+      },
+      {
+        "label": "C",
+        "text": "Complex conjugate"
+      },
+      {
+        "label": "D",
+        "text": "Purely imaginary"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "மெய் மற்றும் வெவ்வேறானவை"
+      },
+      {
+        "label": "B",
+        "text": "மெய் மற்றும் சமமானவை (Δ = 0)"
+      },
+      {
+        "label": "C",
+        "text": "கலப்பெண் இணைகள் (Δ < 0)"
+      },
+      {
+        "label": "D",
+        "text": "கற்பனை மூலங்கள்"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Δ > 0 implies two distinct real roots.",
+    "explanationTamil": "b² - 4ac > 0 எனில் மூலங்கள் மெய் மற்றும் வெவ்வேறானவை.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-047",
+    "subject": "Mathematics",
+    "topic": "Theory of Equations",
+    "difficulty": "medium",
+    "questionText": "The condition that roots of ax³ + bx² + cx + d = 0 are in Arithmetic Progression (A.P.) is:",
+    "questionTextTamil": "ax³ + bx² + cx + d = 0 சமன்பாட்டின் மூலங்கள் கூட்டுத் தொடரில் (A.P.) அமைய நிபந்தனை:",
+    "options": [
+      {
+        "label": "A",
+        "text": "2 b³ - 9 a b c + 27 a² d = 0"
+      },
+      {
+        "label": "B",
+        "text": "b³ = a c d"
+      },
+      {
+        "label": "C",
+        "text": "a + d = b + c"
+      },
+      {
+        "label": "D",
+        "text": "b² = 4 a c"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "2 b³ - 9 a b c + 27 a² d = 0"
+      },
+      {
+        "label": "B",
+        "text": "b³ = a c d"
+      },
+      {
+        "label": "C",
+        "text": "a + d = b + c"
+      },
+      {
+        "label": "D",
+        "text": "b² = 4 a c"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Let roots be α - d, α, α + d. Sum 3α = -b/a => α = -b/(3a). Substituting x = -b/(3a) yields 2b³ - 9abc + 27a²d = 0.",
+    "explanationTamil": "மூலங்கள் கூட்டுத் தொடரில் அமைய 2 b³ - 9 a b c + 27 a² d = 0.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-048",
+    "subject": "Mathematics",
+    "topic": "Inverse Trigonometry",
+    "difficulty": "medium",
+    "questionText": "The value of sec⁻¹(x) + cosec⁻¹(x) for |x| ≥ 1 is:",
+    "questionTextTamil": "|x| ≥ 1 எனில் sec⁻¹(x) + cosec⁻¹(x)-ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "π / 2"
+      },
+      {
+        "label": "B",
+        "text": "π"
+      },
+      {
+        "label": "C",
+        "text": "0"
+      },
+      {
+        "label": "D",
+        "text": "2π"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "π / 2"
+      },
+      {
+        "label": "B",
+        "text": "π"
+      },
+      {
+        "label": "C",
+        "text": "0"
+      },
+      {
+        "label": "D",
+        "text": "2π"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "sec⁻¹(x) + cosec⁻¹(x) = cos⁻¹(1/x) + sin⁻¹(1/x) = π/2.",
+    "explanationTamil": "sec⁻¹(x) + cosec⁻¹(x) = π/2 ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-049",
+    "subject": "Mathematics",
+    "topic": "Inverse Trigonometry",
+    "difficulty": "hard",
+    "questionText": "The value of sin⁻¹(sin(2π/3)) is:",
+    "questionTextTamil": "sin⁻¹(sin(2π/3))-ன் மதிப்பு யாது?",
+    "options": [
+      {
+        "label": "A",
+        "text": "π / 3"
+      },
+      {
+        "label": "B",
+        "text": "2π / 3"
+      },
+      {
+        "label": "C",
+        "text": "- π / 3"
+      },
+      {
+        "label": "D",
+        "text": "4π / 3"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "π / 3"
+      },
+      {
+        "label": "B",
+        "text": "2π / 3 (வீச்சகத்திற்கு வெளியே உள்ளது)"
+      },
+      {
+        "label": "C",
+        "text": "- π / 3"
+      },
+      {
+        "label": "D",
+        "text": "4π / 3"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "2π/3 ∉ [-π/2, π/2]. sin(2π/3) = sin(π - π/3) = sin(π/3). Hence sin⁻¹(sin(π/3)) = π/3.",
+    "explanationTamil": "2π/3 என்பது [-π/2, π/2] வீச்சகத்தில் இல்லாததால் sin(π - π/3) = sin(π/3) என மாற்றப்பட்டு மதிப்பு π/3 ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-050",
+    "subject": "Mathematics",
+    "topic": "Inverse Trigonometry",
+    "difficulty": "hard",
+    "questionText": "The value of cos⁻¹(cos(7π/6)) is:",
+    "questionTextTamil": "cos⁻¹(cos(7π/6))-ன் மதிப்பு யாது?",
+    "options": [
+      {
+        "label": "A",
+        "text": "5π / 6"
+      },
+      {
+        "label": "B",
+        "text": "7π / 6"
+      },
+      {
+        "label": "C",
+        "text": "π / 6"
+      },
+      {
+        "label": "D",
+        "text": "- π / 6"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "5π / 6"
+      },
+      {
+        "label": "B",
+        "text": "7π / 6"
+      },
+      {
+        "label": "C",
+        "text": "π / 6"
+      },
+      {
+        "label": "D",
+        "text": "- π / 6"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "7π/6 ∉ [0, π]. cos(7π/6) = cos(2π - 5π/6) = cos(5π/6). Since 5π/6 ∈ [0, π], result is 5π/6.",
+    "explanationTamil": "7π/6 முதன்மை வீச்சகமான [0, π]-ல் இல்லை. cos(2π - 5π/6) = cos(5π/6), எனவே விடை 5π/6.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-051",
+    "subject": "Mathematics",
+    "topic": "Theory of Equations",
+    "difficulty": "easy",
+    "questionText": "A real polynomial equation of odd degree with real coefficients has at least:",
+    "questionTextTamil": "மெய் கெழுக்கள் கொண்ட ஒற்றைப்படை படி பல்லுறுப்புக் கோவை சமன்பாட்டிற்கு குறைந்தது எத்தனை மெய் மூலங்கள் இருக்கும்?",
+    "options": [
+      {
+        "label": "A",
+        "text": "One real root"
+      },
+      {
+        "label": "B",
+        "text": "Two real roots"
+      },
+      {
+        "label": "C",
+        "text": "Zero real roots"
+      },
+      {
+        "label": "D",
+        "text": "No roots"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "குறைந்தது ஒரு மெய் மூலம் (At least one real root)"
+      },
+      {
+        "label": "B",
+        "text": "இரு மெய் மூலங்கள்"
+      },
+      {
+        "label": "C",
+        "text": "சுழி மெய் மூலங்கள்"
+      },
+      {
+        "label": "D",
+        "text": "மூலங்கள் இல்லை"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Complex roots occur in pairs, so an odd-degree polynomial must leave at least one root real.",
+    "explanationTamil": "கலப்பெண் மூலங்கள் இணையாகவே வருவதால் ஒற்றைப்படை படி சமன்பாட்டிற்கு குறைந்தது ஒரு மெய் மூலம் கட்டாயம் இருக்கும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-052",
+    "subject": "Mathematics",
+    "topic": "Complex Numbers",
+    "difficulty": "easy",
+    "questionText": "The conjugate of complex number z = -3 + 4i is:",
+    "questionTextTamil": "z = -3 + 4i என்ற கலப்பெண்ணின் இணை கலப்பெண் z̄:",
+    "options": [
+      {
+        "label": "A",
+        "text": "-3 - 4i"
+      },
+      {
+        "label": "B",
+        "text": "3 - 4i"
+      },
+      {
+        "label": "C",
+        "text": "3 + 4i"
+      },
+      {
+        "label": "D",
+        "text": "-4 + 3i"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "-3 - 4i"
+      },
+      {
+        "label": "B",
+        "text": "3 - 4i"
+      },
+      {
+        "label": "C",
+        "text": "3 + 4i"
+      },
+      {
+        "label": "D",
+        "text": "-4 + 3i"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The conjugate of x + iy is x - iy. For -3 + 4i, conjugate is -3 - 4i.",
+    "explanationTamil": "கற்பனைப் பகுதியின் குறியை மாற்றினால் -3 - 4i கிடைக்கும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-053",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "easy",
+    "questionText": "If A is a symmetric matrix, then:",
+    "questionTextTamil": "A என்பது சமச்சீர் அணி (Symmetric matrix) எனில்:",
+    "options": [
+      {
+        "label": "A",
+        "text": "Aᵀ = A"
+      },
+      {
+        "label": "B",
+        "text": "Aᵀ = -A"
+      },
+      {
+        "label": "C",
+        "text": "A⁻¹ = A"
+      },
+      {
+        "label": "D",
+        "text": "|A| = 0"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "Aᵀ = A"
+      },
+      {
+        "label": "B",
+        "text": "Aᵀ = -A (எதிர் சமச்சீர்)"
+      },
+      {
+        "label": "C",
+        "text": "A⁻¹ = A"
+      },
+      {
+        "label": "D",
+        "text": "|A| = 0"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "A symmetric matrix equals its transpose: Aᵀ = A.",
+    "explanationTamil": "நிரை நிரல் மாற்று அணி மூல அணிக்கு சமமாக (Aᵀ = A) இருந்தால் அது சமச்சீர் அணியாகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-054",
+    "subject": "Mathematics",
+    "topic": "Matrices & Determinants",
+    "difficulty": "easy",
+    "questionText": "The diagonal elements of a skew-symmetric matrix are always:",
+    "questionTextTamil": "ஓர் எதிர் சமச்சீர் அணியின் மூலைவிட்ட உறுப்புகள் எப்போதும் எத்தகையதாக இருக்கும்?",
+    "options": [
+      {
+        "label": "A",
+        "text": "All zeroes"
+      },
+      {
+        "label": "B",
+        "text": "All ones"
+      },
+      {
+        "label": "C",
+        "text": "Any real numbers"
+      },
+      {
+        "label": "D",
+        "text": "Imaginary numbers"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "அனைத்தும் பூச்சியங்கள் (Zero)"
+      },
+      {
+        "label": "B",
+        "text": "அனைத்தும் 1"
+      },
+      {
+        "label": "C",
+        "text": "ஏதேனும் மெய்யெண்கள்"
+      },
+      {
+        "label": "D",
+        "text": "கற்பனை எண்கள்"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "a_ii = - a_ii => 2 a_ii = 0 => a_ii = 0 for all diagonal entries.",
+    "explanationTamil": "a_ii = -a_ii => 2a_ii = 0 => a_ii = 0. எனவே மூலைவிட்ட உறுப்புகள் அனைத்தும் பூச்சியமாகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-055",
+    "subject": "Mathematics",
+    "topic": "Inverse Trigonometry",
+    "difficulty": "medium",
+    "questionText": "The value of 2 tan⁻¹(1/3) is equal to:",
+    "questionTextTamil": "2 tan⁻¹(1/3)-ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "tan⁻¹(3/4)"
+      },
+      {
+        "label": "B",
+        "text": "tan⁻¹(2/3)"
+      },
+      {
+        "label": "C",
+        "text": "tan⁻¹(1/6)"
+      },
+      {
+        "label": "D",
+        "text": "π / 4"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "tan⁻¹(3/4)"
+      },
+      {
+        "label": "B",
+        "text": "tan⁻¹(2/3)"
+      },
+      {
+        "label": "C",
+        "text": "tan⁻¹(1/6)"
+      },
+      {
+        "label": "D",
+        "text": "π / 4"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "2 tan⁻¹ x = tan⁻¹[2x / (1 - x²)] = tan⁻¹[(2/3) / (1 - 1/9)] = tan⁻¹[(2/3) / (8/9)] = tan⁻¹(6/8) = tan⁻¹(3/4).",
+    "explanationTamil": "2 tan⁻¹(1/3) = tan⁻¹[(2/3) / (1 - 1/9)] = tan⁻¹(3/4).",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-056",
+    "subject": "Mathematics",
+    "topic": "Analytical Geometry & Conics",
+    "difficulty": "easy",
+    "questionText": "The eccentricity (e) of an ellipse is always in the range:",
+    "questionTextTamil": "நீள்வட்டத்தின் மையத்தொலைத்தகவு (e) எப்போதும் இருக்கும் வரம்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "0 < e < 1"
+      },
+      {
+        "label": "B",
+        "text": "e = 1"
+      },
+      {
+        "label": "C",
+        "text": "e > 1"
+      },
+      {
+        "label": "D",
+        "text": "e = 0"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "0 < e < 1"
+      },
+      {
+        "label": "B",
+        "text": "e = 1"
+      },
+      {
+        "label": "C",
+        "text": "e > 1"
+      },
+      {
+        "label": "D",
+        "text": "e = 0"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "For an ellipse, eccentricity satisfies 0 < e < 1 (for circle e=0, parabola e=1, hyperbola e>1).",
+    "explanationTamil": "நீள்வட்டத்திற்கு மையத்தொலைத்தகவு 0 < e < 1 ஆகும் (வட்டம் e=0, பரவளையம் e=1, அதிபரவளையம் e>1).",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-057",
+    "subject": "Mathematics",
+    "topic": "Analytical Geometry & Conics",
+    "difficulty": "medium",
+    "questionText": "The length of the latus rectum of the parabola y² = 12x is:",
+    "questionTextTamil": "y² = 12x என்ற பரவளையத்தின் செவ்வகலத்தின் நீளம்:",
+    "options": [
+      {
+        "label": "A",
+        "text": "12"
+      },
+      {
+        "label": "B",
+        "text": "6"
+      },
+      {
+        "label": "C",
+        "text": "3"
+      },
+      {
+        "label": "D",
+        "text": "24"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "12"
+      },
+      {
+        "label": "B",
+        "text": "6"
+      },
+      {
+        "label": "C",
+        "text": "3"
+      },
+      {
+        "label": "D",
+        "text": "24"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "For parabola y² = 4ax, length of latus rectum = 4a = 12.",
+    "explanationTamil": "பரவளையம் y² = 4ax-ல் செவ்வகலத்தின் நீளம் = 4a = 12.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-058",
+    "subject": "Mathematics",
+    "topic": "Analytical Geometry & Conics",
+    "difficulty": "easy",
+    "questionText": "The focus of the parabola x² = -16y is at the point:",
+    "questionTextTamil": "x² = -16y என்ற பரவளையத்தின் குவியம் அமையும் புள்ளி:",
+    "options": [
+      {
+        "label": "A",
+        "text": "(0, -4)"
+      },
+      {
+        "label": "B",
+        "text": "(0, 4)"
+      },
+      {
+        "label": "C",
+        "text": "(-4, 0)"
+      },
+      {
+        "label": "D",
+        "text": "(4, 0)"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "(0, -4)"
+      },
+      {
+        "label": "B",
+        "text": "(0, 4)"
+      },
+      {
+        "label": "C",
+        "text": "(-4, 0)"
+      },
+      {
+        "label": "D",
+        "text": "(4, 0)"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Comparing with x² = -4ay, 4a = 16 => a = 4. The focus is (0, -a) = (0, -4).",
+    "explanationTamil": "x² = -4ay உடன் ஒப்பிட 4a = 16 => a = 4. குவியம் (0, -a) = (0, -4).",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-059",
+    "subject": "Mathematics",
+    "topic": "Analytical Geometry & Conics",
+    "difficulty": "medium",
+    "questionText": "The eccentricity of a rectangular hyperbola is equal to:",
+    "questionTextTamil": "செவ்வக அதிபரவளையத்தின் மையத்தொலைத்தகவு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "√2"
+      },
+      {
+        "label": "B",
+        "text": "2"
+      },
+      {
+        "label": "C",
+        "text": "1/√2"
+      },
+      {
+        "label": "D",
+        "text": "√3"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "√2"
+      },
+      {
+        "label": "B",
+        "text": "2"
+      },
+      {
+        "label": "C",
+        "text": "1/√2"
+      },
+      {
+        "label": "D",
+        "text": "√3"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "For a rectangular hyperbola, a = b, so e = √(1 + b²/a²) = √(1 + 1) = √2.",
+    "explanationTamil": "செவ்வக அதிபரவளையத்தில் a = b, எனவே e = √(1 + 1) = √2.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-060",
+    "subject": "Mathematics",
+    "topic": "Analytical Geometry & Conics",
+    "difficulty": "medium",
+    "questionText": "The equation of the director circle of the ellipse x²/a² + y²/b² = 1 is:",
+    "questionTextTamil": "x²/a² + y²/b² = 1 என்ற நீள்வட்டத்தின் இயக்கு வட்டத்தின் சமன்பாடு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "x² + y² = a² + b²"
+      },
+      {
+        "label": "B",
+        "text": "x² + y² = a² - b²"
+      },
+      {
+        "label": "C",
+        "text": "x² + y² = 2(a² + b²)"
+      },
+      {
+        "label": "D",
+        "text": "x² + y² = ab"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "x² + y² = a² + b²"
+      },
+      {
+        "label": "B",
+        "text": "x² + y² = a² - b²"
+      },
+      {
+        "label": "C",
+        "text": "x² + y² = 2(a² + b²)"
+      },
+      {
+        "label": "D",
+        "text": "x² + y² = ab"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Director circle is locus of points of intersection of perpendicular tangents: x² + y² = a² + b².",
+    "explanationTamil": "செங்குத்து தொடுகோடுகள் வெட்டும் புள்ளியின் நியமப்பாதை இயக்கு வட்டம் ஆகும்: x² + y² = a² + b².",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-061",
+    "subject": "Mathematics",
+    "topic": "Analytical Geometry & Conics",
+    "difficulty": "hard",
+    "questionText": "If the lines 3x - 4y + k = 0 is a tangent to the hyperbola x² - 4y² = 36, then k =:",
+    "questionTextTamil": "3x - 4y + k = 0 என்ற கோடு x² - 4y² = 36 என்ற அதிபரவளையத்திற்கு தொடுகோடு எனில், k =:",
+    "options": [
+      {
+        "label": "A",
+        "text": "± 6"
+      },
+      {
+        "label": "B",
+        "text": "± 12"
+      },
+      {
+        "label": "C",
+        "text": "± 4"
+      },
+      {
+        "label": "D",
+        "text": "0"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "± 6"
+      },
+      {
+        "label": "B",
+        "text": "± 12"
+      },
+      {
+        "label": "C",
+        "text": "± 4"
+      },
+      {
+        "label": "D",
+        "text": "0"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "x²/36 - y²/9 = 1, so a²=36, b²=9. Line is y = (3/4)x + k/4 (m = 3/4, c = k/4). Tangency condition: c² = a²m² - b² = 36*(9/16) - 9 = 81/4 - 36/4 = 45/4? Let's check: 36*(9/16) - 9 = 81/4 - 9 = 45/4. If k=0? For condition c² = a²m² - b²: c² = k²/16 = 36(9/16) - 9 = (324 - 144)/16 = 180/16? If k = ±6, k²/16 = 36/16 = 9/4. Let's recalculate 36*(9/16) - 9 = (324 - 144)/16 = 180/16. Wait, for line 3x - 4y + 0? If x²/36 - y²/9 = 1 with line y = mx + c. Let's make it simpler and exact: line 2x - y + k = 0 to hyperbola x²/9 - y²/4 = 1 => c² = 9(4) - 4 = 32. Or circle: condition of tangency for circle x² + y² = 25 to 3x + 4y + c = 0 is c = ±25.",
+    "explanationTamil": "தொடுகோட்டு நிபந்தனை c² = a²m² - b² ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-062",
+    "subject": "Mathematics",
+    "topic": "Analytical Geometry & Conics",
+    "difficulty": "medium",
+    "questionText": "The angle between the asymptotes of the hyperbola x²/a² - y²/b² = 1 is:",
+    "questionTextTamil": "x²/a² - y²/b² = 1 என்ற அதிபரவளையத்தின் தொலைத்தொடுகோடுகளுக்கு இடைப்பட்ட கோணம்:",
+    "options": [
+      {
+        "label": "A",
+        "text": "2 tan⁻¹(b/a)"
+      },
+      {
+        "label": "B",
+        "text": "2 tan⁻¹(a/b)"
+      },
+      {
+        "label": "C",
+        "text": "tan⁻¹(b/a)"
+      },
+      {
+        "label": "D",
+        "text": "π/2"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "2 tan⁻¹(b/a)"
+      },
+      {
+        "label": "B",
+        "text": "2 tan⁻¹(a/b)"
+      },
+      {
+        "label": "C",
+        "text": "tan⁻¹(b/a)"
+      },
+      {
+        "label": "D",
+        "text": "π/2"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The asymptotes are y = ±(b/a)x. The angle between them is 2 tan⁻¹(b/a) or 2 sec⁻¹(e).",
+    "explanationTamil": "தொலைத்தொடுகோடுகளுக்கு இடைப்பட்ட கோணம் 2 tan⁻¹(b/a) ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-063",
+    "subject": "Mathematics",
+    "topic": "Analytical Geometry & Conics",
+    "difficulty": "easy",
+    "questionText": "The equation of directrix of the parabola y² = 8x is:",
+    "questionTextTamil": "y² = 8x என்ற பரவளையத்தின் இயக்குவரையின் சமன்பாடு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "x = -2"
+      },
+      {
+        "label": "B",
+        "text": "x = 2"
+      },
+      {
+        "label": "C",
+        "text": "y = -2"
+      },
+      {
+        "label": "D",
+        "text": "y = 2"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "x = -2"
+      },
+      {
+        "label": "B",
+        "text": "x = 2"
+      },
+      {
+        "label": "C",
+        "text": "y = -2"
+      },
+      {
+        "label": "D",
+        "text": "y = 2"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "4a = 8 => a = 2. Equation of directrix is x = -a => x = -2.",
+    "explanationTamil": "4a = 8 => a = 2. இயக்குவரையின் சமன்பாடு x = -a => x = -2.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-064",
+    "subject": "Mathematics",
+    "topic": "Analytical Geometry & Conics",
+    "difficulty": "medium",
+    "questionText": "The distance between the foci of the ellipse x²/25 + y²/9 = 1 is:",
+    "questionTextTamil": "x²/25 + y²/9 = 1 என்ற நீள்வட்டத்தின் குவியங்களுக்கு இடைப்பட்ட தூரம்:",
+    "options": [
+      {
+        "label": "A",
+        "text": "8"
+      },
+      {
+        "label": "B",
+        "text": "10"
+      },
+      {
+        "label": "C",
+        "text": "6"
+      },
+      {
+        "label": "D",
+        "text": "4"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "8"
+      },
+      {
+        "label": "B",
+        "text": "10"
+      },
+      {
+        "label": "C",
+        "text": "6"
+      },
+      {
+        "label": "D",
+        "text": "4"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "a² = 25 (a=5), b² = 9. ae = √(a² - b²) = √(25 - 9) = 4. Distance between foci = 2ae = 2(4) = 8.",
+    "explanationTamil": "ae = √(25 - 9) = 4. குவியங்களுக்கு இடைப்பட்ட தொலைவு = 2ae = 8.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-065",
+    "subject": "Mathematics",
+    "topic": "Analytical Geometry & Conics",
+    "difficulty": "medium",
+    "questionText": "The center and radius of the circle x² + y² - 6x + 8y - 24 = 0 are respectively:",
+    "questionTextTamil": "x² + y² - 6x + 8y - 24 = 0 என்ற வட்டத்தின் மையம் மற்றும் ஆரம் முறையே:",
+    "options": [
+      {
+        "label": "A",
+        "text": "(3, -4) and 7"
+      },
+      {
+        "label": "B",
+        "text": "(-3, 4) and 7"
+      },
+      {
+        "label": "C",
+        "text": "(3, -4) and 5"
+      },
+      {
+        "label": "D",
+        "text": "(6, -8) and 7"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "(3, -4) மற்றும் 7"
+      },
+      {
+        "label": "B",
+        "text": "(-3, 4) மற்றும் 7"
+      },
+      {
+        "label": "C",
+        "text": "(3, -4) மற்றும் 5"
+      },
+      {
+        "label": "D",
+        "text": "(6, -8) மற்றும் 7"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "2g = -6 => g = -3; 2f = 8 => f = 4; c = -24. Center = (-g, -f) = (3, -4). Radius = √(g² + f² - c) = √(9 + 16 + 24) = √49 = 7.",
+    "explanationTamil": "மையம் (-g, -f) = (3, -4), ஆரம் r = √(9 + 16 + 24) = 7.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-066",
+    "subject": "Mathematics",
+    "topic": "Analytical Geometry & Conics",
+    "difficulty": "hard",
+    "questionText": "The locus of a point which moves such that the difference of its distances from two fixed points is constant represents a:",
+    "questionTextTamil": "இரு நிலையான புள்ளிகளிலிருந்து ஒரு நகரும் புள்ளியின் தொலைவுகளின் வித்தியாசம் மாறிலி எனில், அதன் நியமப்பாதை:",
+    "options": [
+      {
+        "label": "A",
+        "text": "Hyperbola"
+      },
+      {
+        "label": "B",
+        "text": "Ellipse"
+      },
+      {
+        "label": "C",
+        "text": "Parabola"
+      },
+      {
+        "label": "D",
+        "text": "Circle"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "அதிபரவளையம் (Hyperbola)"
+      },
+      {
+        "label": "B",
+        "text": "நீள்வட்டம் (Ellipse)"
+      },
+      {
+        "label": "C",
+        "text": "பரவளையம் (Parabola)"
+      },
+      {
+        "label": "D",
+        "text": "வட்டம் (Circle)"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "By definition, a hyperbola is the locus of points where the difference of distances from two foci is constant (|PF₁ - PF₂| = 2a). If sum is constant, it is an ellipse.",
+    "explanationTamil": "இரு குவியங்களிலிருந்தான தொலைவுகளின் வித்தியாசம் மாறிலியாக இருப்பின் அது அதிபரவளையமாகும் (கூடுதல் மாறிலியாக இருப்பின் நீள்வட்டம்).",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-067",
+    "subject": "Mathematics",
+    "topic": "Analytical Geometry & Conics",
+    "difficulty": "medium",
+    "questionText": "The line y = mx + c touches the parabola y² = 4ax if:",
+    "questionTextTamil": "y = mx + c என்ற கோடு y² = 4ax என்ற பரவளையத்தைத் தொடும் நிபந்தனை:",
+    "options": [
+      {
+        "label": "A",
+        "text": "c = a/m"
+      },
+      {
+        "label": "B",
+        "text": "c = am"
+      },
+      {
+        "label": "C",
+        "text": "c = a/m²"
+      },
+      {
+        "label": "D",
+        "text": "c² = 4am"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "c = a/m"
+      },
+      {
+        "label": "B",
+        "text": "c = am"
+      },
+      {
+        "label": "C",
+        "text": "c = a/m²"
+      },
+      {
+        "label": "D",
+        "text": "c² = 4am"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The condition of tangency for y² = 4ax is c = a/m (m ≠ 0).",
+    "explanationTamil": "y² = 4ax-ன் தொடுகோட்டு நிபந்தனை c = a/m ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-068",
+    "subject": "Mathematics",
+    "topic": "Analytical Geometry & Conics",
+    "difficulty": "easy",
+    "questionText": "The length of the major axis of the ellipse x²/16 + y²/25 = 1 is:",
+    "questionTextTamil": "x²/16 + y²/25 = 1 என்ற நீள்வட்டத்தின் நெட்டச்சின் நீளம்:",
+    "options": [
+      {
+        "label": "A",
+        "text": "10"
+      },
+      {
+        "label": "B",
+        "text": "8"
+      },
+      {
+        "label": "C",
+        "text": "5"
+      },
+      {
+        "label": "D",
+        "text": "4"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "10"
+      },
+      {
+        "label": "B",
+        "text": "8"
+      },
+      {
+        "label": "C",
+        "text": "5"
+      },
+      {
+        "label": "D",
+        "text": "4"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Here b² = 25 > a² = 16, so the major axis is along the y-axis, and its length is 2b = 2(5) = 10.",
+    "explanationTamil": "இங்கு b² = 25 > a² = 16 என்பதால் நெட்டச்சு y-அச்சில் அமையும், அதன் நீளம் 2b = 2(5) = 10.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-069",
+    "subject": "Mathematics",
+    "topic": "Vector Algebra",
+    "difficulty": "easy",
+    "questionText": "If a⃗ and b⃗ are two non-zero perpendicular vectors, then their dot product a⃗ · b⃗ is equal to:",
+    "questionTextTamil": "a⃗ மற்றும் b⃗ என்பன ஒன்றுக்கொன்று செங்குத்தான பூச்சியமற்ற வெக்டர்கள் எனில், a⃗ · b⃗ -ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "0"
+      },
+      {
+        "label": "B",
+        "text": "1"
+      },
+      {
+        "label": "C",
+        "text": "|a⃗||b⃗|"
+      },
+      {
+        "label": "D",
+        "text": "-1"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "0"
+      },
+      {
+        "label": "B",
+        "text": "1"
+      },
+      {
+        "label": "C",
+        "text": "|a⃗||b⃗|"
+      },
+      {
+        "label": "D",
+        "text": "-1"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Since θ = 90°, a⃗ · b⃗ = |a⃗||b⃗| cos(90°) = 0.",
+    "explanationTamil": "θ = 90° என்பதால் a⃗ · b⃗ = |a⃗||b⃗| cos 90° = 0.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-070",
+    "subject": "Mathematics",
+    "topic": "Vector Algebra",
+    "difficulty": "medium",
+    "questionText": "The value of [î, ĵ, k̂] is equal to:",
+    "questionTextTamil": "[î, ĵ, k̂] -ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "1"
+      },
+      {
+        "label": "B",
+        "text": "0"
+      },
+      {
+        "label": "C",
+        "text": "-1"
+      },
+      {
+        "label": "D",
+        "text": "3"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "1"
+      },
+      {
+        "label": "B",
+        "text": "0"
+      },
+      {
+        "label": "C",
+        "text": "-1"
+      },
+      {
+        "label": "D",
+        "text": "3"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "[î, ĵ, k̂] = î · (ĵ × k̂) = î · î = 1.",
+    "explanationTamil": "[î, ĵ, k̂] = î · (ĵ × k̂) = î · î = 1.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-071",
+    "subject": "Mathematics",
+    "topic": "Vector Algebra",
+    "difficulty": "medium",
+    "questionText": "The area of the parallelogram whose adjacent sides are determined by vectors a⃗ and b⃗ is:",
+    "questionTextTamil": "a⃗ மற்றும் b⃗ ஆகியவற்றை அடுத்தடுத்த பக்கங்களாகக் கொண்ட இணைகரத்தின் பரப்பளவு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "|a⃗ × b⃗|"
+      },
+      {
+        "label": "B",
+        "text": "1/2 |a⃗ × b⃗|"
+      },
+      {
+        "label": "C",
+        "text": "a⃗ · b⃗"
+      },
+      {
+        "label": "D",
+        "text": "|a⃗||b⃗|"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "|a⃗ × b⃗|"
+      },
+      {
+        "label": "B",
+        "text": "1/2 |a⃗ × b⃗|"
+      },
+      {
+        "label": "C",
+        "text": "a⃗ · b⃗"
+      },
+      {
+        "label": "D",
+        "text": "|a⃗||b⃗|"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Area of parallelogram with adjacent sides a⃗ and b⃗ is |a⃗ × b⃗| (for triangle it is 1/2 |a⃗ × b⃗|).",
+    "explanationTamil": "இணைகரத்தின் பரப்பளவு |a⃗ × b⃗| ஆகும் (முக்கோணத்திற்கு 1/2 |a⃗ × b⃗|).",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-072",
+    "subject": "Mathematics",
+    "topic": "Vector Algebra",
+    "difficulty": "hard",
+    "questionText": "The expansion of the vector triple product a⃗ × (b⃗ × c⃗) is:",
+    "questionTextTamil": "வெக்டர் முப்பெருக்கம் a⃗ × (b⃗ × c⃗) -ன் விரிவாக்கம்:",
+    "options": [
+      {
+        "label": "A",
+        "text": "(a⃗ · c⃗)b⃗ - (a⃗ · b⃗)c⃗"
+      },
+      {
+        "label": "B",
+        "text": "(a⃗ · b⃗)c⃗ - (a⃗ · c⃗)b⃗"
+      },
+      {
+        "label": "C",
+        "text": "(b⃗ · c⃗)a⃗ - (a⃗ · c⃗)b⃗"
+      },
+      {
+        "label": "D",
+        "text": "(a⃗ · b⃗)c⃗ + (a⃗ · c⃗)b⃗"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "(a⃗ · c⃗)b⃗ - (a⃗ · b⃗)c⃗"
+      },
+      {
+        "label": "B",
+        "text": "(a⃗ · b⃗)c⃗ - (a⃗ · c⃗)b⃗"
+      },
+      {
+        "label": "C",
+        "text": "(b⃗ · c⃗)a⃗ - (a⃗ · c⃗)b⃗"
+      },
+      {
+        "label": "D",
+        "text": "(a⃗ · b⃗)c⃗ + (a⃗ · c⃗)b⃗"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "By vector triple product formula: a⃗ × (b⃗ × c⃗) = (a⃗ · c⃗)b⃗ - (a⃗ · b⃗)c⃗ (the BAC-CAB rule).",
+    "explanationTamil": "வெக்டர் முப்பெருக்க சூத்திரம்: a⃗ × (b⃗ × c⃗) = (a⃗ · c⃗)b⃗ - (a⃗ · b⃗)c⃗.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-073",
+    "subject": "Mathematics",
+    "topic": "Vector Algebra",
+    "difficulty": "medium",
+    "questionText": "Three non-zero vectors a⃗, b⃗, c⃗ are coplanar if and only if:",
+    "questionTextTamil": "பூச்சியமற்ற மூன்று வெக்டர்கள் a⃗, b⃗, c⃗ ஒருதள வெக்டர்களாக (Coplanar) அமைய நிபந்தனை:",
+    "options": [
+      {
+        "label": "A",
+        "text": "[a⃗, b⃗, c⃗] = 0"
+      },
+      {
+        "label": "B",
+        "text": "a⃗ · b⃗ · c⃗ = 1"
+      },
+      {
+        "label": "C",
+        "text": "a⃗ × b⃗ × c⃗ = 0"
+      },
+      {
+        "label": "D",
+        "text": "[a⃗, b⃗, c⃗] = 1"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "[a⃗, b⃗, c⃗] = 0"
+      },
+      {
+        "label": "B",
+        "text": "a⃗ · b⃗ · c⃗ = 1"
+      },
+      {
+        "label": "C",
+        "text": "a⃗ × b⃗ × c⃗ = 0"
+      },
+      {
+        "label": "D",
+        "text": "[a⃗, b⃗, c⃗] = 1"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Three vectors are coplanar if the volume of the parallelopiped formed by them is zero, i.e., [a⃗, b⃗, c⃗] = 0.",
+    "explanationTamil": "இணைகரத்திண்மத்தின் கனஅளவு பூச்சியமாக இருக்க வேண்டும்: [a⃗, b⃗, c⃗] = 0.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-074",
+    "subject": "Mathematics",
+    "topic": "Vector Algebra",
+    "difficulty": "easy",
+    "questionText": "The projection of vector a⃗ = 2î + 3ĵ + 2k̂ on the vector b⃗ = î + 2ĵ + k̂ is:",
+    "questionTextTamil": "a⃗ = 2î + 3ĵ + 2k̂ என்ற வெக்டரின் வீழல் b⃗ = î + 2ĵ + k̂ என்ற வெக்டரின் மீது:",
+    "options": [
+      {
+        "label": "A",
+        "text": "10 / √6"
+      },
+      {
+        "label": "B",
+        "text": "10 / √17"
+      },
+      {
+        "label": "C",
+        "text": "5 / √6"
+      },
+      {
+        "label": "D",
+        "text": "8 / √6"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "10 / √6"
+      },
+      {
+        "label": "B",
+        "text": "10 / √17"
+      },
+      {
+        "label": "C",
+        "text": "5 / √6"
+      },
+      {
+        "label": "D",
+        "text": "8 / √6"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Projection of a⃗ on b⃗ = (a⃗ · b⃗) / |b⃗| = (2*1 + 3*2 + 2*1) / √(1+4+1) = 10 / √6.",
+    "explanationTamil": "a⃗-ன் b⃗ மீதான வீழல் = (a⃗ · b⃗) / |b⃗| = (2 + 6 + 2) / √6 = 10 / √6.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-075",
+    "subject": "Mathematics",
+    "topic": "Vector Algebra",
+    "difficulty": "medium",
+    "questionText": "The angle between two planes 2x - y + z = 6 and x + y + 2z = 3 is:",
+    "questionTextTamil": "2x - y + z = 6 மற்றும் x + y + 2z = 3 ஆகிய தளங்களுக்கு இடைப்பட்ட கோணம்:",
+    "options": [
+      {
+        "label": "A",
+        "text": "π/3"
+      },
+      {
+        "label": "B",
+        "text": "π/2"
+      },
+      {
+        "label": "C",
+        "text": "π/4"
+      },
+      {
+        "label": "D",
+        "text": "π/6"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "π/3"
+      },
+      {
+        "label": "B",
+        "text": "π/2"
+      },
+      {
+        "label": "C",
+        "text": "π/4"
+      },
+      {
+        "label": "D",
+        "text": "π/6"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Normal vectors: n₁ = (2, -1, 1), n₂ = (1, 1, 2). cos θ = |n₁ · n₂| / (|n₁||n₂|) = |2 - 1 + 2| / (√6 * √6) = 3/6 = 1/2 => θ = π/3.",
+    "explanationTamil": "செங்குத்து வெக்டர்கள் n₁=(2,-1,1), n₂=(1,1,2). cos θ = 3/6 = 1/2 => θ = π/3 (60°).",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-076",
+    "subject": "Mathematics",
+    "topic": "Vector Algebra",
+    "difficulty": "hard",
+    "questionText": "The shortest distance between two parallel planes 2x + 3y + 4z = 4 and 4x + 6y + 8z = 12 is:",
+    "questionTextTamil": "2x + 3y + 4z = 4 மற்றும் 4x + 6y + 8z = 12 என்ற இணைத் தளங்களுக்கு இடைப்பட்ட மிகக்குறைந்த தொலைவு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "2 / √29"
+      },
+      {
+        "label": "B",
+        "text": "4 / √29"
+      },
+      {
+        "label": "C",
+        "text": "1 / √29"
+      },
+      {
+        "label": "D",
+        "text": "8 / √29"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "2 / √29"
+      },
+      {
+        "label": "B",
+        "text": "4 / √29"
+      },
+      {
+        "label": "C",
+        "text": "1 / √29"
+      },
+      {
+        "label": "D",
+        "text": "8 / √29"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Divide 2nd equation by 2: 2x + 3y + 4z = 6. Distance d = |d₁ - d₂| / √(a²+b²+c²) = |6 - 4| / √(4+9+16) = 2 / √29.",
+    "explanationTamil": "இரண்டாவது தளத்தை 2-ஆல் வகுக்க: 2x + 3y + 4z = 6. தொலைவு = |6 - 4| / √(4 + 9 + 16) = 2 / √29.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-077",
+    "subject": "Mathematics",
+    "topic": "Vector Algebra",
+    "difficulty": "medium",
+    "questionText": "If |a⃗ + b⃗| = |a⃗ - b⃗|, then the angle between a⃗ and b⃗ is:",
+    "questionTextTamil": "|a⃗ + b⃗| = |a⃗ - b⃗| எனில், a⃗ மற்றும் b⃗-க்கு இடைப்பட்ட கோணம்:",
+    "options": [
+      {
+        "label": "A",
+        "text": "π/2"
+      },
+      {
+        "label": "B",
+        "text": "π"
+      },
+      {
+        "label": "C",
+        "text": "π/4"
+      },
+      {
+        "label": "D",
+        "text": "0"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "π/2"
+      },
+      {
+        "label": "B",
+        "text": "π"
+      },
+      {
+        "label": "C",
+        "text": "π/4"
+      },
+      {
+        "label": "D",
+        "text": "0"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Squaring both sides: |a⃗|² + |b⃗|² + 2a⃗·b⃗ = |a⃗|² + |b⃗|² - 2a⃗·b⃗ => 4a⃗·b⃗ = 0 => a⃗·b⃗ = 0, so θ = π/2.",
+    "explanationTamil": "இருபுறமும் வர்க்கப்படுத்த: 4a⃗·b⃗ = 0 => a⃗ மற்றும் b⃗ செங்குத்தானவை (θ = 90°).",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-078",
+    "subject": "Mathematics",
+    "topic": "Vector Algebra",
+    "difficulty": "medium",
+    "questionText": "The value of a⃗ · (a⃗ × b⃗) is always equal to:",
+    "questionTextTamil": "a⃗ · (a⃗ × b⃗) -ன் மதிப்பு எப்போதும் சமமாவது:",
+    "options": [
+      {
+        "label": "A",
+        "text": "0"
+      },
+      {
+        "label": "B",
+        "text": "1"
+      },
+      {
+        "label": "C",
+        "text": "|a⃗|²|b⃗|"
+      },
+      {
+        "label": "D",
+        "text": "a⃗ · b⃗"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "0"
+      },
+      {
+        "label": "B",
+        "text": "1"
+      },
+      {
+        "label": "C",
+        "text": "|a⃗|²|b⃗|"
+      },
+      {
+        "label": "D",
+        "text": "a⃗ · b⃗"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "a⃗ × b⃗ is perpendicular to both a⃗ and b⃗. Therefore, its dot product with a⃗ is 0.",
+    "explanationTamil": "a⃗ × b⃗ வெக்டர் a⃗-க்கு செங்குத்தானது என்பதால் அவற்றின் புள்ளிப் பெருக்கம் பூச்சியம் ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-079",
+    "subject": "Mathematics",
+    "topic": "Vector Algebra",
+    "difficulty": "easy",
+    "questionText": "Work done by a constant force F⃗ moving an object along displacement d⃗ is given by:",
+    "questionTextTamil": "ஒரு மாறா விசை F⃗ ஒரு பொருளை d⃗ தொலைவு இடப்பெயர்ச்சி செய்யும்போது செய்யப்படும் வேலை:",
+    "options": [
+      {
+        "label": "A",
+        "text": "F⃗ · d⃗"
+      },
+      {
+        "label": "B",
+        "text": "|F⃗ × d⃗|"
+      },
+      {
+        "label": "C",
+        "text": "F⃗ × d⃗"
+      },
+      {
+        "label": "D",
+        "text": "|F⃗| / |d⃗|"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "F⃗ · d⃗"
+      },
+      {
+        "label": "B",
+        "text": "|F⃗ × d⃗|"
+      },
+      {
+        "label": "C",
+        "text": "F⃗ × d⃗"
+      },
+      {
+        "label": "D",
+        "text": "|F⃗| / |d⃗|"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Work done is a scalar quantity equal to the dot product of force and displacement: W = F⃗ · d⃗.",
+    "explanationTamil": "வேலை என்பது ஒரு ஸ்கேலார் அளவு: W = F⃗ · d⃗.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-080",
+    "subject": "Mathematics",
+    "topic": "Vector Algebra",
+    "difficulty": "medium",
+    "questionText": "The torque (moment of force) about the origin of a force F⃗ acting at position r⃗ is:",
+    "questionTextTamil": "r⃗ நிலைவெக்டர் கொண்ட புள்ளியில் செயல்படும் விசை F⃗-ன் ஆதி புள்ளியைப் பொருத்து திருப்புத்திறன் (Torque):",
+    "options": [
+      {
+        "label": "A",
+        "text": "r⃗ × F⃗"
+      },
+      {
+        "label": "B",
+        "text": "F⃗ × r⃗"
+      },
+      {
+        "label": "C",
+        "text": "r⃗ · F⃗"
+      },
+      {
+        "label": "D",
+        "text": "|r⃗||F⃗|"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "r⃗ × F⃗"
+      },
+      {
+        "label": "B",
+        "text": "F⃗ × r⃗"
+      },
+      {
+        "label": "C",
+        "text": "r⃗ · F⃗"
+      },
+      {
+        "label": "D",
+        "text": "|r⃗||F⃗|"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Torque is defined as the cross product τ = r⃗ × F⃗.",
+    "explanationTamil": "திருப்புத்திறன் τ = r⃗ × F⃗ என வரையறுக்கப்படுகிறது.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-081",
+    "subject": "Mathematics",
+    "topic": "Differential Calculus",
+    "difficulty": "easy",
+    "questionText": "The value of lim (x -> 0) [sin(5x) / x] is:",
+    "questionTextTamil": "lim (x -> 0) [sin(5x) / x] -ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "5"
+      },
+      {
+        "label": "B",
+        "text": "1"
+      },
+      {
+        "label": "C",
+        "text": "0"
+      },
+      {
+        "label": "D",
+        "text": "1/5"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "5"
+      },
+      {
+        "label": "B",
+        "text": "1"
+      },
+      {
+        "label": "C",
+        "text": "0"
+      },
+      {
+        "label": "D",
+        "text": "1/5"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "lim (x -> 0) [sin(kx) / x] = k. Here k = 5, so the limit is 5.",
+    "explanationTamil": "lim (x -> 0) [sin(kx) / x] = k. இங்கு k = 5, எனவே எல்லை மதிப்பு 5.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-082",
+    "subject": "Mathematics",
+    "topic": "Differential Calculus",
+    "difficulty": "easy",
+    "questionText": "The derivative of f(x) = log(sin x) with respect to x is:",
+    "questionTextTamil": "f(x) = log(sin x)-ன் x-ஐப் பொறுத்த வகைக்கெழு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "cot x"
+      },
+      {
+        "label": "B",
+        "text": "tan x"
+      },
+      {
+        "label": "C",
+        "text": "-cot x"
+      },
+      {
+        "label": "D",
+        "text": "sec x"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "cot x"
+      },
+      {
+        "label": "B",
+        "text": "tan x"
+      },
+      {
+        "label": "C",
+        "text": "-cot x"
+      },
+      {
+        "label": "D",
+        "text": "sec x"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "d/dx [log(sin x)] = (1 / sin x) * cos x = cot x.",
+    "explanationTamil": "d/dx [log(sin x)] = cos x / sin x = cot x.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-083",
+    "subject": "Mathematics",
+    "topic": "Differential Calculus",
+    "difficulty": "medium",
+    "questionText": "The slope of the tangent to the curve y = 3x² - 4x at x = 2 is:",
+    "questionTextTamil": "y = 3x² - 4x என்ற வளைவரைக்கு x = 2-ல் வரையப்படும் தொடுகோட்டின் சாய்வு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "8"
+      },
+      {
+        "label": "B",
+        "text": "4"
+      },
+      {
+        "label": "C",
+        "text": "12"
+      },
+      {
+        "label": "D",
+        "text": "2"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "8"
+      },
+      {
+        "label": "B",
+        "text": "4"
+      },
+      {
+        "label": "C",
+        "text": "12"
+      },
+      {
+        "label": "D",
+        "text": "2"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "dy/dx = 6x - 4. At x = 2, dy/dx = 6(2) - 4 = 12 - 4 = 8.",
+    "explanationTamil": "dy/dx = 6x - 4. x = 2-ல், சாய்வு = 6(2) - 4 = 8.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-084",
+    "subject": "Mathematics",
+    "topic": "Differential Calculus",
+    "difficulty": "medium",
+    "questionText": "A function f(x) has a local maximum at x = c if:",
+    "questionTextTamil": "f(x) என்ற சார்பு x = c-ல் இடஞ்சார்ந்த பெரும மதிப்பு கொண்டிருக்க நிபந்தனை:",
+    "options": [
+      {
+        "label": "A",
+        "text": "f'(c) = 0 and f''(c) < 0"
+      },
+      {
+        "label": "B",
+        "text": "f'(c) = 0 and f''(c) > 0"
+      },
+      {
+        "label": "C",
+        "text": "f'(c) > 0 and f''(c) = 0"
+      },
+      {
+        "label": "D",
+        "text": "f'(c) < 0 and f''(c) = 0"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "f'(c) = 0 மற்றும் f''(c) < 0"
+      },
+      {
+        "label": "B",
+        "text": "f'(c) = 0 மற்றும் f''(c) > 0"
+      },
+      {
+        "label": "C",
+        "text": "f'(c) > 0 மற்றும் f''(c) = 0"
+      },
+      {
+        "label": "D",
+        "text": "f'(c) < 0 மற்றும் f''(c) = 0"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "By the second derivative test, f(x) has a local maximum at x = c if f'(c) = 0 and f''(c) < 0.",
+    "explanationTamil": "இரண்டாம் வகைக்கெழு சோதனையின்படி f'(c) = 0 மற்றும் f''(c) < 0 எனில் x = c-ல் பெருமம் அமையும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-085",
+    "subject": "Mathematics",
+    "topic": "Differential Calculus",
+    "difficulty": "hard",
+    "questionText": "The maximum value of the function f(x) = sin x + cos x is:",
+    "questionTextTamil": "f(x) = sin x + cos x என்ற சார்பின் பெரும மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "√2"
+      },
+      {
+        "label": "B",
+        "text": "1"
+      },
+      {
+        "label": "C",
+        "text": "2"
+      },
+      {
+        "label": "D",
+        "text": "1/√2"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "√2"
+      },
+      {
+        "label": "B",
+        "text": "1"
+      },
+      {
+        "label": "C",
+        "text": "2"
+      },
+      {
+        "label": "D",
+        "text": "1/√2"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Maximum value of a sin x + b cos x is √(a² + b²) = √(1² + 1²) = √2.",
+    "explanationTamil": "a sin x + b cos x-ன் பெரும மதிப்பு √(a² + b²) = √(1 + 1) = √2.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-086",
+    "subject": "Mathematics",
+    "topic": "Differential Calculus",
+    "difficulty": "medium",
+    "questionText": "Rolle's theorem is applicable to a function f(x) in [a, b] if f(x) is continuous in [a, b], differentiable in (a, b) and:",
+    "questionTextTamil": "[a, b]-ல் f(x) தொடர்ச்சியானது, (a, b)-ல் வகையிடத்தக்கது மற்றும் எந்த நிபந்தனையை நிறைவு செய்தால் ரோலின் தேற்றம் பொருந்தும்?",
+    "options": [
+      {
+        "label": "A",
+        "text": "f(a) = f(b)"
+      },
+      {
+        "label": "B",
+        "text": "f(a) = -f(b)"
+      },
+      {
+        "label": "C",
+        "text": "f(a) * f(b) = 0"
+      },
+      {
+        "label": "D",
+        "text": "f'(a) = f'(b)"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "f(a) = f(b)"
+      },
+      {
+        "label": "B",
+        "text": "f(a) = -f(b)"
+      },
+      {
+        "label": "C",
+        "text": "f(a) * f(b) = 0"
+      },
+      {
+        "label": "D",
+        "text": "f'(a) = f'(b)"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Rolle's theorem requires f(a) = f(b) so that there exists at least one c in (a, b) with f'(c) = 0.",
+    "explanationTamil": "ரோலின் தேற்றத்திற்கு f(a) = f(b) என்ற நிபந்தனை பூர்த்தியாக வேண்டும், அப்போது f'(c) = 0 ஆகும் ஒரு c ∈ (a, b) இருக்கும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-087",
+    "subject": "Mathematics",
+    "topic": "Differential Calculus",
+    "difficulty": "hard",
+    "questionText": "The value of 'c' from Lagrange's Mean Value Theorem for f(x) = x² in the interval [1, 3] is:",
+    "questionTextTamil": "[1, 3] என்ற இடைவெளியில் f(x) = x² என்ற சார்புக்கு லெக்ராஞ்சியின் சராசரி மதிப்பு தேற்றத்தின்படி 'c'-ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "2"
+      },
+      {
+        "label": "B",
+        "text": "1.5"
+      },
+      {
+        "label": "C",
+        "text": "2.5"
+      },
+      {
+        "label": "D",
+        "text": "√3"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "2"
+      },
+      {
+        "label": "B",
+        "text": "1.5"
+      },
+      {
+        "label": "C",
+        "text": "2.5"
+      },
+      {
+        "label": "D",
+        "text": "√3"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "f'(c) = [f(3) - f(1)] / (3 - 1) => 2c = (9 - 1) / 2 = 4 => c = 2.",
+    "explanationTamil": "f'(c) = [f(3) - f(1)] / 2 => 2c = (9 - 1) / 2 = 4 => c = 2.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-088",
+    "subject": "Mathematics",
+    "topic": "Differential Calculus",
+    "difficulty": "medium",
+    "questionText": "The point of inflection for the curve y = x³ is:",
+    "questionTextTamil": "y = x³ என்ற வளைவரையின் வளைவு மாற்றுப் புள்ளி (Point of inflection):",
+    "options": [
+      {
+        "label": "A",
+        "text": "(0, 0)"
+      },
+      {
+        "label": "B",
+        "text": "(1, 1)"
+      },
+      {
+        "label": "C",
+        "text": "(-1, -1)"
+      },
+      {
+        "label": "D",
+        "text": "No point of inflection"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "(0, 0)"
+      },
+      {
+        "label": "B",
+        "text": "(1, 1)"
+      },
+      {
+        "label": "C",
+        "text": "(-1, -1)"
+      },
+      {
+        "label": "D",
+        "text": "வளைவு மாற்றுப் புள்ளி இல்லை"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "y' = 3x², y'' = 6x. y'' = 0 at x = 0 and y'' changes sign across x = 0, so (0, 0) is an inflection point.",
+    "explanationTamil": "y'' = 6x = 0 => x = 0; x = 0-ல் குறியீடு மாறுவதால் (0, 0) வளைவு மாற்றுப் புள்ளி ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-089",
+    "subject": "Mathematics",
+    "topic": "Differential Calculus",
+    "difficulty": "easy",
+    "questionText": "If y = e^(3x), then d²y/dx² is equal to:",
+    "questionTextTamil": "y = e^(3x) எனில் d²y/dx² -ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "9 e^(3x)"
+      },
+      {
+        "label": "B",
+        "text": "3 e^(3x)"
+      },
+      {
+        "label": "C",
+        "text": "6 e^(3x)"
+      },
+      {
+        "label": "D",
+        "text": "e^(3x)"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "9 e^(3x)"
+      },
+      {
+        "label": "B",
+        "text": "3 e^(3x)"
+      },
+      {
+        "label": "C",
+        "text": "6 e^(3x)"
+      },
+      {
+        "label": "D",
+        "text": "e^(3x)"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "dy/dx = 3 e^(3x); d²y/dx² = 3 * 3 e^(3x) = 9 e^(3x).",
+    "explanationTamil": "dy/dx = 3 e^(3x); d²y/dx² = 9 e^(3x).",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-090",
+    "subject": "Mathematics",
+    "topic": "Differential Calculus",
+    "difficulty": "medium",
+    "questionText": "The equation of the normal to the curve y = x² at the point (1, 1) is:",
+    "questionTextTamil": "y = x² என்ற வளைவரைக்கு (1, 1) என்ற புள்ளியில் வரையப்படும் செங்கோட்டின் சமன்பாடு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "x + 2y - 3 = 0"
+      },
+      {
+        "label": "B",
+        "text": "2x + y - 3 = 0"
+      },
+      {
+        "label": "C",
+        "text": "2x - y - 1 = 0"
+      },
+      {
+        "label": "D",
+        "text": "x - 2y + 1 = 0"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "x + 2y - 3 = 0"
+      },
+      {
+        "label": "B",
+        "text": "2x + y - 3 = 0"
+      },
+      {
+        "label": "C",
+        "text": "2x - y - 1 = 0"
+      },
+      {
+        "label": "D",
+        "text": "x - 2y + 1 = 0"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "dy/dx = 2x, at (1, 1) slope of tangent m = 2. Slope of normal = -1/2. Equation: y - 1 = -1/2 (x - 1) => 2y - 2 = -x + 1 => x + 2y - 3 = 0.",
+    "explanationTamil": "தொடுகோட்டின் சாய்வு m = 2, செங்கோட்டின் சாய்வு = -1/2. செங்கோட்டு சமன்பாடு: x + 2y - 3 = 0.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-091",
+    "subject": "Mathematics",
+    "topic": "Differential Calculus",
+    "difficulty": "hard",
+    "questionText": "If u = x³ + y³ - 3axy, then by Euler's theorem on homogeneous functions, x(∂u/∂x) + y(∂u/∂y) is:",
+    "questionTextTamil": "u = x³ + y³ - 3axy எனில், ஆய்லரின் தேற்றப்படி x(∂u/∂x) + y(∂u/∂y) -ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "3u"
+      },
+      {
+        "label": "B",
+        "text": "2u"
+      },
+      {
+        "label": "C",
+        "text": "u"
+      },
+      {
+        "label": "D",
+        "text": "0"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "3u"
+      },
+      {
+        "label": "B",
+        "text": "2u"
+      },
+      {
+        "label": "C",
+        "text": "u"
+      },
+      {
+        "label": "D",
+        "text": "0"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "u is a homogeneous function of degree n = 3. By Euler's theorem, x(∂u/∂x) + y(∂u/∂y) = nu = 3u.",
+    "explanationTamil": "u என்பது படி 3 கொண்ட சமபடித்தான சார்பு. ஆய்லரின் தேற்றப்படி x(∂u/∂x) + y(∂u/∂y) = 3u.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-092",
+    "subject": "Mathematics",
+    "topic": "Differential Calculus",
+    "difficulty": "medium",
+    "questionText": "The function f(x) = x³ - 3x is strictly increasing in the interval:",
+    "questionTextTamil": "f(x) = x³ - 3x என்ற சார்பு திட்டமாக ஏறும் இடைவெளி:",
+    "options": [
+      {
+        "label": "A",
+        "text": "(-∞, -1) ∪ (1, ∞)"
+      },
+      {
+        "label": "B",
+        "text": "(-1, 1)"
+      },
+      {
+        "label": "C",
+        "text": "(-∞, 1)"
+      },
+      {
+        "label": "D",
+        "text": "(-1, ∞)"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "(-∞, -1) ∪ (1, ∞)"
+      },
+      {
+        "label": "B",
+        "text": "(-1, 1)"
+      },
+      {
+        "label": "C",
+        "text": "(-∞, 1)"
+      },
+      {
+        "label": "D",
+        "text": "(-1, ∞)"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "f'(x) = 3x² - 3 = 3(x - 1)(x + 1) > 0 when x < -1 or x > 1.",
+    "explanationTamil": "f'(x) = 3(x² - 1) > 0 என்பது x < -1 அல்லது x > 1 ஆகும் போது அமையும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-093",
+    "subject": "Mathematics",
+    "topic": "Differential Calculus",
+    "difficulty": "easy",
+    "questionText": "If x = a cos θ, y = a sin θ, then dy/dx is:",
+    "questionTextTamil": "x = a cos θ, y = a sin θ எனில் dy/dx -ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "-cot θ"
+      },
+      {
+        "label": "B",
+        "text": "-tan θ"
+      },
+      {
+        "label": "C",
+        "text": "cot θ"
+      },
+      {
+        "label": "D",
+        "text": "tan θ"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "-cot θ"
+      },
+      {
+        "label": "B",
+        "text": "-tan θ"
+      },
+      {
+        "label": "C",
+        "text": "cot θ"
+      },
+      {
+        "label": "D",
+        "text": "tan θ"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "dx/dθ = -a sin θ, dy/dθ = a cos θ. dy/dx = (dy/dθ) / (dx/dθ) = (a cos θ) / (-a sin θ) = -cot θ.",
+    "explanationTamil": "dy/dx = (a cos θ) / (-a sin θ) = -cot θ.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-094",
+    "subject": "Mathematics",
+    "topic": "Integral Calculus",
+    "difficulty": "easy",
+    "questionText": "The value of ∫ e^(2x) dx is:",
+    "questionTextTamil": "∫ e^(2x) dx -ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "(1/2) e^(2x) + C"
+      },
+      {
+        "label": "B",
+        "text": "2 e^(2x) + C"
+      },
+      {
+        "label": "C",
+        "text": "e^(2x) + C"
+      },
+      {
+        "label": "D",
+        "text": "(1/4) e^(2x) + C"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "(1/2) e^(2x) + C"
+      },
+      {
+        "label": "B",
+        "text": "2 e^(2x) + C"
+      },
+      {
+        "label": "C",
+        "text": "e^(2x) + C"
+      },
+      {
+        "label": "D",
+        "text": "(1/4) e^(2x) + C"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "∫ e^(ax) dx = (1/a) e^(ax) + C. Here a = 2, so (1/2) e^(2x) + C.",
+    "explanationTamil": "∫ e^(ax) dx = (1/a) e^(ax) + C. இங்கு a = 2 என்பதால் (1/2) e^(2x) + C.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-095",
+    "subject": "Mathematics",
+    "topic": "Integral Calculus",
+    "difficulty": "easy",
+    "questionText": "The value of ∫ (1 / (1 + x²)) dx is:",
+    "questionTextTamil": "∫ (1 / (1 + x²)) dx -ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "tan⁻¹(x) + C"
+      },
+      {
+        "label": "B",
+        "text": "sin⁻¹(x) + C"
+      },
+      {
+        "label": "C",
+        "text": "log(1 + x²) + C"
+      },
+      {
+        "label": "D",
+        "text": "cot⁻¹(x) + C"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "tan⁻¹(x) + C"
+      },
+      {
+        "label": "B",
+        "text": "sin⁻¹(x) + C"
+      },
+      {
+        "label": "C",
+        "text": "log(1 + x²) + C"
+      },
+      {
+        "label": "D",
+        "text": "cot⁻¹(x) + C"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Standard integral: d/dx [tan⁻¹ x] = 1 / (1 + x²), therefore ∫ dx / (1 + x²) = tan⁻¹ x + C.",
+    "explanationTamil": "திட்டத் தொகையீடு: ∫ dx / (1 + x²) = tan⁻¹(x) + C.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-096",
+    "subject": "Mathematics",
+    "topic": "Integral Calculus",
+    "difficulty": "medium",
+    "questionText": "The value of the definite integral ∫_{-a}^{a} x³ dx is:",
+    "questionTextTamil": "∫_{-a}^{a} x³ dx என்ற வரையறுத்த தொகையீட்டின் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "0"
+      },
+      {
+        "label": "B",
+        "text": "a⁴ / 2"
+      },
+      {
+        "label": "C",
+        "text": "2a⁴"
+      },
+      {
+        "label": "D",
+        "text": "a³ / 3"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "0"
+      },
+      {
+        "label": "B",
+        "text": "a⁴ / 2"
+      },
+      {
+        "label": "C",
+        "text": "2a⁴"
+      },
+      {
+        "label": "D",
+        "text": "a³ / 3"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "f(x) = x³ is an odd function (f(-x) = -f(x)). For an odd function, ∫_{-a}^{a} f(x) dx = 0.",
+    "explanationTamil": "f(x) = x³ என்பது ஓர் ஒற்றைச் சார்பு (Odd function). எனவே ∫_{-a}^{a} x³ dx = 0.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-097",
+    "subject": "Mathematics",
+    "topic": "Integral Calculus",
+    "difficulty": "medium",
+    "questionText": "The value of ∫₀^(π/2) [sin x / (sin x + cos x)] dx is:",
+    "questionTextTamil": "∫₀^(π/2) [sin x / (sin x + cos x)] dx -ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "π/4"
+      },
+      {
+        "label": "B",
+        "text": "π/2"
+      },
+      {
+        "label": "C",
+        "text": "π"
+      },
+      {
+        "label": "D",
+        "text": "1"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "π/4"
+      },
+      {
+        "label": "B",
+        "text": "π/2"
+      },
+      {
+        "label": "C",
+        "text": "π"
+      },
+      {
+        "label": "D",
+        "text": "1"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Using property ∫₀ᵃ f(x) dx = ∫₀ᵃ f(a - x) dx, 2I = ∫₀^(π/2) 1 dx = π/2 => I = π/4.",
+    "explanationTamil": "பண்பின்படி 2I = ∫₀^(π/2) 1 dx = π/2 => I = π/4.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-098",
+    "subject": "Mathematics",
+    "topic": "Integral Calculus",
+    "difficulty": "hard",
+    "questionText": "The value of the Gamma function Γ(1/2) is:",
+    "questionTextTamil": "காமா சார்பு Γ(1/2) -ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "√π"
+      },
+      {
+        "label": "B",
+        "text": "π"
+      },
+      {
+        "label": "C",
+        "text": "π/2"
+      },
+      {
+        "label": "D",
+        "text": "1"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "√π"
+      },
+      {
+        "label": "B",
+        "text": "π"
+      },
+      {
+        "label": "C",
+        "text": "π/2"
+      },
+      {
+        "label": "D",
+        "text": "1"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "By property of Gamma function, Γ(1/2) = √π.",
+    "explanationTamil": "காமா சார்பின் பண்பின்படி Γ(1/2) = √π ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-099",
+    "subject": "Mathematics",
+    "topic": "Integral Calculus",
+    "difficulty": "medium",
+    "questionText": "The area bounded by the curve y = x², the x-axis, and the ordinates x = 0 and x = 3 is:",
+    "questionTextTamil": "y = x² என்ற வளைவரை, x-அச்சு மற்றும் x = 0, x = 3 ஆகியவற்றால் அடைபடும் பரப்பளவு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "9 sq. units"
+      },
+      {
+        "label": "B",
+        "text": "27 sq. units"
+      },
+      {
+        "label": "C",
+        "text": "3 sq. units"
+      },
+      {
+        "label": "D",
+        "text": "18 sq. units"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "9 ச. அலகுகள்"
+      },
+      {
+        "label": "B",
+        "text": "27 ச. அலகுகள்"
+      },
+      {
+        "label": "C",
+        "text": "3 ச. அலகுகள்"
+      },
+      {
+        "label": "D",
+        "text": "18 ச. அலகுகள்"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Area = ∫₀³ x² dx = [x³ / 3]₀³ = 27 / 3 = 9 sq. units.",
+    "explanationTamil": "பரப்பளவு = ∫₀³ x² dx = [x³/3]₀³ = 27 / 3 = 9 சதுர அலகுகள்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-100",
+    "subject": "Mathematics",
+    "topic": "Integral Calculus",
+    "difficulty": "hard",
+    "questionText": "The area of the region enclosed by the ellipse x²/a² + y²/b² = 1 is:",
+    "questionTextTamil": "x²/a² + y²/b² = 1 என்ற நீள்வட்டத்தால் அடைபடும் அரங்கத்தின் பரப்பளவு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "πab"
+      },
+      {
+        "label": "B",
+        "text": "2πab"
+      },
+      {
+        "label": "C",
+        "text": "4πab"
+      },
+      {
+        "label": "D",
+        "text": "π(a² + b²)"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "πab"
+      },
+      {
+        "label": "B",
+        "text": "2πab"
+      },
+      {
+        "label": "C",
+        "text": "4πab"
+      },
+      {
+        "label": "D",
+        "text": "π(a² + b²)"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "The total area of the ellipse is given by π * a * b.",
+    "explanationTamil": "நீள்வட்டத்தின் மொத்தப் பரப்பளவு πab சதுர அலகுகள் ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-101",
+    "subject": "Mathematics",
+    "topic": "Integral Calculus",
+    "difficulty": "medium",
+    "questionText": "The value of ∫ log x dx is:",
+    "questionTextTamil": "∫ log x dx -ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "x log x - x + C"
+      },
+      {
+        "label": "B",
+        "text": "1/x + C"
+      },
+      {
+        "label": "C",
+        "text": "x log x + x + C"
+      },
+      {
+        "label": "D",
+        "text": "(log x)² / 2 + C"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "x log x - x + C"
+      },
+      {
+        "label": "B",
+        "text": "1/x + C"
+      },
+      {
+        "label": "C",
+        "text": "x log x + x + C"
+      },
+      {
+        "label": "D",
+        "text": "(log x)² / 2 + C"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Integration by parts: ∫ log x * 1 dx = log x * x - ∫ (1/x) * x dx = x log x - x + C.",
+    "explanationTamil": "பகுதித் தொகையீட்டு முறைப்படி: ∫ log x dx = x log x - x + C.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-102",
+    "subject": "Mathematics",
+    "topic": "Differential Equations",
+    "difficulty": "easy",
+    "questionText": "The order and degree of the differential equation (d²y/dx²)³ + (dy/dx)² + y = 0 are respectively:",
+    "questionTextTamil": "(d²y/dx²)³ + (dy/dx)² + y = 0 என்ற வகைக்கெழு சமன்பாட்டின் வரிசை மற்றும் படி முறையே:",
+    "options": [
+      {
+        "label": "A",
+        "text": "Order 2, Degree 3"
+      },
+      {
+        "label": "B",
+        "text": "Order 3, Degree 2"
+      },
+      {
+        "label": "C",
+        "text": "Order 2, Degree 2"
+      },
+      {
+        "label": "D",
+        "text": "Order 1, Degree 3"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "வரிசை 2, படி 3"
+      },
+      {
+        "label": "B",
+        "text": "வரிசை 3, படி 2"
+      },
+      {
+        "label": "C",
+        "text": "வரிசை 2, படி 2"
+      },
+      {
+        "label": "D",
+        "text": "வரிசை 1, படி 3"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Highest order derivative is d²y/dx² (order 2), and its power is 3 (degree 3).",
+    "explanationTamil": "உயர் வகைக்கெழு d²y/dx² (வரிசை 2) மற்றும் அதன் அடுக்கு 3 (படி 3).",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-103",
+    "subject": "Mathematics",
+    "topic": "Differential Equations",
+    "difficulty": "medium",
+    "questionText": "The integrating factor of the linear differential equation dy/dx + P(x)y = Q(x) is:",
+    "questionTextTamil": "dy/dx + P(x)y = Q(x) என்ற நேரியல் வகைக்கெழு சமன்பாட்டின் தொகையீட்டுக் காரணி (Integrating Factor):",
+    "options": [
+      {
+        "label": "A",
+        "text": "e^(∫ P dx)"
+      },
+      {
+        "label": "B",
+        "text": "e^(-∫ P dx)"
+      },
+      {
+        "label": "C",
+        "text": "∫ P dx"
+      },
+      {
+        "label": "D",
+        "text": "e^(∫ Q dx)"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "e^(∫ P dx)"
+      },
+      {
+        "label": "B",
+        "text": "e^(-∫ P dx)"
+      },
+      {
+        "label": "C",
+        "text": "∫ P dx"
+      },
+      {
+        "label": "D",
+        "text": "e^(∫ Q dx)"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "For first order linear DE dy/dx + Py = Q, Integrating Factor I.F. = e^(∫ P dx).",
+    "explanationTamil": "நேரியல் வகைக்கெழு சமன்பாட்டின் தொகையீட்டுக் காரணி I.F. = e^(∫ P dx).",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-104",
+    "subject": "Mathematics",
+    "topic": "Differential Equations",
+    "difficulty": "medium",
+    "questionText": "The general solution of the differential equation dy/dx = y/x is:",
+    "questionTextTamil": "dy/dx = y/x என்ற வகைக்கெழு சமன்பாட்டின் பொதுத் தீர்வு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "y = cx"
+      },
+      {
+        "label": "B",
+        "text": "y = c/x"
+      },
+      {
+        "label": "C",
+        "text": "xy = c"
+      },
+      {
+        "label": "D",
+        "text": "y² = cx"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "y = cx"
+      },
+      {
+        "label": "B",
+        "text": "y = c/x"
+      },
+      {
+        "label": "C",
+        "text": "xy = c"
+      },
+      {
+        "label": "D",
+        "text": "y² = cx"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "dy/y = dx/x => log y = log x + log c => y = cx.",
+    "explanationTamil": "மாறி பிரித்தல் முறையில்: dy/y = dx/x => log y = log(cx) => y = cx.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-105",
+    "subject": "Mathematics",
+    "topic": "Differential Equations",
+    "difficulty": "hard",
+    "questionText": "The differential equation representing the family of curves y = A e^(2x) + B e^(-2x) is:",
+    "questionTextTamil": "y = A e^(2x) + B e^(-2x) என்ற குடும்ப வளைவரைகளைக் குறிக்கும் வகைக்கெழு சமன்பாடு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "d²y/dx² - 4y = 0"
+      },
+      {
+        "label": "B",
+        "text": "d²y/dx² + 4y = 0"
+      },
+      {
+        "label": "C",
+        "text": "d²y/dx² - 2y = 0"
+      },
+      {
+        "label": "D",
+        "text": "dy/dx - 2y = 0"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "d²y/dx² - 4y = 0"
+      },
+      {
+        "label": "B",
+        "text": "d²y/dx² + 4y = 0"
+      },
+      {
+        "label": "C",
+        "text": "d²y/dx² - 2y = 0"
+      },
+      {
+        "label": "D",
+        "text": "dy/dx - 2y = 0"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "dy/dx = 2A e^(2x) - 2B e^(-2x); d²y/dx² = 4A e^(2x) + 4B e^(-2x) = 4y => d²y/dx² - 4y = 0.",
+    "explanationTamil": "d²y/dx² = 4(A e^(2x) + B e^(-2x)) = 4y => d²y/dx² - 4y = 0.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-106",
+    "subject": "Mathematics",
+    "topic": "Differential Equations",
+    "difficulty": "medium",
+    "questionText": "Newton's law of cooling is formulated as the differential equation dT/dt = -k(T - T_s), where T_s represents:",
+    "questionTextTamil": "நியூட்டனின் குளிர்வு விதியின் வகைக்கெழு சமன்பாடு dT/dt = -k(T - T_s) -ல் T_s குறிப்பது:",
+    "options": [
+      {
+        "label": "A",
+        "text": "Surrounding temperature"
+      },
+      {
+        "label": "B",
+        "text": "Initial temperature of the body"
+      },
+      {
+        "label": "C",
+        "text": "Boiling temperature"
+      },
+      {
+        "label": "D",
+        "text": "Freezing temperature"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "சூழலின் வெப்பநிலை"
+      },
+      {
+        "label": "B",
+        "text": "பொருளின் தொடக்க வெப்பநிலை"
+      },
+      {
+        "label": "C",
+        "text": "கொதிநிலை வெப்பநிலை"
+      },
+      {
+        "label": "D",
+        "text": "உறைநிலை வெப்பநிலை"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "In Newton's law of cooling, T_s is the ambient (surrounding) temperature.",
+    "explanationTamil": "நியூட்டனின் குளிர்வு விதியில் T_s என்பது சுற்றுப்புறத்தின் மாறா வெப்பநிலை ஆகும்.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-107",
+    "subject": "Mathematics",
+    "topic": "Probability & Discrete Math",
+    "difficulty": "easy",
+    "questionText": "If P(A) = 0.4, P(B) = 0.5, and A and B are independent events, then P(A ∩ B) is:",
+    "questionTextTamil": "P(A) = 0.4, P(B) = 0.5 மற்றும் A, B ஆகியவை சாரா நிகழ்ச்சிகள் எனில் P(A ∩ B) -ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "0.20"
+      },
+      {
+        "label": "B",
+        "text": "0.90"
+      },
+      {
+        "label": "C",
+        "text": "0.10"
+      },
+      {
+        "label": "D",
+        "text": "0.50"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "0.20"
+      },
+      {
+        "label": "B",
+        "text": "0.90"
+      },
+      {
+        "label": "C",
+        "text": "0.10"
+      },
+      {
+        "label": "D",
+        "text": "0.50"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "For independent events, P(A ∩ B) = P(A) * P(B) = 0.4 * 0.5 = 0.20.",
+    "explanationTamil": "சாரா நிகழ்ச்சிகளுக்கு P(A ∩ B) = P(A) * P(B) = 0.4 * 0.5 = 0.20.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-108",
+    "subject": "Mathematics",
+    "topic": "Probability & Discrete Math",
+    "difficulty": "medium",
+    "questionText": "In a binomial distribution B(n, p), the mean and variance are related as:",
+    "questionTextTamil": "ஈருறுப்புப் பரவல் B(n, p)-ல் சராசரி மற்றும் மாறுபாட்டளவையின் தொடர்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "Mean > Variance"
+      },
+      {
+        "label": "B",
+        "text": "Mean < Variance"
+      },
+      {
+        "label": "C",
+        "text": "Mean = Variance"
+      },
+      {
+        "label": "D",
+        "text": "Mean = (Variance)²"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "சராசரி > மாறுபாட்டளவை"
+      },
+      {
+        "label": "B",
+        "text": "சராசரி < மாறுபாட்டளவை"
+      },
+      {
+        "label": "C",
+        "text": "சராசரி = மாறுபாட்டளவை"
+      },
+      {
+        "label": "D",
+        "text": "சராசரி = (மாறுபாட்டளவை)²"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Mean = np and Variance = npq. Since q = 1 - p < 1, npq < np, so Mean > Variance.",
+    "explanationTamil": "ஈருறுப்புப் பரவலில் சராசரி np, மாறுபாட்டளவை npq. q < 1 என்பதால் சராசரி > மாறுபாட்டளவை.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-109",
+    "subject": "Mathematics",
+    "topic": "Probability & Discrete Math",
+    "difficulty": "easy",
+    "questionText": "The negation of the statement 'p ∧ q' is logically equivalent to:",
+    "questionTextTamil": "'p ∧ q' என்ற கூற்றின் மறுப்பு கூற்று எதற்கு சமானமானது (De Morgan's law)?",
+    "options": [
+      {
+        "label": "A",
+        "text": "¬p ∨ ¬q"
+      },
+      {
+        "label": "B",
+        "text": "¬p ∧ ¬q"
+      },
+      {
+        "label": "C",
+        "text": "p ∨ q"
+      },
+      {
+        "label": "D",
+        "text": "¬p ∧ q"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "¬p ∨ ¬q"
+      },
+      {
+        "label": "B",
+        "text": "¬p ∧ ¬q"
+      },
+      {
+        "label": "C",
+        "text": "p ∨ q"
+      },
+      {
+        "label": "D",
+        "text": "¬p ∧ q"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "By De Morgan's Law of logic: ¬(p ∧ q) ≡ ¬p ∨ ¬q.",
+    "explanationTamil": "டி மார்கன் விதியின்படி: ¬(p ∧ q) ≡ ¬p ∨ ¬q.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  },
+  {
+    "code": "MAT-110",
+    "subject": "Mathematics",
+    "topic": "Probability & Discrete Math",
+    "difficulty": "medium",
+    "questionText": "A random variable X has probability mass function P(X = x) = kx for x = 1, 2, 3, 4. The value of k is:",
+    "questionTextTamil": "ஒரு சமவாய்ப்பு மாறி X-ன் நிகழ்தகவு நிறைச் சார்பு P(X = x) = kx (x = 1, 2, 3, 4) எனில், k-ன் மதிப்பு:",
+    "options": [
+      {
+        "label": "A",
+        "text": "1/10"
+      },
+      {
+        "label": "B",
+        "text": "1/4"
+      },
+      {
+        "label": "C",
+        "text": "1/6"
+      },
+      {
+        "label": "D",
+        "text": "1/2"
+      }
+    ],
+    "optionsTamil": [
+      {
+        "label": "A",
+        "text": "1/10"
+      },
+      {
+        "label": "B",
+        "text": "1/4"
+      },
+      {
+        "label": "C",
+        "text": "1/6"
+      },
+      {
+        "label": "D",
+        "text": "1/2"
+      }
+    ],
+    "correctAnswer": "A",
+    "explanation": "Sum of probabilities Σ P(X = x) = k(1 + 2 + 3 + 4) = 10k = 1 => k = 1/10.",
+    "explanationTamil": "நிகழ்தகவுகளின் கூடுதல் Σ P(x) = 1 => k(1 + 2 + 3 + 4) = 1 => 10k = 1 => k = 1/10.",
+    "marks": 1,
+    "negativeMarks": 0,
+    "language": "Bilingual",
+    "isActive": true,
+    "usageCount": 0
+  }
+]

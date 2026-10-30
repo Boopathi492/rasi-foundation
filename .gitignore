@@ -4,5 +4,6 @@ node_modules
 .vercel
 .env*
 *.txt
+storage/uploads/
 *.log
 .DS_Store

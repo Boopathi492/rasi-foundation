@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     try {
         await dbConnect();
 
-        const { sessionId, questionId, answer } = req.body;
+        const { sessionId, questionId, answer, markedForReview } = req.body;
 
         if (!sessionId || !questionId) {
             return res.status(400).json({
@@ -18,9 +18,6 @@ export default async function handler(req, res) {
                 message: 'Session ID and Question ID are required',
             });
         }
-
-        // Validate answer (A, B, C, D, or null)
-        const validAnswer = answer && ['A', 'B', 'C', 'D'].includes(answer) ? answer : null;
 
         // Find test session
         const testSession = await TestSession.findById(sessionId);
@@ -36,7 +33,7 @@ export default async function handler(req, res) {
         if (testSession.status !== 'in_progress') {
             return res.status(400).json({
                 success: false,
-                message: `Cannot submit answer. Examination is ${testSession.status}.`,
+                message: `Cannot modify answer. Examination is ${testSession.status}.`,
             });
         }
 
@@ -65,45 +62,73 @@ export default async function handler(req, res) {
             });
         }
 
-        // Get correct answer from database
-        const question = await ScholarshipQuestion.findById(questionId);
-        if (!question) {
-            return res.status(404).json({
-                success: false,
-                message: 'Question not found in question bank',
-            });
+        // Update marked for review status if provided
+        if (markedForReview !== undefined) {
+            sessionQuestion.markedForReview = Boolean(markedForReview);
         }
 
-        const isCorrect = validAnswer !== null && validAnswer === question.correctAnswer;
+        // Process answer update if provided in request body
+        if (answer !== undefined) {
+            const validAnswer = answer && ['A', 'B', 'C', 'D'].includes(answer) ? answer : null;
 
-        // Find existing answer or create new
-        const existingAnswerIndex = testSession.answers.findIndex(
-            a => a.questionId.toString() === questionId.toString()
-        );
+            // Fetch question to check correct answer
+            const question = await ScholarshipQuestion.findById(questionId);
+            if (!question) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Question not found in question bank',
+                });
+            }
 
-        const answerData = {
-            questionId,
-            subject: sessionQuestion.subject || question.subject,
-            selectedAnswer: validAnswer,
-            isCorrect,
-            timeTaken: 0,
-        };
+            // Map display label back to original label using stored shuffledOptions
+            let isCorrect = false;
+            if (validAnswer) {
+                let originalSelected = validAnswer;
+                if (Array.isArray(sessionQuestion.shuffledOptions) && sessionQuestion.shuffledOptions.length === 4) {
+                    const match = sessionQuestion.shuffledOptions.find(o => o.displayLabel === validAnswer);
+                    if (match) {
+                        originalSelected = match.originalLabel;
+                    }
+                }
+                isCorrect = originalSelected === question.correctAnswer;
+            }
 
-        if (existingAnswerIndex >= 0) {
-            testSession.answers[existingAnswerIndex] = answerData;
-        } else {
-            testSession.answers.push(answerData);
+            // Find existing answer or create new
+            const existingAnswerIndex = testSession.answers.findIndex(
+                a => a.questionId.toString() === questionId.toString()
+            );
+
+            const answerData = {
+                questionId,
+                subject: sessionQuestion.subject || question.subject,
+                selectedAnswer: validAnswer,
+                isCorrect,
+                timeTaken: 0,
+            };
+
+            if (existingAnswerIndex >= 0) {
+                testSession.answers[existingAnswerIndex] = answerData;
+            } else {
+                testSession.answers.push(answerData);
+            }
         }
 
         await testSession.save();
 
+        const answeredCount = testSession.answers.filter(
+            a => a.selectedAnswer !== null && a.selectedAnswer !== ''
+        ).length;
+        const markedCount = testSession.questions.filter(q => q.markedForReview).length;
+
         res.status(200).json({
             success: true,
-            message: 'Answer saved',
+            message: 'Answer updated successfully',
             data: {
-                saved: true,
-                answered: testSession.answers.filter(a => a.selectedAnswer !== null && a.selectedAnswer !== '').length,
-                total: testSession.totalQuestions,
+                questionId,
+                selectedAnswer: answer !== undefined ? (answer || null) : undefined,
+                markedForReview: sessionQuestion.markedForReview,
+                answeredCount,
+                markedCount,
             },
         });
 

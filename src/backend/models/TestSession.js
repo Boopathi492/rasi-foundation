@@ -15,13 +15,47 @@ const AnswerSchema = new mongoose.Schema({
         enum: ['A', 'B', 'C', 'D', null],
         default: null,
     },
+    originalSelectedAnswer: {
+        type: String,
+        enum: ['A', 'B', 'C', 'D', null],
+        default: null,
+    },
     isCorrect: {
+        type: Boolean,
+        default: false,
+    },
+    isMarkedForReview: {
         type: Boolean,
         default: false,
     },
     timeTaken: {
         type: Number, // seconds spent on this question
         default: 0,
+    },
+});
+
+const SessionQuestionSchema = new mongoose.Schema({
+    questionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ScholarshipQuestion',
+        required: true,
+    },
+    subject: {
+        type: String,
+        required: true,
+    },
+    orderIndex: {
+        type: Number,
+        required: true,
+    },
+    // Server-randomized option mapping for anti-cheating & integrity
+    shuffledOptions: [{
+        label: { type: String, enum: ['A', 'B', 'C', 'D'] },
+        originalLabel: { type: String, enum: ['A', 'B', 'C', 'D'] }
+    }],
+    markedForReview: {
+        type: Boolean,
+        default: false,
     },
 });
 
@@ -36,6 +70,7 @@ const TestSessionSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
+        index: true,
     },
 
     // Subjects configuration
@@ -46,12 +81,25 @@ const TestSessionSchema = new mongoose.Schema({
             validator: function (v) {
                 return v && v.length === 3;
             },
-            message: 'Must have exactly 3 subjects (Physics, Chemistry, and one elective)',
+            message: 'Must have exactly 3 subjects (Physics, Chemistry, and one optional subject)',
+        },
+    },
+
+    optionalSubject: {
+        type: String,
+        enum: ['Mathematics', 'Biology', 'Botany', 'Zoology'],
+        default: function () {
+            return this.subjects?.[2] || 'Mathematics';
         },
     },
 
     // Question language for this test session
     language: {
+        type: String,
+        enum: ['English', 'Tamil'],
+        default: 'English',
+    },
+    medium: {
         type: String,
         enum: ['English', 'Tamil'],
         default: 'English',
@@ -65,16 +113,7 @@ const TestSessionSchema = new mongoose.Schema({
     },
 
     // Questions assigned to this session (randomized per student)
-    questions: {
-        type: [{
-            questionId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'ScholarshipQuestion',
-            },
-            subject: String,
-            orderIndex: Number,
-        }],
-    },
+    questions: [SessionQuestionSchema],
 
     // Answers submitted by student
     answers: [AnswerSchema],
@@ -82,6 +121,7 @@ const TestSessionSchema = new mongoose.Schema({
     // Test timing
     startTime: {
         type: Date,
+        default: Date.now,
     },
     endTime: {
         type: Date,
@@ -100,11 +140,23 @@ const TestSessionSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    unattemptedQuestions: {
+        type: Number,
+        default: 60,
+    },
     correctAnswers: {
         type: Number,
         default: 0,
     },
+    wrongAnswers: {
+        type: Number,
+        default: 0,
+    },
     score: {
+        type: Number,
+        default: 0,
+    },
+    percentage: {
         type: Number,
         default: 0,
     },
@@ -121,10 +173,17 @@ const TestSessionSchema = new mongoose.Schema({
     status: {
         type: String,
         enum: ['pending', 'in_progress', 'completed', 'expired', 'disqualified'],
-        default: 'pending',
+        default: 'in_progress',
+        index: true,
     },
 
-    // Browser/device info for security
+    // Post-Exam Feedback Status
+    feedbackSubmitted: {
+        type: Boolean,
+        default: false,
+    },
+
+    // Browser/device info for audit & security
     userAgent: String,
     ipAddress: String,
 
@@ -138,12 +197,19 @@ const TestSessionSchema = new mongoose.Schema({
     },
 });
 
-// Calculate score before saving
+// Calculate score and metrics before saving
 TestSessionSchema.pre('save', function (next) {
+    if (this.questions && this.questions.length > 0) {
+        this.totalQuestions = this.questions.length;
+    }
+
     if (this.answers && this.answers.length > 0) {
         this.attemptedQuestions = this.answers.filter(a => a.selectedAnswer !== null && a.selectedAnswer !== '').length;
         this.correctAnswers = this.answers.filter(a => a.isCorrect).length;
-        this.score = this.correctAnswers; // 1 mark per correct answer
+        this.wrongAnswers = Math.max(0, this.attemptedQuestions - this.correctAnswers);
+        this.unattemptedQuestions = Math.max(0, this.totalQuestions - this.attemptedQuestions);
+        this.score = this.correctAnswers; // 1 mark per correct answer, 0 negative
+        this.percentage = this.totalQuestions > 0 ? Math.round((this.score / this.totalQuestions) * 100) : 0;
 
         // Calculate subject-wise scores
         const subjectScores = {};
@@ -161,6 +227,8 @@ TestSessionSchema.pre('save', function (next) {
                 this.subjectWiseScore[subject] = subjectScores[subject];
             }
         });
+    } else {
+        this.unattemptedQuestions = this.totalQuestions || 60;
     }
 
     this.updatedAt = new Date();

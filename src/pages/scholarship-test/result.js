@@ -20,7 +20,12 @@ import {
     FaHome,
     FaFilePdf,
     FaCalendarAlt,
-    FaUniversity
+    FaUniversity,
+    FaStar,
+    FaRegStar,
+    FaCommentDots,
+    FaSpinner,
+    FaAward,
 } from 'react-icons/fa';
 
 export default function ResultPage() {
@@ -30,6 +35,17 @@ export default function ResultPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [result, setResult] = useState(null);
+
+    // Feedback state
+    const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+    const [feedbackLoading, setFeedbackLoading] = useState(false);
+    const [feedbackSuccess, setFeedbackSuccess] = useState(false);
+    const [feedbackError, setFeedbackError] = useState('');
+    const [rating, setRating] = useState(5);
+    const [difficultyRating, setDifficultyRating] = useState('Moderate');
+    const [clarityRating, setClarityRating] = useState('Clear');
+    const [portalRating, setPortalRating] = useState(5);
+    const [comments, setComments] = useState('');
 
     // Subject icon resolver
     const getSubjectIcon = (subject) => {
@@ -58,6 +74,9 @@ export default function ResultPage() {
             }
 
             setResult(data.data);
+            if (data.data?.result?.feedbackSubmitted) {
+                setFeedbackSubmitted(true);
+            }
         } catch (err) {
             setError(err.message);
         } finally {
@@ -70,6 +89,41 @@ export default function ResultPage() {
             fetchResult();
         }
     }, [session, token, fetchResult]);
+
+    const handleFeedbackSubmit = async (e) => {
+        e.preventDefault();
+        setFeedbackLoading(true);
+        setFeedbackError('');
+
+        try {
+            const targetSessionId = session || result?.result?.sessionId;
+            const res = await fetch('/api/scholarship/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId: targetSessionId,
+                    rating,
+                    difficultyRating,
+                    clarityRating,
+                    portalRating,
+                    comments,
+                    language: result?.result?.language || 'English',
+                }),
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.message || 'Failed to submit feedback');
+            }
+
+            setFeedbackSuccess(true);
+            setFeedbackSubmitted(true);
+        } catch (err) {
+            setFeedbackError(err.message);
+        } finally {
+            setFeedbackLoading(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -250,6 +304,163 @@ export default function ResultPage() {
                                 );
                             })}
                         </div>
+                    </div>
+
+                    {/* Post-Exam Feedback Section */}
+                    <div className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 shadow-sm mb-6">
+                        <div className="flex items-center justify-between gap-3 mb-4">
+                            <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                                <FaCommentDots className="text-forest" />
+                                <span>Examination Experience & Feedback</span>
+                            </h3>
+                            {feedbackSubmitted && (
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-forest/10 px-3 py-1 text-xs font-bold text-forest">
+                                    <FaCheckCircle className="text-xs" /> Feedback Submitted
+                                </span>
+                            )}
+                        </div>
+
+                        {feedbackSubmitted ? (
+                            <div className="rounded-xl bg-forest/5 border border-forest/20 p-4 text-center">
+                                <p className="text-xs sm:text-sm font-semibold text-forest">
+                                    Thank you for your valuable feedback! Your response helps us continuously improve the examination portal.
+                                </p>
+                            </div>
+                        ) : (
+                            <form onSubmit={handleFeedbackSubmit} className="space-y-4">
+                                <p className="text-xs text-gray-600">
+                                    Please rate your scholarship examination experience. Your genuine feedback helps us improve our academic evaluation standards.
+                                </p>
+
+                                {feedbackError && (
+                                    <div className="rounded-lg bg-red-50 p-3 text-xs text-red-700 border border-red-200">
+                                        {feedbackError}
+                                    </div>
+                                )}
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {/* Overall Rating */}
+                                    <div className="rounded-xl border border-gray-100 bg-[#fbfdfc] p-3.5">
+                                        <label className="block text-xs font-bold text-gray-800 mb-2">
+                                            Overall Examination Rating
+                                        </label>
+                                        <div className="flex items-center gap-2">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <button
+                                                    key={star}
+                                                    type="button"
+                                                    onClick={() => setRating(star)}
+                                                    className="text-xl text-amber-400 hover:scale-110 transition-transform"
+                                                >
+                                                    {star <= rating ? <FaStar /> : <FaRegStar className="text-gray-300" />}
+                                                </button>
+                                            ))}
+                                            <span className="text-xs font-bold text-gray-600 ml-2">{rating} / 5</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Portal Experience */}
+                                    <div className="rounded-xl border border-gray-100 bg-[#fbfdfc] p-3.5">
+                                        <label className="block text-xs font-bold text-gray-800 mb-2">
+                                            Portal Experience & Speed
+                                        </label>
+                                        <div className="flex items-center gap-2">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <button
+                                                    key={star}
+                                                    type="button"
+                                                    onClick={() => setPortalRating(star)}
+                                                    className="text-xl text-amber-400 hover:scale-110 transition-transform"
+                                                >
+                                                    {star <= portalRating ? <FaStar /> : <FaRegStar className="text-gray-300" />}
+                                                </button>
+                                            ))}
+                                            <span className="text-xs font-bold text-gray-600 ml-2">{portalRating} / 5</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {/* Difficulty Rating */}
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-800 mb-1.5">
+                                            Exam Difficulty
+                                        </label>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {['Easy', 'Moderate', 'Hard'].map((diff) => (
+                                                <button
+                                                    key={diff}
+                                                    type="button"
+                                                    onClick={() => setDifficultyRating(diff)}
+                                                    className={`py-2 text-xs font-semibold rounded-lg border transition-all ${
+                                                        difficultyRating === diff
+                                                            ? 'border-forest bg-forest text-white shadow-xs'
+                                                            : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                                                    }`}
+                                                >
+                                                    {diff}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Question Clarity */}
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-800 mb-1.5">
+                                            Question Clarity
+                                        </label>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {['Clear', 'Fair', 'Unclear'].map((clarity) => (
+                                                <button
+                                                    key={clarity}
+                                                    type="button"
+                                                    onClick={() => setClarityRating(clarity)}
+                                                    className={`py-2 text-xs font-semibold rounded-lg border transition-all ${
+                                                        clarityRating === clarity
+                                                            ? 'border-forest bg-forest text-white shadow-xs'
+                                                            : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                                                    }`}
+                                                >
+                                                    {clarity}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Comments Box */}
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-800 mb-1.5">
+                                        Suggestions or Comments (English or தமிழ்)
+                                    </label>
+                                    <textarea
+                                        value={comments}
+                                        onChange={(e) => setComments(e.target.value)}
+                                        rows={2}
+                                        placeholder="Share any comments regarding the questions, Tamil translation, or test interface..."
+                                        className="w-full rounded-lg border border-gray-200 p-2.5 text-xs text-gray-800 focus:border-forest focus:ring-1 focus:ring-forest"
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={feedbackLoading}
+                                    className="rf-btn-primary py-2.5 px-6 text-xs font-bold !rounded-lg inline-flex items-center gap-2"
+                                >
+                                    {feedbackLoading ? (
+                                        <>
+                                            <FaSpinner className="animate-spin text-xs" />
+                                            <span>Submitting…</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FaCheckCircle className="text-xs" />
+                                            <span>Submit Feedback</span>
+                                        </>
+                                    )}
+                                </button>
+                            </form>
+                        )}
                     </div>
 
                     {/* Candidate Identity & Preferences Summary */}

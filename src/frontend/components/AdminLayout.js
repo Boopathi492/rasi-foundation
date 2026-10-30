@@ -175,6 +175,7 @@ export default function AdminLayout({ children, title = 'Dashboard' }) {
       items: [
         { name: 'Colleges', href: '/admin/colleges', icon: FaUniversity, roles: ['super_admin', 'admin', 'counsellor'] },
         { name: 'Courses', href: '/admin/courses', icon: FaBook, roles: ['super_admin', 'admin', 'counsellor'] },
+        { name: 'Question Bank', href: '/admin/question-bank', icon: FaBook, roles: ['super_admin', 'admin', 'exam_manager'] },
         { name: 'Scholarship Exam', href: '/admin/scholarship-results', icon: FaAward, roles: ['super_admin', 'admin', 'exam_manager'] },
         { name: 'Practice Test', href: '/admin/practice-results', icon: FaTrophy, roles: ['super_admin', 'admin', 'exam_manager'] },
       ],
