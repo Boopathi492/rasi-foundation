@@ -2,17 +2,7 @@ import dbConnect from '@/lib/mongodb';
 import ScholarshipStudent from '@/models/ScholarshipStudent';
 import ScholarshipQuestion from '@/models/ScholarshipQuestion';
 import TestSession from '@/models/TestSession';
-
-// Official Examination Blueprint: 20 questions each, 90 minutes total
-const QUESTIONS_PER_SUBJECT = 20;
-const TEST_DURATION_MINUTES = 90;
-
-// Target difficulty distribution per 20 questions: 7 easy, 9 medium, 4 hard
-const DIFFICULTY_TARGETS = {
-    easy: 7,
-    medium: 9,
-    hard: 4,
-};
+import ScholarshipExamConfig from '@/backend/models/ScholarshipExamConfig';
 
 // Fisher-Yates array shuffle helper
 function shuffleArray(arr) {
@@ -36,10 +26,11 @@ function generateShuffledOptions() {
     ];
 }
 
-// Select balanced 20 questions for a subject
-async function selectBalancedQuestions(subjectName) {
+// Select balanced questions for a subject dynamically based on config
+async function selectBalancedQuestions(subjectName, targetCount, difficultyDistribution) {
     const matchQuery = {
         isActive: true,
+        approvalStatus: 'approved',
         subject: subjectName === 'Biology'
             ? { $in: ['Biology', 'Botany', 'Zoology'] }
             : subjectName,
@@ -47,13 +38,14 @@ async function selectBalancedQuestions(subjectName) {
 
     const selected = [];
     const selectedIds = new Set();
+    const diffTargets = difficultyDistribution || { easy: Math.floor(targetCount * 0.35), medium: Math.floor(targetCount * 0.45), hard: targetCount - Math.floor(targetCount * 0.35) - Math.floor(targetCount * 0.45) };
 
     // Fetch by difficulty buckets
-    for (const [diff, targetCount] of Object.entries(DIFFICULTY_TARGETS)) {
+    for (const [diff, countNeeded] of Object.entries(diffTargets)) {
+        if (countNeeded <= 0) continue;
         const diffQuestions = await ScholarshipQuestion.aggregate([
             { $match: { ...matchQuery, difficulty: diff, _id: { $nin: Array.from(selectedIds) } } },
-            { $sample: { size: targetCount } },
-            { $project: { _id: 1, subject: 1, difficulty: 1, code: 1 } },
+            { $sample: { size: countNeeded } },
         ]);
 
         diffQuestions.forEach(q => {
@@ -62,13 +54,12 @@ async function selectBalancedQuestions(subjectName) {
         });
     }
 
-    // If any bucket fell short, fill remaining from available active questions
-    if (selected.length < QUESTIONS_PER_SUBJECT) {
-        const remainingNeeded = QUESTIONS_PER_SUBJECT - selected.length;
+    // If any bucket fell short, fill remaining from available active approved questions
+    if (selected.length < targetCount) {
+        const remainingNeeded = targetCount - selected.length;
         const fillQuestions = await ScholarshipQuestion.aggregate([
             { $match: { ...matchQuery, _id: { $nin: Array.from(selectedIds) } } },
             { $sample: { size: remainingNeeded } },
-            { $project: { _id: 1, subject: 1, difficulty: 1, code: 1 } },
         ]);
 
         fillQuestions.forEach(q => {
@@ -78,7 +69,7 @@ async function selectBalancedQuestions(subjectName) {
     }
 
     // Shuffle question order within the subject
-    return shuffleArray(selected).slice(0, QUESTIONS_PER_SUBJECT);
+    return shuffleArray(selected).slice(0, targetCount);
 }
 
 export default async function handler(req, res) {
@@ -98,23 +89,27 @@ export default async function handler(req, res) {
             });
         }
 
-        if (!thirdSubject) {
+        // Dynamically fetch active examination configuration from database
+        const examConfig = await ScholarshipExamConfig.getActiveConfig();
+        const testDurationMinutes = examConfig.examDurationMinutes || 90;
+        const compulsorySubjects = examConfig.compulsorySubjects || [];
+        const optionalSubjects = examConfig.optionalSubjects || [];
+
+        // Validate elective subject dynamically against database optionalSubjects list
+        const matchedOptional = optionalSubjects.find(
+            s => s.name.toLowerCase() === String(thirdSubject || '').toLowerCase()
+        );
+
+        if (!matchedOptional) {
+            const allowedNames = optionalSubjects.map(s => s.name).join(' or ');
             return res.status(400).json({
                 success: false,
-                message: 'Please select your elective subject (Mathematics or Biology)',
+                message: `Please select a valid elective subject (${allowedNames})`,
             });
         }
 
-        // Validate elective subject: strictly Mathematics OR Biology
-        const normalizedElective = thirdSubject === 'Mathematics' ? 'Mathematics' : (thirdSubject === 'Biology' ? 'Biology' : null);
-        if (!normalizedElective) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid elective subject selected. You must choose either Mathematics or Biology.',
-            });
-        }
-
-        const validLanguage = language === 'Tamil' ? 'Tamil' : 'English';
+        const normalizedElective = matchedOptional.name;
+        const validLanguage = (examConfig.languages || ['English', 'Tamil']).includes(language) ? language : 'English';
         const validPageSize = Number(pageSize) === 10 ? 10 : 5;
 
         // Find candidate student
@@ -126,8 +121,8 @@ export default async function handler(req, res) {
             });
         }
 
-        // Vocational students can only select Mathematics
-        if (student.plus2Group === 'Vocational' && normalizedElective !== 'Mathematics') {
+        // Vocational students restriction check (if Mathematics is in optional subjects)
+        if (student.plus2Group === 'Vocational' && normalizedElective !== 'Mathematics' && optionalSubjects.some(s => s.name === 'Mathematics')) {
             return res.status(400).json({
                 success: false,
                 message: 'Vocational group students must select Mathematics as elective subject',
@@ -184,6 +179,28 @@ export default async function handler(req, res) {
             }
         }
 
+        // Database-driven question availability check before starting exam
+        const subjectQuotas = [
+            ...compulsorySubjects.map(s => ({ name: s.name, count: s.questionCount, diff: s.difficultyDistribution })),
+            { name: matchedOptional.name, count: matchedOptional.questionCount, diff: matchedOptional.difficultyDistribution },
+        ];
+
+        for (const quota of subjectQuotas) {
+            const matchQuery = {
+                isActive: true,
+                approvalStatus: 'approved',
+                subject: quota.name === 'Biology' ? { $in: ['Biology', 'Botany', 'Zoology'] } : quota.name,
+            };
+
+            const availableCount = await ScholarshipQuestion.countDocuments(matchQuery);
+            if (availableCount < quota.count) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Unable to start examination: Insufficient approved questions in question bank for ${quota.name} (${availableCount} available, ${quota.count} required). Please contact the examination administrator.`,
+                });
+            }
+        }
+
         // Update student record
         student.thirdSubject = normalizedElective;
         student.selectedElective = normalizedElective;
@@ -192,27 +209,46 @@ export default async function handler(req, res) {
         student.testStartTime = new Date();
         await student.save();
 
-        // 3 examination subjects: Physics (20), Chemistry (20), Elective (20)
-        const subjects = ['Physics', 'Chemistry', normalizedElective];
+        const subjectsList = subjectQuotas.map(s => s.name);
         const allQuestions = [];
         const questionIdsToIncrement = [];
 
-        for (const subject of subjects) {
-            const subjectQuestions = await selectBalancedQuestions(subject);
+        // Dynamically select questions for each subject quota
+        for (const quota of subjectQuotas) {
+            const subjectQuestions = await selectBalancedQuestions(quota.name, quota.count, quota.diff);
 
             subjectQuestions.forEach((q) => {
                 questionIdsToIncrement.push(q._id);
+
+                // Build complete immutable snapshot of question content at time of exam start
+                const snapshot = {
+                    code: q.code || '',
+                    subject: quota.name,
+                    topic: q.topic || 'General',
+                    difficulty: q.difficulty || 'medium',
+                    questionText: q.questionText,
+                    questionTextTamil: q.questionTextTamil || '',
+                    options: q.options || [],
+                    optionsTamil: q.optionsTamil || [],
+                    correctAnswer: q.correctAnswer, // safely encapsulated on server session
+                    explanation: q.explanation || '',
+                    explanationTamil: q.explanationTamil || '',
+                    marks: q.marks || examConfig.marksPerQuestion || 1,
+                    negativeMarks: q.negativeMarks || examConfig.negativeMarking || 0,
+                };
+
                 allQuestions.push({
                     questionId: q._id,
-                    subject: subject,
+                    subject: quota.name,
                     orderIndex: allQuestions.length,
                     markedForReview: false,
                     shuffledOptions: generateShuffledOptions(),
+                    snapshot,
                 });
             });
         }
 
-        // Track question usage count
+        // Track question usage count asynchronously
         if (questionIdsToIncrement.length > 0) {
             ScholarshipQuestion.updateMany(
                 { _id: { $in: questionIdsToIncrement } },
@@ -220,20 +256,26 @@ export default async function handler(req, res) {
             ).catch(err => console.error('Error incrementing usage count:', err));
         }
 
-        // Create test session with authoritative server-side timing
+        // Create test session with authoritative server-side timing and immutable config snapshot
         testSession = await TestSession.create({
             studentId: student._id,
             registrationToken,
-            subjects,
+            subjects: subjectsList,
             optionalSubject: normalizedElective,
             medium: validLanguage,
             language: validLanguage,
             pageSize: validPageSize,
             questions: allQuestions,
             totalQuestions: allQuestions.length,
+            duration: testDurationMinutes,
             startTime: new Date(),
-            duration: TEST_DURATION_MINUTES,
             status: 'in_progress',
+            configSnapshot: {
+                examDurationMinutes: testDurationMinutes,
+                totalQuestions: allQuestions.length,
+                marksPerQuestion: examConfig.marksPerQuestion || 1,
+                negativeMarking: examConfig.negativeMarking || 0,
+            },
             userAgent: req.headers['user-agent'],
             ipAddress: req.headers['x-forwarded-for'] || req.socket?.remoteAddress,
         });
@@ -244,8 +286,8 @@ export default async function handler(req, res) {
             data: {
                 sessionId: testSession._id,
                 totalQuestions: allQuestions.length,
-                duration: TEST_DURATION_MINUTES,
-                subjects,
+                duration: testDurationMinutes,
+                subjects: subjectsList,
                 language: validLanguage,
                 pageSize: validPageSize,
                 startTime: testSession.startTime,

@@ -14,39 +14,65 @@ import {
     FaLanguage,
     FaClock,
     FaPlay,
-    FaSpinner
+    FaSpinner,
+    FaBookOpen,
 } from 'react-icons/fa';
+
+function getSubjectIcon(name) {
+    const n = (name || '').toLowerCase();
+    if (n.includes('physic')) return FaAtom;
+    if (n.includes('chem')) return FaFlask;
+    if (n.includes('math')) return FaCalculator;
+    if (n.includes('bio') || n.includes('botany') || n.includes('zoology')) return FaDna;
+    return FaBookOpen;
+}
 
 export default function SelectSubjectPage() {
     const router = useRouter();
     const { token } = router.query;
 
     const [studentInfo, setStudentInfo] = useState(null);
-    const [selectedSubject, setSelectedSubject] = useState('Mathematics');
+    const [examConfig, setExamConfig] = useState(null);
+    const [selectedSubject, setSelectedSubject] = useState('');
     const [language, setLanguage] = useState('English');
     const [pageSize, setPageSize] = useState(5);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
 
-    const fetchStudentInfo = useCallback(async () => {
+    const fetchConfigAndStudent = useCallback(async () => {
         try {
-            const response = await fetch(`/api/scholarship/verify-token?token=${token}`);
-            const data = await response.json();
+            // Fetch live dynamic exam configuration
+            const configRes = await fetch('/api/scholarship/exam-config');
+            const configJson = await configRes.json();
+            const config = configJson.data || null;
+            setExamConfig(config);
 
-            if (!response.ok) {
-                throw new Error(data.message || 'Invalid token');
+            // Fetch student info by token
+            const studentRes = await fetch(`/api/scholarship/verify-token?token=${token}`);
+            const studentJson = await studentRes.json();
+
+            if (!studentRes.ok) {
+                throw new Error(studentJson.message || 'Invalid token');
             }
 
-            setStudentInfo(data.data);
-            if (data.data.plus2Group === 'Vocational') {
-                setSelectedSubject('Mathematics');
+            const student = studentJson.data;
+            setStudentInfo(student);
+
+            // Determine default elective subject dynamically from config
+            const availableElectives = config?.optionalSubjects?.map(s => s.name) || ['Mathematics', 'Biology'];
+            let initialElective = availableElectives[0] || 'Mathematics';
+
+            if (student.plus2Group === 'Vocational' && availableElectives.includes('Mathematics')) {
+                initialElective = 'Mathematics';
+            } else if (student.thirdSubject && availableElectives.includes(student.thirdSubject)) {
+                initialElective = student.thirdSubject;
             }
-            if (data.data.thirdSubject) {
-                setSelectedSubject(data.data.thirdSubject);
-            }
-            if (data.data.examLanguage) {
-                setLanguage(data.data.examLanguage);
+
+            setSelectedSubject(initialElective);
+
+            if (student.examLanguage) {
+                setLanguage(student.examLanguage);
             }
         } catch (err) {
             setError(err.message);
@@ -57,13 +83,18 @@ export default function SelectSubjectPage() {
 
     useEffect(() => {
         if (token) {
-            fetchStudentInfo();
+            fetchConfigAndStudent();
         }
-    }, [token, fetchStudentInfo]);
+    }, [token, fetchConfigAndStudent]);
 
     const handleStartTest = async () => {
         if (!selectedSubject) {
-            setError('Please select your elective subject (Mathematics or Biology)');
+            setError('Please select your elective subject');
+            return;
+        }
+
+        if (examConfig && examConfig.isExamReady === false) {
+            setError('Examination is currently unavailable due to maintenance. Please contact administration.');
             return;
         }
 
@@ -96,6 +127,19 @@ export default function SelectSubjectPage() {
     };
 
     const isVocational = studentInfo?.plus2Group === 'Vocational';
+    const compulsoryList = examConfig?.compulsorySubjects || [
+        { name: 'Physics', questionCount: 20 },
+        { name: 'Chemistry', questionCount: 20 },
+    ];
+    const optionalList = examConfig?.optionalSubjects || [
+        { name: 'Mathematics', questionCount: 20 },
+        { name: 'Biology', questionCount: 20 },
+    ];
+    const compulsoryTotal = compulsoryList.reduce((acc, s) => acc + (s.questionCount || 0), 0);
+    const optionalQuota = optionalList.find(s => s.name === selectedSubject)?.questionCount || optionalList[0]?.questionCount || 20;
+    const totalExamQuestions = examConfig?.totalQuestions || (compulsoryTotal + optionalQuota);
+    const examDuration = examConfig?.examDurationMinutes || 90;
+    const languagesAvailable = examConfig?.languages || ['English', 'Tamil'];
 
     if (loading) {
         return (
@@ -136,7 +180,7 @@ export default function SelectSubjectPage() {
     return (
         <Layout
             title="Start Examination — Rasi Foundation Scholarship"
-            description="Select elective subject, question-paper language, and commence the 60-question examination."
+            description="Select elective subject, question-paper language, and commence the scholarship examination."
         >
             <section className="min-h-screen bg-[#f8faf9] py-10 sm:py-16 px-4">
                 <div className="container mx-auto max-w-3xl">
@@ -153,130 +197,122 @@ export default function SelectSubjectPage() {
                     </div>
 
                     <div className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-10 shadow-sm space-y-8">
-                        {/* Mandatory Subjects Notice */}
+                        {/* Dynamic Mandatory Subjects Notice */}
                         <div>
                             <span className="text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">
-                                Mandatory Subjects (40 Questions)
+                                Mandatory Subjects ({compulsoryTotal} Questions)
                             </span>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3.5">
-                                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-forest/10 text-forest">
-                                        <FaAtom className="text-base" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold text-gray-900">Physics</p>
-                                        <p className="text-[11px] text-gray-500">20 Compulsory Questions</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3.5">
-                                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-forest/10 text-forest">
-                                        <FaFlask className="text-base" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold text-gray-900">Chemistry</p>
-                                        <p className="text-[11px] text-gray-500">20 Compulsory Questions</p>
-                                    </div>
-                                </div>
+                                {compulsoryList.map((comp) => {
+                                    const CompIcon = getSubjectIcon(comp.name);
+                                    return (
+                                        <div key={comp.name} className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3.5">
+                                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-forest/10 text-forest">
+                                                <CompIcon className="text-base" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold text-gray-900">{comp.name}</p>
+                                                <p className="text-[11px] text-gray-500">{comp.questionCount} Compulsory Questions</p>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
 
-                        {/* Elective Selection */}
+                        {/* Dynamic Elective Selection */}
                         <div>
                             <span className="text-xs font-bold uppercase tracking-wider text-gray-900 block mb-2">
-                                Choose Elective Subject (20 Questions) <span className="text-crimson">*</span>
+                                Choose Elective Subject ({optionalQuota} Questions) <span className="text-crimson">*</span>
                             </span>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <label className={`flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all ${
-                                    selectedSubject === 'Mathematics'
-                                        ? 'border-forest bg-forest/5 shadow-sm'
-                                        : 'border-gray-200 hover:border-gray-300'
-                                }`}>
-                                    <input
-                                        type="radio"
-                                        name="elective"
-                                        value="Mathematics"
-                                        checked={selectedSubject === 'Mathematics'}
-                                        onChange={() => setSelectedSubject('Mathematics')}
-                                        className="mt-1 h-4 w-4 text-forest focus:ring-forest"
-                                    />
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <FaCalculator className="text-forest text-sm" />
-                                            <p className="text-sm font-bold text-gray-900">Mathematics</p>
-                                        </div>
-                                        <p className="text-xs text-gray-500 mt-1">Calculus, Algebra, Geometry, Probability</p>
-                                    </div>
-                                </label>
+                                {optionalList.map((opt) => {
+                                    const OptIcon = getSubjectIcon(opt.name);
+                                    const isOptDisabled = isVocational && opt.name !== 'Mathematics' && optionalList.some(s => s.name === 'Mathematics');
+                                    const isSelected = selectedSubject === opt.name;
 
-                                <label className={`flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all ${
-                                    selectedSubject === 'Biology'
-                                        ? 'border-forest bg-forest/5 shadow-sm'
-                                        : 'border-gray-200 hover:border-gray-300'
-                                } ${isVocational ? 'opacity-40 cursor-not-allowed' : ''}`}>
-                                    <input
-                                        type="radio"
-                                        name="elective"
-                                        value="Biology"
-                                        disabled={isVocational}
-                                        checked={selectedSubject === 'Biology'}
-                                        onChange={() => setSelectedSubject('Biology')}
-                                        className="mt-1 h-4 w-4 text-forest focus:ring-forest"
-                                    />
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <FaDna className="text-forest text-sm" />
-                                            <p className="text-sm font-bold text-gray-900">Biology</p>
-                                        </div>
-                                        <p className="text-xs text-gray-500 mt-1">Botany & Zoology, Human Physiology, Genetics</p>
-                                    </div>
-                                </label>
+                                    return (
+                                        <label
+                                            key={opt.name}
+                                            className={`flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all ${
+                                                isSelected
+                                                    ? 'border-forest bg-forest/5 shadow-sm'
+                                                    : 'border-gray-200 hover:border-gray-300'
+                                            } ${isOptDisabled ? 'opacity-40 cursor-not-allowed' : ''}`}
+                                        >
+                                            <input
+                                                type="radio"
+                                                name="elective"
+                                                value={opt.name}
+                                                disabled={isOptDisabled}
+                                                checked={isSelected}
+                                                onChange={() => setSelectedSubject(opt.name)}
+                                                className="mt-1 h-4 w-4 text-forest focus:ring-forest"
+                                            />
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <OptIcon className="text-forest text-sm" />
+                                                    <p className="text-sm font-bold text-gray-900">{opt.name}</p>
+                                                </div>
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                    {opt.questionCount} Elective Questions
+                                                    {isOptDisabled && ' (Vocational students must take Mathematics)'}
+                                                </p>
+                                            </div>
+                                        </label>
+                                    );
+                                })}
                             </div>
                         </div>
 
-                        {/* Language Medium */}
+                        {/* Dynamic Language Medium */}
                         <div>
                             <span className="text-xs font-bold uppercase tracking-wider text-gray-900 block mb-2 flex items-center gap-1.5">
                                 <FaLanguage className="text-forest" />
                                 <span>Question Paper Language Medium</span>
                             </span>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <label className={`flex items-start gap-3 rounded-xl border-2 p-3.5 cursor-pointer transition-all ${
-                                    language === 'English'
-                                        ? 'border-forest bg-forest/5 shadow-sm'
-                                        : 'border-gray-200 hover:border-gray-300'
-                                }`}>
-                                    <input
-                                        type="radio"
-                                        name="language"
-                                        value="English"
-                                        checked={language === 'English'}
-                                        onChange={() => setLanguage('English')}
-                                        className="mt-0.5 h-4 w-4 text-forest focus:ring-forest"
-                                    />
-                                    <div>
-                                        <p className="text-sm font-bold text-gray-900">English Medium</p>
-                                        <p className="text-xs text-gray-500">English question text and options</p>
-                                    </div>
-                                </label>
+                                {languagesAvailable.includes('English') && (
+                                    <label className={`flex items-start gap-3 rounded-xl border-2 p-3.5 cursor-pointer transition-all ${
+                                        language === 'English'
+                                            ? 'border-forest bg-forest/5 shadow-sm'
+                                            : 'border-gray-200 hover:border-gray-300'
+                                    }`}>
+                                        <input
+                                            type="radio"
+                                            name="language"
+                                            value="English"
+                                            checked={language === 'English'}
+                                            onChange={() => setLanguage('English')}
+                                            className="mt-0.5 h-4 w-4 text-forest focus:ring-forest"
+                                        />
+                                        <div>
+                                            <p className="text-sm font-bold text-gray-900">English Medium</p>
+                                            <p className="text-xs text-gray-500">English question text and options</p>
+                                        </div>
+                                    </label>
+                                )}
 
-                                <label className={`flex items-start gap-3 rounded-xl border-2 p-3.5 cursor-pointer transition-all ${
-                                    language === 'Tamil'
-                                        ? 'border-forest bg-forest/5 shadow-sm'
-                                        : 'border-gray-200 hover:border-gray-300'
-                                }`}>
-                                    <input
-                                        type="radio"
-                                        name="language"
-                                        value="Tamil"
-                                        checked={language === 'Tamil'}
-                                        onChange={() => setLanguage('Tamil')}
-                                        className="mt-0.5 h-4 w-4 text-forest focus:ring-forest"
-                                    />
-                                    <div>
-                                        <p className="text-sm font-bold text-gray-900">Tamil Medium (தமிழ்)</p>
-                                        <p className="text-xs text-gray-500">தமிழ் வழியில் வினாக்கள் மற்றும் விடைகள்</p>
-                                    </div>
-                                </label>
+                                {languagesAvailable.includes('Tamil') && (
+                                    <label className={`flex items-start gap-3 rounded-xl border-2 p-3.5 cursor-pointer transition-all ${
+                                        language === 'Tamil'
+                                            ? 'border-forest bg-forest/5 shadow-sm'
+                                            : 'border-gray-200 hover:border-gray-300'
+                                    }`}>
+                                        <input
+                                            type="radio"
+                                            name="language"
+                                            value="Tamil"
+                                            checked={language === 'Tamil'}
+                                            onChange={() => setLanguage('Tamil')}
+                                            className="mt-0.5 h-4 w-4 text-forest focus:ring-forest"
+                                        />
+                                        <div>
+                                            <p className="text-sm font-bold text-gray-900">Tamil Medium (தமிழ்)</p>
+                                            <p className="text-xs text-gray-500">தமிழ் வழியில் வினாக்கள் மற்றும் விடைகள்</p>
+                                        </div>
+                                    </label>
+                                )}
                             </div>
                         </div>
 
@@ -311,16 +347,30 @@ export default function SelectSubjectPage() {
                             </div>
                         </div>
 
-                        {/* Rules Summary */}
+                        {/* Dynamic Rules Summary */}
                         <div className="rounded-xl border border-forest/20 bg-forest/5 p-4 text-xs text-gray-700 space-y-1.5">
                             <p className="font-bold text-forest flex items-center gap-1.5">
                                 <FaClock />
                                 <span>Examination Parameters</span>
                             </p>
-                            <p>• Total Questions: <strong>60 Questions</strong> (20 Physics + 20 Chemistry + 20 {selectedSubject})</p>
-                            <p>• Duration: <strong>90 Minutes</strong> (Server countdown timer begins immediately upon click)</p>
+                            <p>
+                                • Total Questions: <strong>{totalExamQuestions} Questions</strong> ({compulsoryList.map(s => `${s.questionCount} ${s.name}`).join(' + ')} + {optionalQuota} {selectedSubject})
+                            </p>
+                            <p>• Duration: <strong>{examDuration} Minutes</strong> (Server countdown timer begins immediately upon click)</p>
+                            <p>• Marking: <strong>{examConfig?.marksPerQuestion || 1} Mark</strong> per correct answer {examConfig?.negativeMarking > 0 ? `(-${examConfig.negativeMarking} negative marks)` : '(No negative marking)'}</p>
                             <p>• Answers are continuously saved in real time</p>
                         </div>
+
+                        {/* Availability Warning if Exam is not ready */}
+                        {examConfig && examConfig.isExamReady === false && (
+                            <div className="rounded-xl border border-amber-300 bg-amber-50 p-3.5 text-xs text-amber-800 flex items-start gap-2.5">
+                                <FaExclamationTriangle className="text-amber-600 shrink-0 mt-0.5 text-sm" />
+                                <div>
+                                    <strong className="font-bold">Administrative Notice:</strong>
+                                    <p className="mt-0.5">The examination system is currently verifying subject question quotas. Examination launch is temporarily suspended.</p>
+                                </div>
+                            </div>
+                        )}
 
                         {error && (
                             <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-700 flex items-center gap-2">
@@ -333,8 +383,8 @@ export default function SelectSubjectPage() {
                         <button
                             type="button"
                             onClick={handleStartTest}
-                            disabled={submitting}
-                            className="rf-btn-primary w-full py-3.5 text-sm font-bold !rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                            disabled={submitting || (examConfig && examConfig.isExamReady === false)}
+                            className="rf-btn-primary w-full py-3.5 text-sm font-bold !rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {submitting ? (
                                 <>
@@ -344,7 +394,7 @@ export default function SelectSubjectPage() {
                             ) : (
                                 <>
                                     <FaPlay className="text-xs" />
-                                    <span>Commence 90-Minute Examination</span>
+                                    <span>Commence {examDuration}-Minute Examination</span>
                                 </>
                             )}
                         </button>

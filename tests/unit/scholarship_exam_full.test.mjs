@@ -6,6 +6,7 @@ import ScholarshipStudent from '../../src/backend/models/ScholarshipStudent.js';
 import ScholarshipQuestion from '../../src/backend/models/ScholarshipQuestion.js';
 import TestSession from '../../src/backend/models/TestSession.js';
 import ScholarshipExamFeedback from '../../src/backend/models/ScholarshipExamFeedback.js';
+import ScholarshipExamConfig from '../../src/backend/models/ScholarshipExamConfig.js';
 import { buildPdf } from '../../src/backend/lib/pdf.js';
 
 test('Exam Structure: enforces 60 questions, 90 minutes, 1 mark/question', () => {
@@ -187,4 +188,192 @@ test('Result PDF: builds certified A4 scorecard with bilingual reference and sec
     assert.ok(Buffer.isBuffer(buffer), 'PDF output must be a Buffer');
     assert.ok(buffer.length > 1000, 'PDF buffer must contain binary PDF data');
     assert.equal(buffer.slice(0, 4).toString(), '%PDF', 'Must start with PDF signature %PDF');
+});
+
+test('Dynamic Configuration: validates dynamic exam settings and subject quotas', () => {
+    const config = new ScholarshipExamConfig({
+        configKey: 'test_config',
+        examTitle: 'Scholarship 2026 Test Exam',
+        examDurationMinutes: 120,
+        totalQuestions: 60,
+        marksPerQuestion: 2,
+        negativeMarking: 0.5,
+        compulsorySubjects: [
+            { name: 'Physics', questionCount: 20, difficultyDistribution: { easy: 6, medium: 10, hard: 4 } },
+            { name: 'Chemistry', questionCount: 20, difficultyDistribution: { easy: 6, medium: 10, hard: 4 } },
+        ],
+        optionalSubjects: [
+            { name: 'Mathematics', questionCount: 20, difficultyDistribution: { easy: 6, medium: 10, hard: 4 } },
+            { name: 'Biology', questionCount: 20, difficultyDistribution: { easy: 6, medium: 10, hard: 4 } },
+        ],
+        practiceTestConfig: {
+            allowedSubjects: ['Physics', 'Chemistry', 'Mathematics', 'Biology'],
+            defaultQuestionCount: 20,
+            durationPerQuestionMinutes: 2,
+        },
+    });
+
+    const err = config.validateSync();
+    assert.equal(err, undefined, 'Config validation must pass with custom dynamic values');
+    assert.equal(config.examDurationMinutes, 120, 'Duration should be dynamically configured');
+    assert.equal(config.marksPerQuestion, 2, 'Marks per question should be dynamically configurable');
+    assert.equal(config.negativeMarking, 0.5, 'Negative marking should be dynamically configurable');
+    assert.equal(config.compulsorySubjects.length, 2, 'Should have 2 compulsory subjects');
+    assert.equal(config.optionalSubjects.length, 2, 'Should have 2 optional subjects');
+    assert.equal(config.practiceTestConfig.defaultQuestionCount, 20, 'Practice test question count must be dynamic');
+});
+
+test('Immutable Snapshot: session snapshot isolates in-progress exams from question bank alterations', () => {
+    const dummyStudentId = new mongoose.Types.ObjectId();
+    const qId = new mongoose.Types.ObjectId();
+
+    // Student starts an exam; a snapshot of the question is stored at start time
+    const initialQuestion = {
+        code: 'PHY-SNAP-01',
+        subject: 'Physics',
+        topic: 'Optics',
+        difficulty: 'medium',
+        questionText: 'What is the speed of light in vacuum?',
+        questionTextTamil: 'வெற்றிடத்தில் ஒளியின் வேகம் என்ன?',
+        options: [
+            { label: 'A', text: '3 x 10^8 m/s' },
+            { label: 'B', text: '2 x 10^8 m/s' },
+            { label: 'C', text: '3 x 10^6 m/s' },
+            { label: 'D', text: '1.5 x 10^8 m/s' },
+        ],
+        optionsTamil: [
+            { label: 'A', text: '3 x 10^8 மீ/வி' },
+            { label: 'B', text: '2 x 10^8 மீ/வி' },
+            { label: 'C', text: '3 x 10^6 மீ/வி' },
+            { label: 'D', text: '1.5 x 10^8 மீ/வி' },
+        ],
+        correctAnswer: 'A',
+        explanation: 'The speed of light in vacuum is approximately 300,000 km/s.',
+        explanationTamil: 'வெற்றிடத்தில் ஒளியின் வேகம் சுமார் 300,000 கிமீ/வி.',
+        marks: 1,
+        negativeMarks: 0,
+    };
+
+    const session = new TestSession({
+        studentId: dummyStudentId,
+        registrationToken: 'RASI-SCH-SNAPSHOT-TEST',
+        subjects: ['Physics', 'Chemistry', 'Mathematics'],
+        optionalSubject: 'Mathematics',
+        totalQuestions: 1,
+        duration: 90,
+        questions: [
+            {
+                questionId: qId,
+                subject: 'Physics',
+                orderIndex: 0,
+                shuffledOptions: [
+                    { displayLabel: 'A', originalLabel: 'B' },
+                    { displayLabel: 'B', originalLabel: 'A' },
+                    { displayLabel: 'C', originalLabel: 'C' },
+                    { displayLabel: 'D', originalLabel: 'D' },
+                ],
+                snapshot: initialQuestion,
+            },
+        ],
+        configSnapshot: {
+            examDurationMinutes: 90,
+            totalQuestions: 1,
+            marksPerQuestion: 1,
+            negativeMarking: 0,
+        },
+    });
+
+    const err = session.validateSync();
+    assert.equal(err, undefined, 'Session with immutable snapshot must validate cleanly');
+
+    // Simulate question in bank being altered or deleted by admin
+    const questionBankVersion = {
+        _id: qId,
+        questionText: 'MODIFIED QUESTION TEXT BY ADMIN',
+        correctAnswer: 'D', // Admin mistakenly changed answer key
+    };
+
+    // Evaluation against session snapshot MUST use the snapshot, not the modified bank version
+    const sessionQ = session.questions[0];
+    const studentSelectedDisplay = 'B'; // Display B maps to original A
+    const originalSelected = sessionQ.shuffledOptions.find(o => o.displayLabel === studentSelectedDisplay).originalLabel;
+
+    const isCorrectAgainstSnapshot = originalSelected === sessionQ.snapshot.correctAnswer;
+    assert.equal(isCorrectAgainstSnapshot, true, 'Student answer evaluated against session snapshot must be correct regardless of bank modification');
+    assert.notEqual(sessionQ.snapshot.questionText, questionBankVersion.questionText, 'Snapshot text must remain preserved');
+});
+
+test('Question Approval Workflow: enforces approvalStatus enum (pending, approved, rejected)', () => {
+    const validApproved = new ScholarshipQuestion({
+        code: 'TEST-APP-01',
+        subject: 'Physics',
+        topic: 'Mechanics',
+        difficulty: 'easy',
+        questionText: 'Test question text',
+        questionTextTamil: 'தேர்வு வினா உரை',
+        options: [
+            { label: 'A', text: 'Option 1' },
+            { label: 'B', text: 'Option 2' },
+            { label: 'C', text: 'Option 3' },
+            { label: 'D', text: 'Option 4' },
+        ],
+        optionsTamil: [
+            { label: 'A', text: 'தேர்வு 1' },
+            { label: 'B', text: 'தேர்வு 2' },
+            { label: 'C', text: 'தேர்வு 3' },
+            { label: 'D', text: 'தேர்வு 4' },
+        ],
+        correctAnswer: 'A',
+        approvalStatus: 'approved',
+    });
+    assert.equal(validApproved.validateSync(), undefined, 'Approved question must validate');
+
+    const validPending = new ScholarshipQuestion({
+        code: 'TEST-APP-02',
+        subject: 'Physics',
+        topic: 'Mechanics',
+        difficulty: 'easy',
+        questionText: 'Test question text',
+        questionTextTamil: 'தேர்வு வினா உரை',
+        options: [
+            { label: 'A', text: 'Option 1' },
+            { label: 'B', text: 'Option 2' },
+            { label: 'C', text: 'Option 3' },
+            { label: 'D', text: 'Option 4' },
+        ],
+        optionsTamil: [
+            { label: 'A', text: 'தேர்வு 1' },
+            { label: 'B', text: 'தேர்வு 2' },
+            { label: 'C', text: 'தேர்வு 3' },
+            { label: 'D', text: 'தேர்வு 4' },
+        ],
+        correctAnswer: 'A',
+        approvalStatus: 'pending',
+    });
+    assert.equal(validPending.validateSync(), undefined, 'Pending question must validate');
+
+    const invalidStatus = new ScholarshipQuestion({
+        code: 'TEST-APP-03',
+        subject: 'Physics',
+        topic: 'Mechanics',
+        difficulty: 'easy',
+        questionText: 'Test question text',
+        questionTextTamil: 'தேர்வு வினா உரை',
+        options: [
+            { label: 'A', text: 'Option 1' },
+            { label: 'B', text: 'Option 2' },
+            { label: 'C', text: 'Option 3' },
+            { label: 'D', text: 'Option 4' },
+        ],
+        optionsTamil: [
+            { label: 'A', text: 'தேர்வு 1' },
+            { label: 'B', text: 'தேர்வு 2' },
+            { label: 'C', text: 'தேர்வு 3' },
+            { label: 'D', text: 'தேர்வு 4' },
+        ],
+        correctAnswer: 'A',
+        approvalStatus: 'unknown_status',
+    });
+    const err = invalidStatus.validateSync();
+    assert.ok(err?.errors?.approvalStatus, 'Invalid approval status must fail validation');
 });

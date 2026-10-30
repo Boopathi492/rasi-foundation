@@ -50,12 +50,35 @@ const SessionQuestionSchema = new mongoose.Schema({
     },
     // Server-randomized option mapping for anti-cheating & integrity
     shuffledOptions: [{
+        displayLabel: { type: String, enum: ['A', 'B', 'C', 'D'] },
+        originalLabel: { type: String, enum: ['A', 'B', 'C', 'D'] },
         label: { type: String, enum: ['A', 'B', 'C', 'D'] },
-        originalLabel: { type: String, enum: ['A', 'B', 'C', 'D'] }
     }],
     markedForReview: {
         type: Boolean,
         default: false,
+    },
+    // Immutable snapshot of question content at time of exam start
+    snapshot: {
+        code: { type: String },
+        subject: { type: String },
+        topic: { type: String },
+        difficulty: { type: String },
+        questionText: { type: String },
+        questionTextTamil: { type: String },
+        options: [{
+            label: { type: String, enum: ['A', 'B', 'C', 'D'] },
+            text: { type: String },
+        }],
+        optionsTamil: [{
+            label: { type: String, enum: ['A', 'B', 'C', 'D'] },
+            text: { type: String },
+        }],
+        correctAnswer: { type: String, enum: ['A', 'B', 'C', 'D'] },
+        explanation: { type: String },
+        explanationTamil: { type: String },
+        marks: { type: Number, default: 1 },
+        negativeMarks: { type: Number, default: 0 },
     },
 });
 
@@ -110,6 +133,14 @@ const TestSessionSchema = new mongoose.Schema({
         type: Number,
         default: 5,
         enum: [5, 10],
+    },
+
+    // Immutable snapshot of exam configuration at time of exam start
+    configSnapshot: {
+        examDurationMinutes: { type: Number, default: 90 },
+        totalQuestions: { type: Number, default: 60 },
+        marksPerQuestion: { type: Number, default: 1 },
+        negativeMarking: { type: Number, default: 0 },
     },
 
     // Questions assigned to this session (randomized per student)

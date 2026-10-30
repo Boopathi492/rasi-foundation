@@ -56,25 +56,28 @@ export default async function handler(req, res) {
         const remainingMinutes = Math.floor(remainingMs / 60000);
         const remainingSeconds = Math.floor(remainingMs / 1000);
 
-        // Get question IDs from session
-        const questionIds = testSession.questions.map(q => q.questionId);
+        // Prefer immutable snapshot captured at session start. Fall back to live DB for legacy sessions.
+        const needsDbLookup = testSession.questions.some(q => !q.snapshot || !q.snapshot.questionText);
+        let questionMap = {};
 
-        // Fetch questions without exposing correctAnswer or explanation
-        const questions = await ScholarshipQuestion.find(
-            { _id: { $in: questionIds } },
-            { correctAnswer: 0, explanation: 0, explanationTamil: 0 }
-        );
-
-        const questionMap = {};
-        questions.forEach(q => {
-            questionMap[q._id.toString()] = q;
-        });
+        if (needsDbLookup) {
+            const questionIds = testSession.questions.map(q => q.questionId).filter(Boolean);
+            const questions = await ScholarshipQuestion.find(
+                { _id: { $in: questionIds } },
+                { correctAnswer: 0, explanation: 0, explanationTamil: 0 }
+            );
+            questions.forEach(q => {
+                questionMap[q._id.toString()] = q;
+            });
+        }
 
         const isTamil = (testSession.medium || testSession.language) === 'Tamil';
 
         // Build ordered question list with server-mapped randomized options
         const orderedQuestions = testSession.questions.map((q, index) => {
-            const fullQuestion = questionMap[q.questionId?.toString()];
+            // Use immutable snapshot if present, otherwise fallback to database question
+            const snap = q.snapshot && q.snapshot.questionText ? q.snapshot : null;
+            const fullQuestion = snap || questionMap[q.questionId?.toString()];
             if (!fullQuestion) return null;
 
             const existingAnswer = testSession.answers.find(
@@ -102,7 +105,7 @@ export default async function handler(req, res) {
 
             return {
                 index: index + 1,
-                id: fullQuestion._id,
+                id: q.questionId,
                 code: fullQuestion.code,
                 subject: q.subject || fullQuestion.subject,
                 topic: fullQuestion.topic,

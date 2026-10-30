@@ -106,6 +106,12 @@ const ScholarshipQuestionSchema = new mongoose.Schema({
         default: true,
         index: true,
     },
+    approvalStatus: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'approved',
+        index: true,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
@@ -117,9 +123,9 @@ const ScholarshipQuestionSchema = new mongoose.Schema({
 });
 
 // Indexes for efficient, fast randomized question selection and admin queries
-ScholarshipQuestionSchema.index({ subject: 1, isActive: 1, difficulty: 1 });
-ScholarshipQuestionSchema.index({ subject: 1, topic: 1, isActive: 1 });
-ScholarshipQuestionSchema.index({ subject: 1, usageCount: 1 });
+ScholarshipQuestionSchema.index({ subject: 1, isActive: 1, approvalStatus: 1, difficulty: 1 });
+ScholarshipQuestionSchema.index({ subject: 1, topic: 1, isActive: 1, approvalStatus: 1 });
+ScholarshipQuestionSchema.index({ subject: 1, usageCount: 1, approvalStatus: 1 });
 
 ScholarshipQuestionSchema.pre('save', function (next) {
     this.updatedAt = new Date();

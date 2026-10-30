@@ -30,6 +30,23 @@ export default function PracticeTestPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('Physics');
+    const [examConfig, setExamConfig] = useState(null);
+
+    // Dynamic config fetch
+    useEffect(() => {
+        fetch('/api/scholarship/exam-config')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.data) {
+                    setExamConfig(data.data);
+                    const allowed = data.data.practiceTestConfig?.allowedSubjects;
+                    if (Array.isArray(allowed) && allowed.length > 0) {
+                        setSelectedSubject(allowed[0]);
+                    }
+                }
+            })
+            .catch(err => console.warn('Could not load dynamic exam config for practice test:', err));
+    }, []);
 
     // Subject config
     const subjectConfig = {
@@ -103,7 +120,8 @@ export default function PracticeTestPage() {
 
         setLoading(true);
         try {
-            const response = await fetch(`/api/practice-test/questions?count=15&subject=${selectedSubject}`);
+            const qCount = examConfig?.practiceTestConfig?.defaultQuestionCount || 15;
+            const response = await fetch(`/api/practice-test/questions?count=${qCount}&subject=${selectedSubject}`);
             const data = await response.json();
 
             if (!response.ok) {
@@ -222,7 +240,7 @@ export default function PracticeTestPage() {
                             <div className="bg-white rounded-2xl p-6 shadow-lg mb-8">
                                 <h3 className="text-lg font-bold text-gray-800 mb-4">Choose Your Subject</h3>
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                    {Object.entries(subjectConfig).map(([key, config]) => {
+                                    {Object.entries(subjectConfig).filter(([key]) => !examConfig?.practiceTestConfig?.allowedSubjects || examConfig.practiceTestConfig.allowedSubjects.includes(key)).map(([key, config]) => {
                                         const Icon = config.icon;
                                         const isSelected = selectedSubject === key;
                                         return (
@@ -256,7 +274,7 @@ export default function PracticeTestPage() {
                                     <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
                                         <FaQuestionCircle className="text-2xl text-blue-600" />
                                     </div>
-                                    <h3 className="text-lg font-bold text-gray-800 mb-2">15 Questions</h3>
+                                    <h3 className="text-lg font-bold text-gray-800 mb-2">{examConfig?.practiceTestConfig?.defaultQuestionCount || 15} Questions</h3>
                                     <p className="text-gray-600">Carefully selected MCQ questions covering various topics</p>
                                 </div>
 
@@ -264,7 +282,7 @@ export default function PracticeTestPage() {
                                     <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
                                         <FaClock className="text-2xl text-green-600" />
                                     </div>
-                                    <h3 className="text-lg font-bold text-gray-800 mb-2">30 Minutes</h3>
+                                    <h3 className="text-lg font-bold text-gray-800 mb-2">{(examConfig?.practiceTestConfig?.defaultQuestionCount || 15) * (examConfig?.practiceTestConfig?.durationPerQuestionMinutes || 2)} Minutes</h3>
                                     <p className="text-gray-600">Complete the test within the time limit for best practice</p>
                                 </div>
 

@@ -15,6 +15,7 @@ async function handler(req, res) {
                 difficulty = '',
                 search = '',
                 status = 'all',
+                approvalStatus = 'all',
                 sortBy = 'code',
                 sortOrder = 'asc',
             } = req.query;
@@ -37,6 +38,10 @@ async function handler(req, res) {
                 query.isActive = true;
             } else if (status === 'inactive') {
                 query.isActive = false;
+            }
+
+            if (approvalStatus && approvalStatus !== 'all') {
+                query.approvalStatus = approvalStatus;
             }
 
             if (search) {
@@ -65,8 +70,8 @@ async function handler(req, res) {
                 ScholarshipQuestion.countDocuments(query),
             ]);
 
-            // Aggregate subject and difficulty stats
-            const [subjectStats, difficultyStats, totalAll, activeCount] = await Promise.all([
+            // Aggregate subject, difficulty, and approval stats
+            const [subjectStats, difficultyStats, totalAll, activeCount, approvedCount, pendingCount, rejectedCount] = await Promise.all([
                 ScholarshipQuestion.aggregate([
                     { $group: { _id: '$subject', count: { $sum: 1 } } },
                 ]),
@@ -75,6 +80,9 @@ async function handler(req, res) {
                 ]),
                 ScholarshipQuestion.countDocuments(),
                 ScholarshipQuestion.countDocuments({ isActive: true }),
+                ScholarshipQuestion.countDocuments({ approvalStatus: 'approved' }),
+                ScholarshipQuestion.countDocuments({ approvalStatus: 'pending' }),
+                ScholarshipQuestion.countDocuments({ approvalStatus: 'rejected' }),
             ]);
 
             // Distinct topics for dropdowns
@@ -99,6 +107,9 @@ async function handler(req, res) {
                     total: totalAll,
                     active: activeCount,
                     inactive: totalAll - activeCount,
+                    approved: approvedCount,
+                    pending: pendingCount,
+                    rejected: rejectedCount,
                     subjects: subjectCounts,
                     difficulties: difficultyCounts,
                 },
@@ -130,6 +141,7 @@ async function handler(req, res) {
                 marks = 1,
                 negativeMarks = 0,
                 isActive = true,
+                approvalStatus = 'approved',
             } = req.body;
 
             // Basic validation
@@ -193,6 +205,7 @@ async function handler(req, res) {
                 negativeMarks: Number(negativeMarks) || 0,
                 language: 'Bilingual',
                 isActive: Boolean(isActive),
+                approvalStatus: ['pending', 'approved', 'rejected'].includes(approvalStatus) ? approvalStatus : 'approved',
                 usageCount: 0,
             });
 

@@ -71,18 +71,26 @@ export default async function handler(req, res) {
         if (answer !== undefined) {
             const validAnswer = answer && ['A', 'B', 'C', 'D'].includes(answer) ? answer : null;
 
-            // Fetch question to check correct answer
-            const question = await ScholarshipQuestion.findById(questionId);
-            if (!question) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Question not found in question bank',
-                });
+            // Prefer immutable snapshot captured at exam start
+            let correctAnswer = sessionQuestion.snapshot?.correctAnswer;
+            let questionSubject = sessionQuestion.snapshot?.subject || sessionQuestion.subject;
+
+            if (!correctAnswer) {
+                const question = await ScholarshipQuestion.findById(questionId);
+                if (question) {
+                    correctAnswer = question.correctAnswer;
+                    questionSubject = question.subject;
+                } else {
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Question not found in question bank',
+                    });
+                }
             }
 
             // Map display label back to original label using stored shuffledOptions
             let isCorrect = false;
-            if (validAnswer) {
+            if (validAnswer && correctAnswer) {
                 let originalSelected = validAnswer;
                 if (Array.isArray(sessionQuestion.shuffledOptions) && sessionQuestion.shuffledOptions.length === 4) {
                     const match = sessionQuestion.shuffledOptions.find(o => o.displayLabel === validAnswer);
@@ -90,7 +98,7 @@ export default async function handler(req, res) {
                         originalSelected = match.originalLabel;
                     }
                 }
-                isCorrect = originalSelected === question.correctAnswer;
+                isCorrect = originalSelected === correctAnswer;
             }
 
             // Find existing answer or create new
@@ -100,7 +108,7 @@ export default async function handler(req, res) {
 
             const answerData = {
                 questionId,
-                subject: sessionQuestion.subject || question.subject,
+                subject: questionSubject || sessionQuestion.subject,
                 selectedAnswer: validAnswer,
                 isCorrect,
                 timeTaken: 0,

@@ -66,10 +66,15 @@ export default async function handler(req, res) {
             });
         }
 
-        // Authoritative re-evaluation of all answers
-        const questionIds = testSession.questions.map(q => q.questionId);
-        const questionsInDb = await ScholarshipQuestion.find({ _id: { $in: questionIds } });
-        const questionMap = new Map(questionsInDb.map(q => [q._id.toString(), q]));
+        // Authoritative re-evaluation of all answers against immutable session snapshots
+        const needsDbLookup = testSession.questions.some(q => !q.snapshot || !q.snapshot.correctAnswer);
+        let questionMap = new Map();
+
+        if (needsDbLookup) {
+            const questionIds = testSession.questions.map(q => q.questionId).filter(Boolean);
+            const questionsInDb = await ScholarshipQuestion.find({ _id: { $in: questionIds } });
+            questionMap = new Map(questionsInDb.map(q => [q._id.toString(), q]));
+        }
 
         let calculatedScore = 0;
         let calculatedCorrect = 0;
@@ -83,10 +88,12 @@ export default async function handler(req, res) {
         testSession.answers.forEach(ans => {
             if (ans.selectedAnswer) {
                 calculatedAttempted++;
-                const fullQ = questionMap.get(ans.questionId.toString());
                 const sessionQ = testSession.questions.find(sq => sq.questionId.toString() === ans.questionId.toString());
+                const snap = sessionQ?.snapshot && sessionQ.snapshot.correctAnswer ? sessionQ.snapshot : null;
+                const dbQ = questionMap.get(ans.questionId.toString());
+                const targetQ = snap || dbQ;
 
-                if (fullQ) {
+                if (targetQ) {
                     let originalSelected = ans.selectedAnswer;
                     if (sessionQ && Array.isArray(sessionQ.shuffledOptions) && sessionQ.shuffledOptions.length === 4) {
                         const perm = sessionQ.shuffledOptions.find(o => o.displayLabel === ans.selectedAnswer);
@@ -95,14 +102,17 @@ export default async function handler(req, res) {
                         }
                     }
 
-                    const isCorrect = originalSelected === fullQ.correctAnswer;
+                    const isCorrect = originalSelected === targetQ.correctAnswer;
                     ans.isCorrect = isCorrect;
 
                     if (isCorrect) {
                         calculatedCorrect++;
-                        calculatedScore += (fullQ.marks || 1);
-                        const sub = ans.subject || fullQ.subject;
+                        calculatedScore += (targetQ.marks || testSession.configSnapshot?.marksPerQuestion || 1);
+                        const sub = ans.subject || targetQ.subject || sessionQ?.subject;
                         subjectWiseMap[sub] = (subjectWiseMap[sub] || 0) + 1;
+                    } else if (ans.selectedAnswer && (targetQ.negativeMarks || testSession.configSnapshot?.negativeMarking)) {
+                        const penalty = targetQ.negativeMarks || testSession.configSnapshot?.negativeMarking || 0;
+                        calculatedScore = Math.max(0, calculatedScore - penalty);
                     }
                 }
             } else {

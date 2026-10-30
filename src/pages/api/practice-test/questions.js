@@ -1,5 +1,6 @@
 import dbConnect from '@/lib/mongodb';
 import ScholarshipQuestion from '@/models/ScholarshipQuestion';
+import ScholarshipExamConfig from '@/backend/models/ScholarshipExamConfig';
 import { getBalancedQuestions } from '@/data/practiceQuestions';
 import { chemistryQuestions } from '@/data/chemistryQuestions';
 import { mathematicsQuestions } from '@/data/mathematicsQuestions';
@@ -44,16 +45,23 @@ export default async function handler(req, res) {
         let subjectName = subject;
         let questions = [];
 
+        let durationPerQuestion = 2;
+
         // Try querying from the production ScholarshipQuestion database first
         try {
             await dbConnect();
+            const examConfig = await ScholarshipExamConfig.getActiveConfig();
+            if (examConfig?.practiceTestConfig?.durationPerQuestionMinutes) {
+                durationPerQuestion = examConfig.practiceTestConfig.durationPerQuestionMinutes;
+            }
+
             let querySubject = subject;
             if (subject === 'Biology') {
                 querySubject = { $in: ['Biology', 'Botany', 'Zoology'] };
             }
 
             const dbQuestions = await ScholarshipQuestion.aggregate([
-                { $match: { subject: querySubject, isActive: true } },
+                { $match: { subject: querySubject, isActive: true, approvalStatus: 'approved' } },
                 { $sample: { size: questionCount } },
             ]);
 
@@ -116,7 +124,7 @@ export default async function handler(req, res) {
             data: {
                 questions,
                 totalQuestions: questions.length,
-                duration: questions.length * 2, // 2 minutes per question
+                duration: questions.length * durationPerQuestion,
                 subject: subjectName,
             },
         });
