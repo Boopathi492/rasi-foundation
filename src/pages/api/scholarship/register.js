@@ -1,5 +1,6 @@
 import dbConnect from '@/lib/mongodb';
 import ScholarshipStudent from '@/models/ScholarshipStudent';
+import { enqueueAndDispatchSync, mapStudentToSheetRow } from '@/backend/lib/sheetdb';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -134,6 +135,24 @@ export default async function handler(req, res) {
 
         // Masked Aadhaar for response
         const maskedAadhaar = cleanedAadhaar ? `XXXX-XXXX-${cleanedAadhaar.slice(-4)}` : '';
+
+        // Map 32 headers and dispatch durable SheetDB synchronization
+        try {
+            const sheetPayload = mapStudentToSheetRow(student, {
+                preferredCollege2: req.body.preferredCollege2,
+                preferredCourse2: req.body.preferredCourse2,
+                pageSize: req.body.pageSize || 5,
+            });
+
+            await enqueueAndDispatchSync({
+                destinationTab: 'Scholarship_Students',
+                recordReferenceId: student._id.toString(),
+                payload: sheetPayload,
+                operationType: 'insert',
+            });
+        } catch (syncErr) {
+            console.error('[Registration Sync Queue Error]:', syncErr.message);
+        }
 
         res.status(201).json({
             success: true,

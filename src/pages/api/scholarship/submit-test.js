@@ -2,6 +2,7 @@ import dbConnect from '@/lib/mongodb';
 import ScholarshipStudent from '@/models/ScholarshipStudent';
 import ScholarshipQuestion from '@/models/ScholarshipQuestion';
 import TestSession from '@/models/TestSession';
+import { enqueueAndDispatchSync, mapResultToSheetRow } from '@/backend/lib/sheetdb';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -139,11 +140,29 @@ export default async function handler(req, res) {
         await testSession.save();
 
         // Update student record
-        await ScholarshipStudent.findByIdAndUpdate(testSession.studentId, {
-            testStatus: 'completed',
-            testEndTime: new Date(),
-            testScore: calculatedScore,
-        });
+        const student = await ScholarshipStudent.findByIdAndUpdate(
+            testSession.studentId,
+            {
+                testStatus: 'completed',
+                testEndTime: new Date(),
+                testScore: calculatedScore,
+            },
+            { new: true }
+        );
+
+        // Map 22 scorecard headers and dispatch durable SheetDB synchronization
+        try {
+            const resultSheetPayload = mapResultToSheetRow(testSession, student || {});
+
+            await enqueueAndDispatchSync({
+                destinationTab: 'Scholarship_Results',
+                recordReferenceId: testSession._id.toString(),
+                payload: resultSheetPayload,
+                operationType: 'insert',
+            });
+        } catch (syncErr) {
+            console.error('[Submit Exam Sync Queue Error]:', syncErr.message);
+        }
 
         // Prepare subject scores
         const subjectScores = [];

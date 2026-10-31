@@ -2,6 +2,7 @@ import dbConnect from '@/lib/mongodb';
 import TestSession from '@/models/TestSession';
 import ScholarshipStudent from '@/models/ScholarshipStudent';
 import ScholarshipExamFeedback from '@/backend/models/ScholarshipExamFeedback';
+import { enqueueAndDispatchSync, mapFeedbackToSheetRow } from '@/backend/lib/sheetdb';
 
 export default async function handler(req, res) {
     await dbConnect();
@@ -88,6 +89,20 @@ export default async function handler(req, res) {
             // Update session flag
             testSession.feedbackSubmitted = true;
             await testSession.save();
+
+            // Map 12 feedback headers and dispatch durable SheetDB synchronization
+            try {
+                const feedbackSheetPayload = mapFeedbackToSheetRow(feedback, student || {}, testSession);
+
+                await enqueueAndDispatchSync({
+                    destinationTab: 'Scholarship_Feedback',
+                    recordReferenceId: feedback._id.toString(),
+                    payload: feedbackSheetPayload,
+                    operationType: 'insert',
+                });
+            } catch (syncErr) {
+                console.error('[Submit Feedback Sync Queue Error]:', syncErr.message);
+            }
 
             return res.status(201).json({
                 success: true,

@@ -57,6 +57,20 @@ const ScholarshipExamFeedbackSchema = new mongoose.Schema({
         enum: ['English', 'Tamil'],
         default: 'English',
     },
+    // SheetDB Synchronization metadata
+    sheetdbSynced: {
+        type: Boolean,
+        default: false,
+        index: true,
+    },
+    sheetdbSyncedAt: {
+        type: Date,
+        default: null,
+    },
+    sheetdbError: {
+        type: String,
+        default: null,
+    },
     createdAt: {
         type: Date,
         default: Date.now,

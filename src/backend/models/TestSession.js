@@ -214,6 +214,21 @@ const TestSessionSchema = new mongoose.Schema({
         default: false,
     },
 
+    // SheetDB Synchronization metadata
+    sheetdbSynced: {
+        type: Boolean,
+        default: false,
+        index: true,
+    },
+    sheetdbSyncedAt: {
+        type: Date,
+        default: null,
+    },
+    sheetdbError: {
+        type: String,
+        default: null,
+    },
+
     // Browser/device info for audit & security
     userAgent: String,
     ipAddress: String,

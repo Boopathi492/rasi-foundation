@@ -192,6 +192,7 @@ export default function AdminLayout({ children, title = 'Dashboard' }) {
     {
       group: 'Governance & Analytics',
       items: [
+        { name: 'SheetDB Sync Manager', href: '/admin/sheetdb-sync', icon: FaServer, roles: ['super_admin', 'admin', 'exam_manager'] },
         { name: 'Reports & Exports', href: '/admin/reports', icon: FaFileAlt, roles: ['super_admin', 'admin', 'counsellor', 'exam_manager'] },
         { name: 'Audit Trail', href: '/admin/audit', icon: FaShieldAlt, roles: ['super_admin', 'admin', 'exam_manager'] },
         { name: 'System Logs & Health', href: '/admin/logs', icon: FaServer, roles: ['super_admin', 'admin'] },
