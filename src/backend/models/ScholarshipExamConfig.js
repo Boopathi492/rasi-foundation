@@ -82,7 +82,7 @@ const ScholarshipExamConfigSchema = new mongoose.Schema({
         },
         defaultQuestionCount: {
             type: Number,
-            default: 15,
+            default: 20,
         },
         durationPerQuestionMinutes: {
             type: Number,

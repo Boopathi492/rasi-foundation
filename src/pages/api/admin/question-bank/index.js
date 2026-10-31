@@ -11,6 +11,7 @@ async function handler(req, res) {
                 page = 1,
                 limit = 20,
                 subject = '',
+                chapter = '',
                 topic = '',
                 difficulty = '',
                 search = '',
@@ -24,6 +25,10 @@ async function handler(req, res) {
 
             if (subject && subject !== 'all') {
                 query.subject = subject;
+            }
+
+            if (chapter && chapter !== 'all') {
+                query.chapter = chapter;
             }
 
             if (topic && topic !== 'all') {
@@ -50,6 +55,7 @@ async function handler(req, res) {
                     { code: { $regex: s, $options: 'i' } },
                     { questionText: { $regex: s, $options: 'i' } },
                     { questionTextTamil: { $regex: s, $options: 'i' } },
+                    { chapter: { $regex: s, $options: 'i' } },
                     { topic: { $regex: s, $options: 'i' } },
                 ];
             }
@@ -85,8 +91,12 @@ async function handler(req, res) {
                 ScholarshipQuestion.countDocuments({ approvalStatus: 'rejected' }),
             ]);
 
-            // Distinct topics for dropdowns
-            const topics = await ScholarshipQuestion.distinct('topic', subject && subject !== 'all' ? { subject } : {});
+            // Distinct chapters & topics for dropdowns
+            const subjectScope = subject && subject !== 'all' ? { subject } : {};
+            const [topics, chapters] = await Promise.all([
+                ScholarshipQuestion.distinct('topic', subjectScope),
+                ScholarshipQuestion.distinct('chapter', subjectScope),
+            ]);
 
             const subjectCounts = {};
             subjectStats.forEach(s => { subjectCounts[s._id] = s.count; });
@@ -114,6 +124,7 @@ async function handler(req, res) {
                     difficulties: difficultyCounts,
                 },
                 topics: topics.filter(Boolean).sort(),
+                chapters: chapters.filter(Boolean).sort(),
             });
 
         } catch (error) {
@@ -129,6 +140,7 @@ async function handler(req, res) {
             const {
                 code,
                 subject,
+                chapter,
                 topic,
                 difficulty = 'medium',
                 questionText,
@@ -192,6 +204,7 @@ async function handler(req, res) {
             const newQuestion = await ScholarshipQuestion.create({
                 code: String(code).trim().toUpperCase(),
                 subject,
+                chapter: String(chapter || topic || 'General').trim(),
                 topic: String(topic).trim(),
                 difficulty,
                 questionText: String(questionText).trim(),

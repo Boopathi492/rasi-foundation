@@ -14,6 +14,12 @@ const ScholarshipQuestionSchema = new mongoose.Schema({
         enum: ['Physics', 'Chemistry', 'Mathematics', 'Botany', 'Zoology', 'Biology'],
         index: true,
     },
+    chapter: {
+        type: String,
+        default: 'General',
+        trim: true,
+        index: true,
+    },
     topic: {
         type: String,
         default: 'General',
@@ -124,6 +130,7 @@ const ScholarshipQuestionSchema = new mongoose.Schema({
 
 // Indexes for efficient, fast randomized question selection and admin queries
 ScholarshipQuestionSchema.index({ subject: 1, isActive: 1, approvalStatus: 1, difficulty: 1 });
+ScholarshipQuestionSchema.index({ subject: 1, chapter: 1, isActive: 1, approvalStatus: 1 });
 ScholarshipQuestionSchema.index({ subject: 1, topic: 1, isActive: 1, approvalStatus: 1 });
 ScholarshipQuestionSchema.index({ subject: 1, usageCount: 1, approvalStatus: 1 });
 

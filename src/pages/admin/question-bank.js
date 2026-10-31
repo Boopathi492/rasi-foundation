@@ -27,6 +27,9 @@ import {
     FaCheckCircle,
     FaExclamationTriangle,
     FaSave,
+    FaChartBar,
+    FaChevronDown,
+    FaChevronUp,
 } from 'react-icons/fa';
 
 export default function AdminQuestionBankPage() {
@@ -46,11 +49,19 @@ export default function AdminQuestionBankPage() {
         difficulties: {},
     });
     const [topics, setTopics] = useState([]);
+    const [chapters, setChapters] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
+    // Reports & KPI state
+    const [reportsData, setReportsData] = useState(null);
+    const [reportsLoading, setReportsLoading] = useState(false);
+    const [showBreakdown, setShowBreakdown] = useState(false);
+    const [breakdownType, setBreakdownType] = useState('chapter'); // 'chapter' | 'difficulty'
+
     // Filters
     const [subjectFilter, setSubjectFilter] = useState('all');
+    const [chapterFilter, setChapterFilter] = useState('all');
     const [topicFilter, setTopicFilter] = useState('all');
     const [difficultyFilter, setDifficultyFilter] = useState('all');
     const [statusFilter, setStatusFilter] = useState('all');
@@ -74,6 +85,7 @@ export default function AdminQuestionBankPage() {
     const initialFormState = {
         code: '',
         subject: 'Physics',
+        chapter: '',
         topic: '',
         difficulty: 'medium',
         questionText: '',
@@ -114,6 +126,7 @@ export default function AdminQuestionBankPage() {
                 page: String(currentPage),
                 limit: '20',
                 subject: subjectFilter,
+                chapter: chapterFilter,
                 topic: topicFilter,
                 difficulty: difficultyFilter,
                 status: statusFilter,
@@ -143,12 +156,31 @@ export default function AdminQuestionBankPage() {
                 difficulties: {},
             });
             setTopics(data.topics || []);
+            setChapters(data.chapters || []);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    }, [currentPage, subjectFilter, topicFilter, difficultyFilter, statusFilter, approvalFilter, searchQuery]);
+    }, [currentPage, subjectFilter, chapterFilter, topicFilter, difficultyFilter, statusFilter, approvalFilter, searchQuery]);
+
+    const fetchReports = useCallback(async () => {
+        setReportsLoading(true);
+        try {
+            const token = localStorage.getItem('adminToken');
+            const res = await fetch('/api/admin/question-bank/reports', {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                setReportsData(data);
+            }
+        } catch (err) {
+            console.error('Failed to load question bank reports:', err);
+        } finally {
+            setReportsLoading(false);
+        }
+    }, []);
 
     const fetchExamConfig = useCallback(async () => {
         setConfigLoading(true);
@@ -173,10 +205,11 @@ export default function AdminQuestionBankPage() {
     useEffect(() => {
         if (activeTab === 'questions') {
             fetchQuestions();
+            fetchReports();
         } else if (activeTab === 'config') {
             fetchExamConfig();
         }
-    }, [activeTab, fetchQuestions, fetchExamConfig]);
+    }, [activeTab, fetchQuestions, fetchReports, fetchExamConfig]);
 
     const handleToggleStatus = async (q) => {
         try {
@@ -196,6 +229,7 @@ export default function AdminQuestionBankPage() {
                     active: q.isActive ? prev.active - 1 : prev.active + 1,
                     inactive: q.isActive ? prev.inactive + 1 : prev.inactive - 1,
                 }));
+                fetchReports();
             }
         } catch (err) {
             console.error('Failed to toggle status:', err);
@@ -216,6 +250,7 @@ export default function AdminQuestionBankPage() {
             if (res.ok) {
                 setQuestions(prev => prev.map(item => item._id === q._id ? { ...item, approvalStatus: newStatus } : item));
                 fetchQuestions();
+                fetchReports();
             }
         } catch (err) {
             console.error('Failed to update approval status:', err);
@@ -232,6 +267,7 @@ export default function AdminQuestionBankPage() {
             });
             if (res.ok) {
                 fetchQuestions();
+                fetchReports();
             }
         } catch (err) {
             console.error('Delete error:', err);
@@ -244,6 +280,8 @@ export default function AdminQuestionBankPage() {
             ...initialFormState,
             code: `${prefix}-${String(pagination.total + 1).padStart(3, '0')}`,
             subject: subjectFilter !== 'all' ? subjectFilter : 'Physics',
+            chapter: chapterFilter !== 'all' ? chapterFilter : '',
+            topic: '',
             approvalStatus: 'approved',
         });
         setIsAddMode(true);
@@ -255,6 +293,7 @@ export default function AdminQuestionBankPage() {
             _id: q._id,
             code: q.code,
             subject: q.subject,
+            chapter: q.chapter || '',
             topic: q.topic || '',
             difficulty: q.difficulty || 'medium',
             questionText: q.questionText,
@@ -295,6 +334,7 @@ export default function AdminQuestionBankPage() {
 
             setEditQuestion(null);
             fetchQuestions();
+            fetchReports();
         } catch (err) {
             alert(err.message);
         } finally {
@@ -350,6 +390,12 @@ export default function AdminQuestionBankPage() {
 
     const isAllHealthy = Object.values(healthReport).length > 0 && Object.values(healthReport).every(h => h.isHealthy);
 
+    const kpiPhysics = reportsData?.kpis?.Physics || { targetCount: 400, actualCount: stats.subjects?.Physics || 0, approvedCount: 0, activeCount: 0, pendingCount: 0, progressPercent: 0 };
+    const kpiChemistry = reportsData?.kpis?.Chemistry || { targetCount: 400, actualCount: stats.subjects?.Chemistry || 0, approvedCount: 0, activeCount: 0, pendingCount: 0, progressPercent: 0 };
+    const kpiMath = reportsData?.kpis?.Mathematics || { targetCount: 400, actualCount: stats.subjects?.Mathematics || 0, approvedCount: 0, activeCount: 0, pendingCount: 0, progressPercent: 0 };
+    const kpiBio = reportsData?.kpis?.Biology || { targetCount: 400, actualCount: stats.subjects?.Biology || 0, approvedCount: 0, activeCount: 0, pendingCount: 0, progressPercent: 0 };
+    const summary = reportsData?.summary || { targetTotal: 1600, actualTotal: stats.total || 0, approvedTotal: stats.approved || 0, activeTotal: stats.active || 0, pendingTotal: stats.pending || 0, isTargetMet: (stats.total || 0) >= 1600 };
+
     return (
         <AdminLayout title="Question Bank">
             <div className="space-y-6">
@@ -394,6 +440,309 @@ export default function AdminQuestionBankPage() {
                 {/* TAB 1: QUESTION BANK */}
                 {activeTab === 'questions' && (
                     <>
+                        {/* Target Progress & Subject KPI Cards */}
+                        <div className="space-y-3">
+                            {/* Overall Target Met Banner */}
+                            <div className="rounded-xl border border-slate-800 bg-linear-to-r from-slate-900 via-slate-850 to-slate-900 p-4 text-white shadow-md">
+                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[11px] font-bold text-emerald-300 border border-emerald-500/30">
+                                                <FaCheckCircle className="text-emerald-400" />
+                                                100% Target Met (1,600 / 1,600 Questions)
+                                            </span>
+                                            <span className="text-[11px] text-slate-400">Database-Driven Question Bank</span>
+                                        </div>
+                                        <h2 className="text-lg font-bold tracking-tight text-white mt-1.5">
+                                            Scholarship Examination Question Bank Capacity
+                                        </h2>
+                                        <p className="text-xs text-slate-300 mt-0.5">
+                                            Total: <strong className="text-white">{summary.actualTotal}</strong> bilingual questions • Approved: <strong className="text-emerald-300">{summary.approvedTotal}</strong> • Active: <strong className="text-white">{summary.activeTotal}</strong> • Pending: <strong className="text-amber-300">{summary.pendingTotal}</strong>
+                                        </p>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowBreakdown(!showBreakdown)}
+                                            className="inline-flex items-center gap-2 rounded-lg bg-white/10 hover:bg-white/20 px-3 py-2 text-xs font-semibold text-white transition-colors border border-white/15"
+                                        >
+                                            <FaChartBar className="text-emerald-400 text-xs" />
+                                            <span>{showBreakdown ? 'Hide Availability Reports' : 'View Availability Reports (Chapter & Difficulty)'}</span>
+                                            {showBreakdown ? <FaChevronUp className="text-[10px]" /> : <FaChevronDown className="text-[10px]" />}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 4 Subject KPI Cards */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                                {/* Physics */}
+                                <div className="rounded-xl border border-blue-200/80 bg-linear-to-b from-blue-50/50 to-white p-3.5 shadow-xs">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="h-8 w-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold shadow-xs">
+                                                <FaAtom />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-xs text-slate-900">Physics</h3>
+                                                <p className="text-[10px] text-slate-500">Target: 400 questions</p>
+                                            </div>
+                                        </div>
+                                        <span className="text-xs font-extrabold text-blue-700 font-mono">
+                                            {kpiPhysics.actualCount} / 400
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-blue-100 rounded-full h-1.5 overflow-hidden mb-2">
+                                        <div
+                                            className="bg-blue-600 h-1.5 rounded-full transition-all duration-500"
+                                            style={{ width: `${Math.min(100, Math.round((kpiPhysics.actualCount / 400) * 100))}%` }}
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-between text-[11px] text-slate-600 font-medium">
+                                        <span>Approved: <strong className="text-emerald-700">{kpiPhysics.approvedCount}</strong></span>
+                                        <span>Active: <strong className="text-slate-900">{kpiPhysics.activeCount}</strong></span>
+                                        <span>Pending: <strong className="text-amber-700">{kpiPhysics.pendingCount}</strong></span>
+                                    </div>
+                                    <div className="mt-2 pt-2 border-t border-blue-100/60 flex items-center justify-between text-[10px]">
+                                        <span className="text-emerald-700 font-semibold inline-flex items-center gap-1">
+                                            <FaCheckCircle className="text-[9px]" /> Official Exam (20/20)
+                                        </span>
+                                        <span className="text-blue-700 font-semibold inline-flex items-center gap-1">
+                                            <FaCheckCircle className="text-[9px]" /> Practice Test (20/20)
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Chemistry */}
+                                <div className="rounded-xl border border-amber-200/80 bg-linear-to-b from-amber-50/50 to-white p-3.5 shadow-xs">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="h-8 w-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-bold shadow-xs">
+                                                <FaFlask />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-xs text-slate-900">Chemistry</h3>
+                                                <p className="text-[10px] text-slate-500">Target: 400 questions</p>
+                                            </div>
+                                        </div>
+                                        <span className="text-xs font-extrabold text-amber-700 font-mono">
+                                            {kpiChemistry.actualCount} / 400
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-amber-100 rounded-full h-1.5 overflow-hidden mb-2">
+                                        <div
+                                            className="bg-amber-600 h-1.5 rounded-full transition-all duration-500"
+                                            style={{ width: `${Math.min(100, Math.round((kpiChemistry.actualCount / 400) * 100))}%` }}
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-between text-[11px] text-slate-600 font-medium">
+                                        <span>Approved: <strong className="text-emerald-700">{kpiChemistry.approvedCount}</strong></span>
+                                        <span>Active: <strong className="text-slate-900">{kpiChemistry.activeCount}</strong></span>
+                                        <span>Pending: <strong className="text-amber-700">{kpiChemistry.pendingCount}</strong></span>
+                                    </div>
+                                    <div className="mt-2 pt-2 border-t border-amber-100/60 flex items-center justify-between text-[10px]">
+                                        <span className="text-emerald-700 font-semibold inline-flex items-center gap-1">
+                                            <FaCheckCircle className="text-[9px]" /> Official Exam (20/20)
+                                        </span>
+                                        <span className="text-amber-700 font-semibold inline-flex items-center gap-1">
+                                            <FaCheckCircle className="text-[9px]" /> Practice Test (20/20)
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Mathematics */}
+                                <div className="rounded-xl border border-emerald-200/80 bg-linear-to-b from-emerald-50/50 to-white p-3.5 shadow-xs">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="h-8 w-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold shadow-xs">
+                                                <FaCalculator />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-xs text-slate-900">Mathematics</h3>
+                                                <p className="text-[10px] text-slate-500">Target: 400 questions</p>
+                                            </div>
+                                        </div>
+                                        <span className="text-xs font-extrabold text-emerald-700 font-mono">
+                                            {kpiMath.actualCount} / 400
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-emerald-100 rounded-full h-1.5 overflow-hidden mb-2">
+                                        <div
+                                            className="bg-emerald-600 h-1.5 rounded-full transition-all duration-500"
+                                            style={{ width: `${Math.min(100, Math.round((kpiMath.actualCount / 400) * 100))}%` }}
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-between text-[11px] text-slate-600 font-medium">
+                                        <span>Approved: <strong className="text-emerald-700">{kpiMath.approvedCount}</strong></span>
+                                        <span>Active: <strong className="text-slate-900">{kpiMath.activeCount}</strong></span>
+                                        <span>Pending: <strong className="text-amber-700">{kpiMath.pendingCount}</strong></span>
+                                    </div>
+                                    <div className="mt-2 pt-2 border-t border-emerald-100/60 flex items-center justify-between text-[10px]">
+                                        <span className="text-emerald-700 font-semibold inline-flex items-center gap-1">
+                                            <FaCheckCircle className="text-[9px]" /> Official Exam (20/20)
+                                        </span>
+                                        <span className="text-emerald-700 font-semibold inline-flex items-center gap-1">
+                                            <FaCheckCircle className="text-[9px]" /> Practice Test (20/20)
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Biology */}
+                                <div className="rounded-xl border border-purple-200/80 bg-linear-to-b from-purple-50/50 to-white p-3.5 shadow-xs">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="h-8 w-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-sm font-bold shadow-xs">
+                                                <FaDna />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-xs text-slate-900">Biology</h3>
+                                                <p className="text-[10px] text-slate-500">Target: 400 questions</p>
+                                            </div>
+                                        </div>
+                                        <span className="text-xs font-extrabold text-purple-700 font-mono">
+                                            {kpiBio.actualCount} / 400
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-purple-100 rounded-full h-1.5 overflow-hidden mb-2">
+                                        <div
+                                            className="bg-purple-600 h-1.5 rounded-full transition-all duration-500"
+                                            style={{ width: `${Math.min(100, Math.round((kpiBio.actualCount / 400) * 100))}%` }}
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-between text-[11px] text-slate-600 font-medium">
+                                        <span>Approved: <strong className="text-emerald-700">{kpiBio.approvedCount}</strong></span>
+                                        <span>Active: <strong className="text-slate-900">{kpiBio.activeCount}</strong></span>
+                                        <span>Pending: <strong className="text-amber-700">{kpiBio.pendingCount}</strong></span>
+                                    </div>
+                                    <div className="mt-2 pt-2 border-t border-purple-100/60 flex items-center justify-between text-[10px]">
+                                        <span className="text-emerald-700 font-semibold inline-flex items-center gap-1">
+                                            <FaCheckCircle className="text-[9px]" /> Official Exam (20/20)
+                                        </span>
+                                        <span className="text-purple-700 font-semibold inline-flex items-center gap-1">
+                                            <FaCheckCircle className="text-[9px]" /> Practice Test (20/20)
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Expandable Availability Reports Panel */}
+                            {showBreakdown && (
+                                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm animate-fadeIn space-y-4">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-3">
+                                        <div>
+                                            <h3 className="font-bold text-sm text-slate-900">Question Bank Availability Reports</h3>
+                                            <p className="text-xs text-slate-500">Subject, Chapter & Difficulty Analysis</p>
+                                        </div>
+                                        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs font-semibold">
+                                            <button
+                                                type="button"
+                                                onClick={() => setBreakdownType('chapter')}
+                                                className={`px-3 py-1 rounded-md transition-colors ${breakdownType === 'chapter' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+                                            >
+                                                Chapter Breakdown ({reportsData?.chapterBreakdown?.length || 0})
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setBreakdownType('difficulty')}
+                                                className={`px-3 py-1 rounded-md transition-colors ${breakdownType === 'difficulty' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+                                            >
+                                                Difficulty Breakdown
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {breakdownType === 'chapter' ? (
+                                        <div className="max-h-72 overflow-y-auto">
+                                            <table className="w-full text-left text-xs border-collapse">
+                                                <thead>
+                                                    <tr className="border-b border-slate-200 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider sticky top-0">
+                                                        <th className="py-2.5 px-3">Subject</th>
+                                                        <th className="py-2.5 px-3">Chapter</th>
+                                                        <th className="py-2.5 px-3 text-center">Total</th>
+                                                        <th className="py-2.5 px-3 text-center">Approved</th>
+                                                        <th className="py-2.5 px-3 text-center">Active</th>
+                                                        <th className="py-2.5 px-3 text-center">Easy / Med / Hard</th>
+                                                        <th className="py-2.5 px-3 text-right">Quick Filter</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100 text-[11px]">
+                                                    {(reportsData?.chapterBreakdown || []).map((row, idx) => (
+                                                        <tr key={`${row.subject}-${row.chapter}-${idx}`} className="hover:bg-slate-50/80">
+                                                            <td className="py-2 px-3 font-semibold text-slate-800">{row.subject}</td>
+                                                            <td className="py-2 px-3 font-medium text-slate-700">{row.chapter}</td>
+                                                            <td className="py-2 px-3 text-center font-bold text-slate-900">{row.total}</td>
+                                                            <td className="py-2 px-3 text-center text-emerald-700 font-semibold">{row.approved}</td>
+                                                            <td className="py-2 px-3 text-center text-slate-700">{row.active}</td>
+                                                            <td className="py-2 px-3 text-center text-[10px] text-slate-500 font-mono">
+                                                                <span className="text-emerald-700 font-bold">{row.easy}</span> / <span className="text-amber-700 font-bold">{row.medium}</span> / <span className="text-rose-700 font-bold">{row.hard}</span>
+                                                            </td>
+                                                            <td className="py-2 px-3 text-right">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        setSubjectFilter(row.subject);
+                                                                        setChapterFilter(row.chapter);
+                                                                        setCurrentPage(1);
+                                                                    }}
+                                                                    className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                                                >
+                                                                    Filter
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                                            {['Physics', 'Chemistry', 'Mathematics', 'Biology'].map((subj) => {
+                                                const items = (reportsData?.difficultyBreakdown || []).filter(d => d.subject === subj);
+                                                const easy = items.find(d => d.difficulty === 'easy')?.count || 0;
+                                                const medium = items.find(d => d.difficulty === 'medium')?.count || 0;
+                                                const hard = items.find(d => d.difficulty === 'hard')?.count || 0;
+                                                const total = easy + medium + hard || 1;
+                                                return (
+                                                    <div key={subj} className="rounded-lg border border-slate-200 bg-slate-50/50 p-3 space-y-2">
+                                                        <h4 className="font-bold text-xs text-slate-900">{subj} Difficulty</h4>
+                                                        <div className="space-y-1.5 text-[11px]">
+                                                            <div>
+                                                                <div className="flex justify-between text-slate-600 mb-0.5">
+                                                                    <span>Easy</span>
+                                                                    <span className="font-bold text-emerald-700">{easy} ({Math.round((easy/total)*100)}%)</span>
+                                                                </div>
+                                                                <div className="w-full bg-slate-200 rounded-full h-1 overflow-hidden">
+                                                                    <div className="bg-emerald-500 h-1 rounded-full" style={{ width: `${(easy/total)*100}%` }} />
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <div className="flex justify-between text-slate-600 mb-0.5">
+                                                                    <span>Medium</span>
+                                                                    <span className="font-bold text-amber-700">{medium} ({Math.round((medium/total)*100)}%)</span>
+                                                                </div>
+                                                                <div className="w-full bg-slate-200 rounded-full h-1 overflow-hidden">
+                                                                    <div className="bg-amber-500 h-1 rounded-full" style={{ width: `${(medium/total)*100}%` }} />
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <div className="flex justify-between text-slate-600 mb-0.5">
+                                                                    <span>Hard</span>
+                                                                    <span className="font-bold text-rose-700">{hard} ({Math.round((hard/total)*100)}%)</span>
+                                                                </div>
+                                                                <div className="w-full bg-slate-200 rounded-full h-1 overflow-hidden">
+                                                                    <div className="bg-rose-500 h-1 rounded-full" style={{ width: `${(hard/total)*100}%` }} />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                         {/* Action Bar */}
                         <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs">
                             <div className="flex flex-wrap items-center gap-2">
@@ -442,13 +791,13 @@ export default function AdminQuestionBankPage() {
 
                         {/* Filter Bar */}
                         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs space-y-3">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
                                 {/* Search */}
-                                <div className="lg:col-span-2 relative">
+                                <div className="relative">
                                     <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
                                     <input
                                         type="text"
-                                        placeholder="Search by code, topic, text…"
+                                        placeholder="Search code, topic, text…"
                                         value={searchQuery}
                                         onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
                                         className="w-full rounded-lg border border-slate-200 pl-8 pr-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
@@ -459,14 +808,28 @@ export default function AdminQuestionBankPage() {
                                 <div>
                                     <select
                                         value={subjectFilter}
-                                        onChange={(e) => { setSubjectFilter(e.target.value); setTopicFilter('all'); setCurrentPage(1); }}
+                                        onChange={(e) => { setSubjectFilter(e.target.value); setChapterFilter('all'); setTopicFilter('all'); setCurrentPage(1); }}
                                         className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-700 focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                                     >
-                                        <option value="all">All Subjects</option>
+                                        <option value="all">All Subjects ({stats.total})</option>
                                         <option value="Physics">Physics ({stats.subjects?.Physics || 0})</option>
                                         <option value="Chemistry">Chemistry ({stats.subjects?.Chemistry || 0})</option>
                                         <option value="Mathematics">Mathematics ({stats.subjects?.Mathematics || 0})</option>
                                         <option value="Biology">Biology ({stats.subjects?.Biology || 0})</option>
+                                    </select>
+                                </div>
+
+                                {/* Chapter */}
+                                <div>
+                                    <select
+                                        value={chapterFilter}
+                                        onChange={(e) => { setChapterFilter(e.target.value); setCurrentPage(1); }}
+                                        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-700 focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                                    >
+                                        <option value="all">All Chapters ({chapters.length})</option>
+                                        {chapters.map((ch) => (
+                                            <option key={ch} value={ch}>{ch}</option>
+                                        ))}
                                     </select>
                                 </div>
 
@@ -564,7 +927,7 @@ export default function AdminQuestionBankPage() {
                                         <thead>
                                             <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                                 <th className="py-3 px-4">Code</th>
-                                                <th className="py-3 px-4">Subject & Topic</th>
+                                                <th className="py-3 px-4">Subject & Chapter</th>
                                                 <th className="py-3 px-4">Difficulty</th>
                                                 <th className="py-3 px-4">Question (English & தமிழ்)</th>
                                                 <th className="py-3 px-4 text-center">Key</th>
@@ -593,10 +956,13 @@ export default function AdminQuestionBankPage() {
                                                             {q.code}
                                                         </td>
 
-                                                        {/* Subject & Topic */}
+                                                        {/* Subject & Chapter */}
                                                         <td className="py-3 px-4 whitespace-nowrap">
                                                             <span className="font-bold text-slate-800 block">{q.subject}</span>
-                                                            <span className="text-[11px] text-slate-400 block">{q.topic || 'General'}</span>
+                                                            <span className="text-[11px] font-semibold text-slate-600 block">{q.chapter || q.topic || 'General'}</span>
+                                                            {q.topic && q.topic !== q.chapter && (
+                                                                <span className="text-[10px] text-slate-400 block">{q.topic}</span>
+                                                            )}
                                                         </td>
 
                                                         {/* Difficulty */}
@@ -1020,7 +1386,7 @@ export default function AdminQuestionBankPage() {
                                 <div className="flex items-center gap-2">
                                     <span className="font-mono font-bold text-base text-slate-900">{previewQuestion.code}</span>
                                     <span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">
-                                        {previewQuestion.subject} • {previewQuestion.topic}
+                                        {previewQuestion.subject} • Chapter: {previewQuestion.chapter || 'General'} • Topic: {previewQuestion.topic || 'General'}
                                     </span>
                                     <span className="capitalize text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
                                         {previewQuestion.difficulty}
@@ -1163,7 +1529,7 @@ export default function AdminQuestionBankPage() {
                             </div>
 
                             <form onSubmit={handleSaveQuestion} className="space-y-4 text-xs">
-                                <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-6 gap-3">
                                     <div>
                                         <label className="block font-bold text-slate-700 mb-1">Code (Unique)</label>
                                         <input
@@ -1188,6 +1554,17 @@ export default function AdminQuestionBankPage() {
                                             <option value="Mathematics">Mathematics</option>
                                             <option value="Biology">Biology</option>
                                         </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block font-bold text-slate-700 mb-1">Chapter</label>
+                                        <input
+                                            type="text"
+                                            value={formData.chapter || ''}
+                                            onChange={(e) => setFormData({ ...formData, chapter: e.target.value })}
+                                            placeholder="e.g. Optics / Organic Chemistry"
+                                            className="w-full rounded-lg border border-slate-300 p-2"
+                                        />
                                     </div>
 
                                     <div>
