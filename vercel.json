@@ -3,28 +3,22 @@
   "regions": ["bom1"],
   "functions": {
     "src/pages/api/**/*.js": {
-      "maxDuration": 15
+      "maxDuration": 10
     }
   },
   "crons": [
     {
       "path": "/api/cron/sheetdb-sync",
-      "schedule": "*/10 * * * *"
+      "schedule": "0 6 * * *"
     }
   ],
   "headers": [
     {
-      "source": "/api/(scholarship|admin|cron|biodata|payment|counselling|feedback)/(.*)",
+      "source": "/api/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" },
         { "key": "Pragma", "value": "no-cache" },
         { "key": "Expires", "value": "0" }
-      ]
-    },
-    {
-      "source": "/api/(colleges|courses|achievements|announcements)",
-      "headers": [
-        { "key": "Cache-Control", "value": "s-maxage=60, stale-while-revalidate=300" }
       ]
     },
     {
