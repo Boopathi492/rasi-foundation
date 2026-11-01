@@ -13,8 +13,10 @@ import {
     mapResultToSheetRow,
     mapFeedbackToSheetRow,
 } from '@/backend/lib/sheetdb';
+import { setNoCacheHeaders } from '@/backend/lib/apiSecurity';
 
 async function handler(req, res) {
+    setNoCacheHeaders(res);
     await dbConnect();
 
     if (req.method === 'GET') {
@@ -100,8 +102,8 @@ async function handler(req, res) {
                 const results = await reconcilePendingJobs(50);
                 return res.status(200).json({
                     success: true,
-                    message: `Retried ${results.length} pending/failed jobs`,
-                    count: results.length,
+                    message: `Retried jobs: ${results.completedCount} succeeded, ${results.failedCount} failed, ${results.reclaimedStaleCount} stale reclaimed.`,
+                    data: results,
                 });
 
             } else if (action === 'reconcile_missing') {

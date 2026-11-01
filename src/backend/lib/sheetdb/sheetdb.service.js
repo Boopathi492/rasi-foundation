@@ -2,7 +2,8 @@
  * SheetDB Centralized Client Service
  *
  * Implements server-only HTTP calls with AbortController timeouts,
- * payload validation, rate-limit tracking, and duplicate prevention.
+ * API authentication headers, payload validation, rate-limit tracking,
+ * and duplicate prevention.
  */
 
 import { SHEETDB_CONFIG } from './sheetdb.config.js';
@@ -14,6 +15,7 @@ let lastQuotaMetrics = {
     limit: null,
     lastCheckedAt: null,
     lastStatusCode: null,
+    isQuotaExceeded: false,
 };
 
 export function getSheetDBQuotaMetrics() {
@@ -34,10 +36,14 @@ export async function searchRow(tabName, queryParam, queryValue) {
     const timeout = setTimeout(() => controller.abort(), SHEETDB_CONFIG.timeoutMs);
 
     try {
+        const authHeaders = SHEETDB_CONFIG.getAuthHeaders();
         const searchUrl = `${baseUrl}/search?sheet=${encodeURIComponent(tabName)}&${encodeURIComponent(queryParam)}=${encodeURIComponent(queryValue)}`;
         const res = await fetch(searchUrl, {
             method: 'GET',
-            headers: { 'Accept': 'application/json' },
+            headers: {
+                'Accept': 'application/json',
+                ...authHeaders,
+            },
             signal: controller.signal,
         });
 
@@ -49,6 +55,7 @@ export async function searchRow(tabName, queryParam, queryValue) {
                 limit: parseInt(res.headers.get('x-ratelimit-limit'), 10),
                 lastCheckedAt: new Date(),
                 lastStatusCode: res.status,
+                isQuotaExceeded: res.status === 402,
             };
         }
 
@@ -63,11 +70,22 @@ export async function searchRow(tabName, queryParam, queryValue) {
             };
         }
 
+        // Handle specific HTTP error cases
+        let errorDetails = `SheetDB search failed with status ${res.status}`;
+        if (res.status === 401 || res.status === 403) {
+            errorDetails = 'SheetDB Authentication Failure: Invalid or missing API credentials';
+        } else if (res.status === 402) {
+            errorDetails = 'SheetDB Quota Exhausted: 500 requests/month free tier allowance reached';
+            lastQuotaMetrics.isQuotaExceeded = true;
+        } else if (res.status === 429) {
+            errorDetails = 'SheetDB Rate Limit: 90 requests/minute exceeded';
+        }
+
         return {
             success: false,
             found: false,
             status: res.status,
-            error: `SheetDB search failed with status ${res.status}`,
+            error: errorDetails,
         };
     } catch (err) {
         clearTimeout(timeout);
@@ -114,17 +132,19 @@ export async function appendRow(tabName, rowData) {
         };
     }
 
-    // 4. HTTP POST with AbortController timeout
+    // 4. HTTP POST with AbortController timeout and Auth headers
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), SHEETDB_CONFIG.timeoutMs);
 
     try {
+        const authHeaders = SHEETDB_CONFIG.getAuthHeaders();
         const targetUrl = `${baseUrl}?sheet=${encodeURIComponent(tabName)}`;
         const response = await fetch(targetUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
+                ...authHeaders,
             },
             body: JSON.stringify({ data: [rowData] }),
             signal: controller.signal,
@@ -139,6 +159,7 @@ export async function appendRow(tabName, rowData) {
                 limit: parseInt(response.headers.get('x-ratelimit-limit'), 10),
                 lastCheckedAt: new Date(),
                 lastStatusCode: response.status,
+                isQuotaExceeded: response.status === 402,
             };
         }
 
@@ -152,15 +173,37 @@ export async function appendRow(tabName, rowData) {
             };
         }
 
+        // Handle specific error codes
         let errorDetails = `HTTP ${response.status} ${response.statusText}`;
-        try {
-            const errJson = await response.json();
-            if (errJson?.error) errorDetails = errJson.error;
-        } catch {
-            // response was not JSON
-        }
+        let isRetryable = false;
 
-        const isRetryable = response.status === 429 || (response.status >= 500 && response.status <= 599);
+        if (response.status === 401 || response.status === 403) {
+            errorDetails = 'SheetDB Authentication Failure: Invalid or missing API credentials';
+            isRetryable = false; // Never retry auth failures in loop
+        } else if (response.status === 402) {
+            errorDetails = 'SheetDB Quota Exhausted: 500 requests/month free tier allowance reached';
+            lastQuotaMetrics.isQuotaExceeded = true;
+            isRetryable = false; // Cannot retry until quota reset or upgrade
+        } else if (response.status === 429) {
+            errorDetails = 'SheetDB Rate Limit: 90 requests/minute exceeded';
+            isRetryable = true; // Retry with exponential backoff
+        } else if (response.status >= 500 && response.status <= 599) {
+            try {
+                const errJson = await response.json();
+                if (errJson?.error) errorDetails = errJson.error;
+            } catch {
+                // Not JSON
+            }
+            isRetryable = true; // Temporary server failure
+        } else {
+            try {
+                const errJson = await response.json();
+                if (errJson?.error) errorDetails = errJson.error;
+            } catch {
+                // Not JSON
+            }
+            isRetryable = false;
+        }
 
         return {
             success: false,

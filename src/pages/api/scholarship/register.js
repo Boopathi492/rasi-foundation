@@ -1,8 +1,10 @@
 import dbConnect from '@/lib/mongodb';
 import ScholarshipStudent from '@/models/ScholarshipStudent';
 import { enqueueAndDispatchSync, mapStudentToSheetRow } from '@/backend/lib/sheetdb';
+import { setNoCacheHeaders } from '@/backend/lib/apiSecurity';
 
 export default async function handler(req, res) {
+    setNoCacheHeaders(res);
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, message: 'Method not allowed' });
     }

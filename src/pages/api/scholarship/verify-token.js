@@ -1,8 +1,10 @@
 import dbConnect from '@/backend/lib/mongodb';
 import ScholarshipStudent from '@/backend/models/ScholarshipStudent';
 import TestSession from '@/backend/models/TestSession';
+import { setNoCacheHeaders } from '@/backend/lib/apiSecurity';
 
 export default async function handler(req, res) {
+    setNoCacheHeaders(res);
     if (req.method !== 'GET') {
         return res.status(405).json({ success: false, message: 'Method not allowed' });
     }

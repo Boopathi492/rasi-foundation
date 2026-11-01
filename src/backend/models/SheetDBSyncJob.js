@@ -53,6 +53,20 @@ const SheetDBSyncJobSchema = new mongoose.Schema(
             default: Date.now,
             index: true,
         },
+        // Worker lease and lock tracking fields
+        lockedAt: {
+            type: Date,
+            default: null,
+        },
+        lockedBy: {
+            type: String,
+            default: null,
+        },
+        leaseExpiresAt: {
+            type: Date,
+            default: null,
+            index: true,
+        },
         lastErrorCode: {
             type: String,
             default: null,
@@ -71,7 +85,9 @@ const SheetDBSyncJobSchema = new mongoose.Schema(
     }
 );
 
-// Compound index for efficient worker polling
+// Compound indexes for efficient worker polling and stale lease sweeps
 SheetDBSyncJobSchema.index({ status: 1, nextRetryTime: 1, destinationTab: 1 });
+SheetDBSyncJobSchema.index({ status: 1, leaseExpiresAt: 1 });
+SheetDBSyncJobSchema.index({ destinationTab: 1, recordReferenceId: 1 });
 
 export default mongoose.models.SheetDBSyncJob || mongoose.model('SheetDBSyncJob', SheetDBSyncJobSchema);

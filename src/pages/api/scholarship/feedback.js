@@ -3,8 +3,10 @@ import TestSession from '@/models/TestSession';
 import ScholarshipStudent from '@/models/ScholarshipStudent';
 import ScholarshipExamFeedback from '@/backend/models/ScholarshipExamFeedback';
 import { enqueueAndDispatchSync, mapFeedbackToSheetRow } from '@/backend/lib/sheetdb';
+import { setNoCacheHeaders } from '@/backend/lib/apiSecurity';
 
 export default async function handler(req, res) {
+    setNoCacheHeaders(res);
     await dbConnect();
 
     if (req.method === 'POST') {
