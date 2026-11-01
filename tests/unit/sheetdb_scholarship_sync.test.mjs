@@ -207,3 +207,141 @@ test('SheetDB Security & Privacy: No authentication secrets or plaintext Aadhaar
     assert.equal(keys.length, 32);
     assert.deepEqual(keys.sort(), [...SCHOLARSHIP_STUDENTS_HEADERS].sort());
 });
+
+test('SheetDB Concurrency & Deduplication: searchRow detects pre-existing row and avoids duplicate write', async () => {
+    process.env.SHEETDB_URL = 'https://sheetdb.io/api/v1/mock_endpoint';
+    const { searchRow } = await import('../../src/backend/lib/sheetdb/sheetdb.service.js');
+    const originalFetch = globalThis.fetch;
+    try {
+        globalThis.fetch = async () => {
+            return {
+                ok: true,
+                status: 200,
+                headers: new Headers({
+                    'x-ratelimit-remaining': '88',
+                    'x-ratelimit-limit': '90',
+                }),
+                json: async () => [{ application_number: 'RASI-DUP-001', student_reference_id: 'rec_999' }],
+            };
+        };
+
+        const result = await searchRow('Scholarship_Students', 'application_number', 'RASI-DUP-001');
+        assert.equal(result.success, true);
+        assert.equal(result.found, true);
+        assert.equal(result.count, 1);
+    } finally {
+        globalThis.fetch = originalFetch;
+    }
+});
+
+test('SheetDB Failure Simulation: HTTP 429 returns retryable true with backoff scheduling', async () => {
+    process.env.SHEETDB_URL = 'https://sheetdb.io/api/v1/mock_endpoint';
+    const { appendRow } = await import('../../src/backend/lib/sheetdb/sheetdb.service.js');
+    const originalFetch = globalThis.fetch;
+    try {
+        globalThis.fetch = async () => {
+            return {
+                ok: false,
+                status: 429,
+                statusText: 'Too Many Requests',
+                headers: new Headers({
+                    'x-ratelimit-remaining': '0',
+                    'x-ratelimit-limit': '90',
+                }),
+                json: async () => ({ error: 'Rate limit exceeded: 90 requests/minute' }),
+            };
+        };
+
+        const validRow = {};
+        SCHOLARSHIP_FEEDBACK_HEADERS.forEach(h => { validRow[h] = 'test'; });
+        validRow.overall_rating = 5;
+        validRow.question_clarity = 5;
+        validRow.portal_experience = 5;
+
+        const res = await appendRow('Scholarship_Feedback', validRow);
+        assert.equal(res.success, false);
+        assert.equal(res.statusCode, 429);
+        assert.equal(res.retryable, true, 'HTTP 429 must be classified as retryable');
+    } finally {
+        globalThis.fetch = originalFetch;
+    }
+});
+
+test('SheetDB Failure Simulation: HTTP 402 (Payment/Quota Exhausted) is correctly captured', async () => {
+    process.env.SHEETDB_URL = 'https://sheetdb.io/api/v1/mock_endpoint';
+    const { appendRow } = await import('../../src/backend/lib/sheetdb/sheetdb.service.js');
+    const originalFetch = globalThis.fetch;
+    try {
+        globalThis.fetch = async () => {
+            return {
+                ok: false,
+                status: 402,
+                statusText: 'Payment Required',
+                headers: new Headers(),
+                json: async () => ({ error: 'Monthly quota of 500 requests exceeded' }),
+            };
+        };
+
+        const validRow = {};
+        SCHOLARSHIP_FEEDBACK_HEADERS.forEach(h => { validRow[h] = 'test'; });
+        validRow.overall_rating = 5;
+        validRow.question_clarity = 5;
+        validRow.portal_experience = 5;
+
+        const res = await appendRow('Scholarship_Feedback', validRow);
+        assert.equal(res.success, false);
+        assert.equal(res.statusCode, 402);
+        assert.equal(res.retryable, false, 'HTTP 402 quota exhaustion is non-retryable without quota reset');
+    } finally {
+        globalThis.fetch = originalFetch;
+    }
+});
+
+test('SheetDB Failure Simulation: Request timeout triggers 408 with retryable true', async () => {
+    process.env.SHEETDB_URL = 'https://sheetdb.io/api/v1/mock_endpoint';
+    const { appendRow } = await import('../../src/backend/lib/sheetdb/sheetdb.service.js');
+    const originalFetch = globalThis.fetch;
+    try {
+        globalThis.fetch = async () => {
+            const err = new Error('The operation was aborted');
+            err.name = 'AbortError';
+            throw err;
+        };
+
+        const validRow = {};
+        SCHOLARSHIP_FEEDBACK_HEADERS.forEach(h => { validRow[h] = 'test'; });
+        validRow.overall_rating = 5;
+        validRow.question_clarity = 5;
+        validRow.portal_experience = 5;
+
+        const res = await appendRow('Scholarship_Feedback', validRow);
+        assert.equal(res.success, false);
+        assert.equal(res.statusCode, 408);
+        assert.equal(res.retryable, true, 'Timeout must be flagged as retryable');
+    } finally {
+        globalThis.fetch = originalFetch;
+    }
+});
+
+test('SheetDB Data Mapping Robustness: Missing optional fields fall back safely without undefined', () => {
+    const sparseStudent = {
+        _id: 'rec_sparse',
+        registrationToken: 'RASI-SPARSE-001',
+        name: 'Vimal',
+    };
+
+    const row = mapStudentToSheetRow(sparseStudent);
+    assert.equal(row.student_reference_id, 'rec_sparse');
+    assert.equal(row.application_number, 'RASI-SPARSE-001');
+    assert.equal(row.full_name, 'Vimal');
+    assert.equal(row.masked_aadhaar, '');
+    assert.equal(row.studied_in_govt_school, 'No');
+    assert.equal(row.first_generation_graduate, 'No');
+    assert.equal(row.questions_per_page, 5);
+
+    // Verify none of the 32 values are undefined
+    for (const [k, v] of Object.entries(row)) {
+        assert.notEqual(v, undefined, `Field ${k} must not be undefined`);
+    }
+});
+
