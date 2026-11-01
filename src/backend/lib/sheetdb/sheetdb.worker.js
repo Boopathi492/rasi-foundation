@@ -6,6 +6,7 @@
  * and atomic state updates.
  */
 
+import mongoose from 'mongoose';
 import SheetDBSyncJob from '../../models/SheetDBSyncJob.js';
 import ScholarshipStudent from '../../models/ScholarshipStudent.js';
 import TestSession from '../../models/TestSession.js';
@@ -165,24 +166,26 @@ export async function processJob(jobId, explicitWorkerId = null) {
             await job.save();
 
             // Update underlying operational model with sync timestamp
-            if (destinationTab === 'Scholarship_Students') {
-                await ScholarshipStudent.findByIdAndUpdate(recordReferenceId, {
-                    sheetdbSynced: true,
-                    sheetdbSyncedAt: new Date(),
-                    sheetdbError: null,
-                });
-            } else if (destinationTab === 'Scholarship_Results') {
-                await TestSession.findByIdAndUpdate(recordReferenceId, {
-                    sheetdbSynced: true,
-                    sheetdbSyncedAt: new Date(),
-                    sheetdbError: null,
-                });
-            } else if (destinationTab === 'Scholarship_Feedback') {
-                await ScholarshipExamFeedback.findByIdAndUpdate(recordReferenceId, {
-                    sheetdbSynced: true,
-                    sheetdbSyncedAt: new Date(),
-                    sheetdbError: null,
-                });
+            if (mongoose.Types.ObjectId.isValid(recordReferenceId)) {
+                if (destinationTab === 'Scholarship_Students') {
+                    await ScholarshipStudent.findByIdAndUpdate(recordReferenceId, {
+                        sheetdbSynced: true,
+                        sheetdbSyncedAt: new Date(),
+                        sheetdbError: null,
+                    });
+                } else if (destinationTab === 'Scholarship_Results') {
+                    await TestSession.findByIdAndUpdate(recordReferenceId, {
+                        sheetdbSynced: true,
+                        sheetdbSyncedAt: new Date(),
+                        sheetdbError: null,
+                    });
+                } else if (destinationTab === 'Scholarship_Feedback') {
+                    await ScholarshipExamFeedback.findByIdAndUpdate(recordReferenceId, {
+                        sheetdbSynced: true,
+                        sheetdbSyncedAt: new Date(),
+                        sheetdbError: null,
+                    });
+                }
             }
 
             return { success: true, job };
@@ -209,22 +212,24 @@ export async function processJob(jobId, explicitWorkerId = null) {
         await job.save();
 
         // Update model with error flag
-        const errNotice = `[${job.lastErrorCode}] ${job.lastErrorMessage}`;
-        if (destinationTab === 'Scholarship_Students') {
-            await ScholarshipStudent.findByIdAndUpdate(recordReferenceId, {
-                sheetdbSynced: false,
-                sheetdbError: errNotice,
-            });
-        } else if (destinationTab === 'Scholarship_Results') {
-            await TestSession.findByIdAndUpdate(recordReferenceId, {
-                sheetdbSynced: false,
-                sheetdbError: errNotice,
-            });
-        } else if (destinationTab === 'Scholarship_Feedback') {
-            await ScholarshipExamFeedback.findByIdAndUpdate(recordReferenceId, {
-                sheetdbSynced: false,
-                sheetdbError: errNotice,
-            });
+        if (mongoose.Types.ObjectId.isValid(recordReferenceId)) {
+            const errNotice = `[${job.lastErrorCode}] ${job.lastErrorMessage}`;
+            if (destinationTab === 'Scholarship_Students') {
+                await ScholarshipStudent.findByIdAndUpdate(recordReferenceId, {
+                    sheetdbSynced: false,
+                    sheetdbError: errNotice,
+                });
+            } else if (destinationTab === 'Scholarship_Results') {
+                await TestSession.findByIdAndUpdate(recordReferenceId, {
+                    sheetdbSynced: false,
+                    sheetdbError: errNotice,
+                });
+            } else if (destinationTab === 'Scholarship_Feedback') {
+                await ScholarshipExamFeedback.findByIdAndUpdate(recordReferenceId, {
+                    sheetdbSynced: false,
+                    sheetdbError: errNotice,
+                });
+            }
         }
 
         return { success: false, job, retryable: writeResult.retryable && !isQuotaExhausted && !isAuthError };
