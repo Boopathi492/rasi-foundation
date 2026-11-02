@@ -382,7 +382,13 @@ export default async function handler(req, res) {
 
         if (mongoose.connection.readyState === 1) {
             const now = new Date();
-            await ScholarshipRegistrationLock.deleteMany({ expiresAt: { $lte: now } }).catch(() => {});
+            // Purge expired locks and any legacy 'registered' locks on candidate identity keys so SheetDB remains sole authoritative truth
+            await ScholarshipRegistrationLock.deleteMany({
+                $or: [
+                    { expiresAt: { $lte: now } },
+                    { keys: { $in: [mobileHash, emailHash].filter(Boolean) }, state: 'registered' },
+                ],
+            }).catch(() => {});
 
             if (idemHash) {
                 const existingIdem = await ScholarshipRegistrationLock.findOne({ idemHash, expiresAt: { $gt: now } }).lean();
@@ -426,29 +432,50 @@ export default async function handler(req, res) {
                     studentReferenceId,
                     applicationNumber,
                     state: 'pending',
-                    expiresAt: new Date(Date.now() + 2 * 60 * 1000), // 2-minute in-flight TTL
+                    expiresAt: new Date(Date.now() + 60 * 1000), // 60-second in-flight mutex TTL
                 });
             } catch (lockErr) {
                 if (lockErr?.code === 11000) {
+                    const checkTime = new Date();
+                    // Clean up any expired locks matching these keys
+                    await ScholarshipRegistrationLock.deleteMany({
+                        keys: { $in: lockKeys },
+                        expiresAt: { $lte: checkTime },
+                    }).catch(() => {});
+
                     const colliding = await ScholarshipRegistrationLock.findOne({
                         keys: { $in: lockKeys },
-                        expiresAt: { $gt: new Date() },
+                        expiresAt: { $gt: checkTime },
                     }).lean();
 
-                    if (colliding?.state === 'pending') {
+                    if (colliding && colliding.state === 'pending') {
                         return res.status(409).json({
                             success: false,
                             errorCode: 'CONCURRENT_SUBMISSION',
                             message: 'A registration submission for this candidate is already in progress. Please wait a moment.',
                         });
                     }
-                    return res.status(409).json({
-                        success: false,
-                        errorCode: 'DUPLICATE_REGISTRATION',
-                        message: 'A student with this mobile number or email has already registered.',
-                    });
+
+                    // If colliding lock was stale/expired and removed, acquire lock
+                    try {
+                        mongoLockDoc = await ScholarshipRegistrationLock.create({
+                            keys: lockKeys,
+                            idemHash: idemHash || null,
+                            studentReferenceId,
+                            applicationNumber,
+                            state: 'pending',
+                            expiresAt: new Date(Date.now() + 60 * 1000),
+                        });
+                    } catch {
+                        return res.status(409).json({
+                            success: false,
+                            errorCode: 'CONCURRENT_SUBMISSION',
+                            message: 'A registration submission for this candidate is already in progress. Please wait a moment.',
+                        });
+                    }
+                } else {
+                    throw lockErr;
                 }
-                throw lockErr;
             }
         }
 
@@ -478,13 +505,10 @@ export default async function handler(req, res) {
 
         if (dupCheck.found && dupCheck.records.length > 0) {
             if (mongoLockDoc) {
-                await ScholarshipRegistrationLock.updateOne(
-                    { _id: mongoLockDoc._id },
-                    { $set: { state: 'registered', expiresAt: new Date(Date.now() + 10 * 60 * 1000) } }
-                ).catch(() => {});
+                await ScholarshipRegistrationLock.deleteOne({ _id: mongoLockDoc._id }).catch(() => {});
             }
             const matchedMobile = dupCheck.records.some(
-                (r) => String(r.student_mobile || '').replace(/\D/g, '') === cleanMobile
+                (r) => String(r.student_mobile || '').replace(/\D/g, '').slice(-10) === cleanMobile
             );
             return res.status(409).json({
                 success: false,
@@ -557,12 +581,24 @@ export default async function handler(req, res) {
             });
         }
 
-        // 8. SheetDB write confirmed -> finalize short-lived non-PII lock, link optional staged documents, prime cache & issue JWT
+        // 8. SheetDB write confirmed -> release candidate lock, preserve optional idempotency key replay, prime cache & issue JWT
         if (mongoLockDoc) {
-            await ScholarshipRegistrationLock.updateOne(
-                { _id: mongoLockDoc._id },
-                { $set: { state: 'registered', expiresAt: new Date(Date.now() + 15 * 60 * 1000) } }
-            ).catch(() => {});
+            if (idemHash) {
+                // Free mobile and email keys immediately so SheetDB remains sole source of truth;
+                // keep ONLY the client's idempotency key hash for replay.
+                await ScholarshipRegistrationLock.updateOne(
+                    { _id: mongoLockDoc._id },
+                    {
+                        $set: {
+                            keys: [idemHash],
+                            state: 'registered',
+                            expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+                        },
+                    }
+                ).catch(() => {});
+            } else {
+                await ScholarshipRegistrationLock.deleteOne({ _id: mongoLockDoc._id }).catch(() => {});
+            }
         }
 
         if (docCheck.verifiedDocs.length > 0 && mongoose.connection.readyState === 1) {
