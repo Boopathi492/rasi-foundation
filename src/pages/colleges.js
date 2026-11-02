@@ -1149,13 +1149,13 @@ export default function Colleges({ collegesData }) {
         }
         aside={
           <Reveal className="relative">
-            <div className="relative aspect-[8/7] w-full overflow-hidden rounded-[2.5rem] shadow-card-hover ring-8 ring-white/20">
+            <div className="relative aspect-[8/7] w-full overflow-hidden rounded-[2.5rem] bg-black/20 backdrop-blur-sm shadow-card-hover ring-8 ring-white/20">
               <Image
                 src="/images/colleges/colleges-banner.webp"
-                alt="Rasi Foundation - Students walking on a premier college campus"
+                alt="Rasi Foundation - Explore Top Colleges across Tamil Nadu and Bangalore"
                 fill
                 sizes="(min-width: 1024px) 40vw, 90vw"
-                className="h-full w-full object-cover object-center"
+                className="object-contain object-center p-3"
                 priority
               />
             </div>

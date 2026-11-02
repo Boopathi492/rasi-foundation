@@ -1029,13 +1029,13 @@ export default function Courses({ initialCourses = [] }) {
         }
         aside={
           <Reveal>
-            <div className="relative mx-auto aspect-[5/6] max-h-[420px] w-full overflow-hidden rounded-[3rem] shadow-card-hover ring-8 ring-white/20">
+            <div className="relative mx-auto aspect-[5/6] max-h-[420px] w-full overflow-hidden rounded-[3rem] bg-black/20 backdrop-blur-sm shadow-card-hover ring-8 ring-white/20">
               <Image
                 src="/images/courses/courses-banner.webp"
-                alt="Rasi Foundation - Student discovering courses on university campus"
+                alt="Rasi Foundation - Discover the Course that Fits Your Future"
                 fill
                 sizes="(min-width: 1024px) 35vw, 90vw"
-                className="h-full w-full object-cover object-top"
+                className="object-contain object-center p-3"
                 priority
               />
             </div>
