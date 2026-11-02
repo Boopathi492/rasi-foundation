@@ -21,6 +21,7 @@ import College from '../../src/backend/models/College.js';
 import { getRequestId } from '../../src/backend/lib/apiHandler.js';
 import { can, ROLES, roleFromTokenPayload } from '../../src/backend/lib/rbac.js';
 import { maskAadhaar } from '../../src/backend/lib/redact.js';
+import { sanitizeMongoUri, getSafeMongoDiagnostics } from '../../src/backend/lib/mongodb.js';
 
 test('Models: All 13 models register valid schemas with expected collections and indexes', () => {
   assert.equal(BioData.collection.name, 'biodatas');
@@ -131,4 +132,27 @@ test('StudentDocument: validates permitted document types', () => {
   });
   assert.equal(doc.validateSync(), undefined);
   assert.equal(doc.verificationStatus, 'pending');
+});
+
+test('MongoDB Connection: sanitizeMongoUri strips whitespace and quotes safely', () => {
+  assert.equal(sanitizeMongoUri('  mongodb://127.0.0.1:27017/rasi-foundation  \n'), 'mongodb://127.0.0.1:27017/rasi-foundation');
+  assert.equal(sanitizeMongoUri('"mongodb+srv://u:p@cluster.mongodb.net/db"'), 'mongodb+srv://u:p@cluster.mongodb.net/db');
+  assert.equal(sanitizeMongoUri("'mongodb+srv://u:p@cluster.mongodb.net/db'"), 'mongodb+srv://u:p@cluster.mongodb.net/db');
+  assert.equal(sanitizeMongoUri(null), '');
+  assert.equal(sanitizeMongoUri(undefined), '');
+});
+
+test('MongoDB Connection: getSafeMongoDiagnostics produces redacted diagnostics without passwords', () => {
+  const diag = getSafeMongoDiagnostics('mongodb+srv://admin_user:superSecretPass123@cluster1.n12u8v2.mongodb.net/rasi-foundation?retryWrites=true&w=majority');
+  assert.equal(diag.configured, true);
+  assert.equal(diag.protocol, 'mongodb+srv:');
+  assert.equal(diag.host, 'cluster1.n12u8v2.mongodb.net');
+  assert.equal(diag.database, 'rasi-foundation');
+  assert.equal(diag.username, 'admin_user');
+  assert.equal(diag.passwordConfigured, true);
+  assert.equal(diag.passwordLength, 18);
+  assert.equal(diag.authSource, 'defaulted_to_admin');
+
+  const jsonStr = JSON.stringify(diag);
+  assert.ok(!jsonStr.includes('superSecretPass123'), 'Diagnostics must NEVER leak passwords');
 });
