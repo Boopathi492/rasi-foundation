@@ -1,8 +1,17 @@
-import dbConnect from '@/lib/mongodb';
-import ScholarshipStudent from '@/models/ScholarshipStudent';
-import ScholarshipQuestion from '@/models/ScholarshipQuestion';
-import TestSession from '@/models/TestSession';
-import ScholarshipExamConfig from '@/backend/models/ScholarshipExamConfig';
+import dbConnect from '../../../backend/lib/mongodb.js';
+import ScholarshipStudent from '../../../backend/models/ScholarshipStudent.js';
+import ScholarshipQuestion from '../../../backend/models/ScholarshipQuestion.js';
+import TestSession from '../../../backend/models/TestSession.js';
+import ScholarshipExamConfig from '../../../backend/models/ScholarshipExamConfig.js';
+import {
+    findScholarshipStudentByToken,
+    findScholarshipResult,
+} from '../../../backend/lib/sheetdb/index.js';
+import { setNoCacheHeaders } from '../../../backend/lib/apiSecurity.js';
+import {
+    authorizeScholarshipRequest,
+    issueScholarshipSession,
+} from '../../../backend/lib/scholarshipAuth.js';
 
 // Fisher-Yates array shuffle helper
 function shuffleArray(arr) {
@@ -38,9 +47,12 @@ async function selectBalancedQuestions(subjectName, targetCount, difficultyDistr
 
     const selected = [];
     const selectedIds = new Set();
-    const diffTargets = difficultyDistribution || { easy: Math.floor(targetCount * 0.35), medium: Math.floor(targetCount * 0.45), hard: targetCount - Math.floor(targetCount * 0.35) - Math.floor(targetCount * 0.45) };
+    const diffTargets = difficultyDistribution || {
+        easy: Math.floor(targetCount * 0.35),
+        medium: Math.floor(targetCount * 0.45),
+        hard: targetCount - Math.floor(targetCount * 0.35) - Math.floor(targetCount * 0.45),
+    };
 
-    // Fetch by difficulty buckets
     for (const [diff, countNeeded] of Object.entries(diffTargets)) {
         if (countNeeded <= 0) continue;
         const diffQuestions = await ScholarshipQuestion.aggregate([
@@ -48,13 +60,12 @@ async function selectBalancedQuestions(subjectName, targetCount, difficultyDistr
             { $sample: { size: countNeeded } },
         ]);
 
-        diffQuestions.forEach(q => {
+        diffQuestions.forEach((q) => {
             selected.push(q);
             selectedIds.add(q._id.toString());
         });
     }
 
-    // If any bucket fell short, fill remaining from available active approved questions
     if (selected.length < targetCount) {
         const remainingNeeded = targetCount - selected.length;
         const fillQuestions = await ScholarshipQuestion.aggregate([
@@ -62,46 +73,65 @@ async function selectBalancedQuestions(subjectName, targetCount, difficultyDistr
             { $sample: { size: remainingNeeded } },
         ]);
 
-        fillQuestions.forEach(q => {
+        fillQuestions.forEach((q) => {
             selected.push(q);
             selectedIds.add(q._id.toString());
         });
     }
 
-    // Shuffle question order within the subject
     return shuffleArray(selected).slice(0, targetCount);
 }
 
 export default async function handler(req, res) {
+    setNoCacheHeaders(res);
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, message: 'Method not allowed' });
     }
 
     try {
-        await dbConnect();
+        const body = req.body || {};
+        const cleanToken = String(body.registrationToken || '').trim().toUpperCase();
+        const { thirdSubject, language = 'English', pageSize = 5 } = body;
 
-        const { registrationToken, thirdSubject, language = 'English', pageSize = 5 } = req.body;
-
-        if (!registrationToken) {
+        if (!cleanToken) {
             return res.status(400).json({
                 success: false,
                 message: 'Registration token is required',
             });
         }
 
-        // Dynamically fetch active examination configuration from database
+        // 1. Verify signed candidate authentication & prevent cross-student exam initiation
+        const auth = authorizeScholarshipRequest(req, {
+            expectedApplicationNumber: cleanToken,
+        });
+        if (!auth.ok) {
+            return res.status(auth.statusCode).json({
+                success: false,
+                reason: auth.reason,
+                message: auth.message,
+            });
+        }
+
+        await dbConnect();
+
+        // 2. Fetch active examination configuration from MongoDB
         const examConfig = await ScholarshipExamConfig.getActiveConfig();
         const testDurationMinutes = examConfig.examDurationMinutes || 90;
-        const compulsorySubjects = examConfig.compulsorySubjects || [];
-        const optionalSubjects = examConfig.optionalSubjects || [];
+        const compulsorySubjects = examConfig.compulsorySubjects || [
+            { name: 'Physics', questionCount: 20 },
+            { name: 'Chemistry', questionCount: 20 },
+        ];
+        const optionalSubjects = examConfig.optionalSubjects || [
+            { name: 'Mathematics', questionCount: 20 },
+            { name: 'Biology', questionCount: 20 },
+        ];
 
-        // Validate elective subject dynamically against database optionalSubjects list
         const matchedOptional = optionalSubjects.find(
-            s => s.name.toLowerCase() === String(thirdSubject || '').toLowerCase()
+            (s) => s.name.toLowerCase() === String(thirdSubject || '').trim().toLowerCase()
         );
 
         if (!matchedOptional) {
-            const allowedNames = optionalSubjects.map(s => s.name).join(' or ');
+            const allowedNames = optionalSubjects.map((s) => s.name).join(' or ');
             return res.status(400).json({
                 success: false,
                 message: `Please select a valid elective subject (${allowedNames})`,
@@ -112,24 +142,38 @@ export default async function handler(req, res) {
         const validLanguage = (examConfig.languages || ['English', 'Tamil']).includes(language) ? language : 'English';
         const validPageSize = Number(pageSize) === 10 ? 10 : 5;
 
-        // Find candidate student
-        const student = await ScholarshipStudent.findOne({ registrationToken });
-        if (!student) {
+        // 3. Lookup candidate profile from SheetDB (with 60s cache + legacy MongoDB read-only fallback)
+        const studentLookup = await findScholarshipStudentByToken(cleanToken);
+        if (!studentLookup.ok) {
+            return res.status(studentLookup.statusCode || 503).json({
+                success: false,
+                errorCode: studentLookup.errorCode,
+                retryable: studentLookup.retryable,
+                message: 'Unable to verify candidate registration right now. Please try again shortly.',
+            });
+        }
+
+        if (!studentLookup.found || !studentLookup.student) {
             return res.status(404).json({
                 success: false,
                 message: 'Invalid registration token. Please complete registration first.',
             });
         }
 
-        // Vocational students restriction check (if Mathematics is in optional subjects)
-        if (student.plus2Group === 'Vocational' && normalizedElective !== 'Mathematics' && optionalSubjects.some(s => s.name === 'Mathematics')) {
+        const student = studentLookup.student;
+
+        // Vocational students restriction check
+        if (
+            student.plus2Group === 'Vocational' &&
+            normalizedElective !== 'Mathematics' &&
+            optionalSubjects.some((s) => s.name === 'Mathematics')
+        ) {
             return res.status(400).json({
                 success: false,
                 message: 'Vocational group students must select Mathematics as elective subject',
             });
         }
 
-        // Check if test already completed
         if (student.testStatus === 'completed') {
             return res.status(400).json({
                 success: false,
@@ -137,16 +181,20 @@ export default async function handler(req, res) {
             });
         }
 
-        // Check if test session exists
-        let testSession = await TestSession.findOne({ registrationToken });
+        // 4. Check existing runtime TestSession or authoritative SheetDB result
+        let testSession = await TestSession.findOne({ registrationToken: cleanToken });
 
         if (testSession) {
-            // If test is in progress and not expired, resume existing session idempotently
             if (testSession.status === 'in_progress') {
-                const endTime = new Date(testSession.startTime);
-                endTime.setMinutes(endTime.getMinutes() + testSession.duration);
+                const endTime = new Date(new Date(testSession.startTime).getTime() + (testSession.duration || 90) * 60 * 1000);
 
                 if (new Date() < endTime) {
+                    const accessToken = issueScholarshipSession(res, {
+                        studentReferenceId: student.studentReferenceId,
+                        applicationNumber: cleanToken,
+                        sessionId: String(testSession._id),
+                    });
+
                     return res.status(200).json({
                         success: true,
                         message: 'Examination already in progress',
@@ -158,20 +206,31 @@ export default async function handler(req, res) {
                             subjects: testSession.subjects,
                             startTime: testSession.startTime,
                             totalQuestions: testSession.totalQuestions,
+                            accessToken,
                         },
                     });
-                } else {
-                    // Mark as expired
-                    testSession.status = 'expired';
-                    await testSession.save();
-                    return res.status(400).json({
-                        success: false,
-                        message: 'Your examination time has expired',
-                    });
                 }
+
+                testSession.status = 'expired';
+                await testSession.save();
+                return res.status(400).json({
+                    success: false,
+                    message: 'Your examination time has expired',
+                });
             }
 
-            if (testSession.status === 'completed') {
+            if (testSession.status === 'completed' || testSession.status === 'disqualified' || testSession.status === 'expired') {
+                return res.status(400).json({
+                    success: false,
+                    message: testSession.status === 'completed'
+                        ? 'You have already completed the examination'
+                        : `Examination session is ${testSession.status}`,
+                });
+            }
+        } else if (!auth.claims?.freshReg) {
+            // Ensure completed candidates whose runtime session has TTL-expired cannot retake the exam
+            const priorResult = await findScholarshipResult({ applicationNumber: cleanToken });
+            if (priorResult.ok && priorResult.found) {
                 return res.status(400).json({
                     success: false,
                     message: 'You have already completed the examination',
@@ -179,9 +238,9 @@ export default async function handler(req, res) {
             }
         }
 
-        // Database-driven question availability check before starting exam
+        // 5. Verify question bank availability
         const subjectQuotas = [
-            ...compulsorySubjects.map(s => ({ name: s.name, count: s.questionCount, diff: s.difficultyDistribution })),
+            ...compulsorySubjects.map((s) => ({ name: s.name, count: s.questionCount, diff: s.difficultyDistribution })),
             { name: matchedOptional.name, count: matchedOptional.questionCount, diff: matchedOptional.difficultyDistribution },
         ];
 
@@ -201,26 +260,32 @@ export default async function handler(req, res) {
             }
         }
 
-        // Update student record
-        student.thirdSubject = normalizedElective;
-        student.selectedElective = normalizedElective;
-        student.examLanguage = validLanguage;
-        student.testStatus = 'in_progress';
-        student.testStartTime = new Date();
-        await student.save();
+        // Update legacy MongoDB student status ONLY if this was a pre-existing legacy record; never insert new student profiles
+        if (student.source === 'legacy_mongodb' && student.legacyMongoId) {
+            await ScholarshipStudent.updateOne(
+                { _id: student.legacyMongoId },
+                {
+                    $set: {
+                        thirdSubject: normalizedElective,
+                        selectedElective: normalizedElective,
+                        examLanguage: validLanguage,
+                        testStatus: 'in_progress',
+                        testStartTime: new Date(),
+                    },
+                }
+            ).catch(() => {});
+        }
 
-        const subjectsList = subjectQuotas.map(s => s.name);
+        const subjectsList = subjectQuotas.map((s) => s.name);
         const allQuestions = [];
         const questionIdsToIncrement = [];
 
-        // Dynamically select questions for each subject quota
         for (const quota of subjectQuotas) {
             const subjectQuestions = await selectBalancedQuestions(quota.name, quota.count, quota.diff);
 
             subjectQuestions.forEach((q) => {
                 questionIdsToIncrement.push(q._id);
 
-                // Build complete immutable snapshot of question content at time of exam start
                 const snapshot = {
                     code: q.code || '',
                     subject: quota.name,
@@ -230,7 +295,7 @@ export default async function handler(req, res) {
                     questionTextTamil: q.questionTextTamil || '',
                     options: q.options || [],
                     optionsTamil: q.optionsTamil || [],
-                    correctAnswer: q.correctAnswer, // safely encapsulated on server session
+                    correctAnswer: q.correctAnswer,
                     explanation: q.explanation || '',
                     explanationTamil: q.explanationTamil || '',
                     marks: q.marks || examConfig.marksPerQuestion || 1,
@@ -248,18 +313,23 @@ export default async function handler(req, res) {
             });
         }
 
-        // Track question usage count asynchronously
         if (questionIdsToIncrement.length > 0) {
             ScholarshipQuestion.updateMany(
                 { _id: { $in: questionIdsToIncrement } },
                 { $inc: { usageCount: 1 } }
-            ).catch(err => console.error('Error incrementing usage count:', err));
+            ).catch(() => {});
         }
 
-        // Create test session with authoritative server-side timing and immutable config snapshot
+        // 6. Create transient runtime TestSession (active exam state + immutable question snapshots)
         testSession = await TestSession.create({
-            studentId: student._id,
-            registrationToken,
+            studentId: student.legacyMongoId || null,
+            studentReferenceId: student.studentReferenceId,
+            registrationToken: cleanToken,
+            candidateName: student.name,
+            studentMobile: student.studentMobile,
+            plus2Group: student.plus2Group,
+            admissionCourse: student.admissionCourse,
+            collegeName: student.collegeName,
             subjects: subjectsList,
             optionalSubject: normalizedElective,
             medium: validLanguage,
@@ -276,11 +346,17 @@ export default async function handler(req, res) {
                 marksPerQuestion: examConfig.marksPerQuestion || 1,
                 negativeMarking: examConfig.negativeMarking || 0,
             },
-            userAgent: req.headers['user-agent'],
-            ipAddress: req.headers['x-forwarded-for'] || req.socket?.remoteAddress,
+            userAgent: req.headers?.['user-agent'] || '',
+            ipAddress: String(req.headers?.['x-forwarded-for'] || req.socket?.remoteAddress || '').split(',')[0].trim(),
         });
 
-        res.status(201).json({
+        const accessToken = issueScholarshipSession(res, {
+            studentReferenceId: student.studentReferenceId,
+            applicationNumber: cleanToken,
+            sessionId: String(testSession._id),
+        });
+
+        return res.status(201).json({
             success: true,
             message: 'Examination started successfully',
             data: {
@@ -291,15 +367,14 @@ export default async function handler(req, res) {
                 language: validLanguage,
                 pageSize: validPageSize,
                 startTime: testSession.startTime,
+                accessToken,
             },
         });
-
     } catch (error) {
-        console.error('Start test error:', error);
-        res.status(500).json({
+        console.error('[Scholarship Start Test Error]:', error?.name || 'Error');
+        return res.status(500).json({
             success: false,
             message: 'Failed to start examination. Please try again.',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined,
         });
     }
 }

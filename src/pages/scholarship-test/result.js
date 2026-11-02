@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Layout from '@/frontend/components/Layout';
 import Link from 'next/link';
 import Image from 'next/image';
+import { buildCandidateHeaders } from '@/frontend/lib/scholarshipSessionClient';
 import {
     FaCheckCircle,
     FaTimesCircle,
@@ -61,12 +62,15 @@ export default function ResultPage() {
         try {
             let url = '/api/scholarship/result';
             if (token) {
-                url += `?token=${token}`;
+                url += `?token=${encodeURIComponent(token)}`;
             } else if (session) {
-                url += `?session=${session}`;
+                url += `?session=${encodeURIComponent(session)}`;
             }
 
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                credentials: 'same-origin',
+                headers: buildCandidateHeaders(),
+            });
             const data = await response.json();
 
             if (!response.ok) {
@@ -99,7 +103,8 @@ export default function ResultPage() {
             const targetSessionId = session || result?.result?.sessionId;
             const res = await fetch('/api/scholarship/feedback', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                headers: buildCandidateHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({
                     sessionId: targetSessionId,
                     rating,

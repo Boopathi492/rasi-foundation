@@ -1,7 +1,9 @@
 // Script to list colleges without departments
 const mongoose = require('mongoose');
 
-const MONGODB_URI = 'mongodb+srv://rasifoundationadmission_db_user:LN3JnRfZMzhLCwJc@cluster1.n12u8v2.mongodb.net/rasi-foundation?retryWrites=true&w=majority&appName=Cluster1';
+require('dotenv').config({ path: '.env.local' });
+const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) { console.error('Error: MONGODB_URI environment variable is required.'); process.exit(1); }
 
 async function listMissingColleges() {
     await mongoose.connect(MONGODB_URI);

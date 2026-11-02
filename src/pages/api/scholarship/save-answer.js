@@ -1,16 +1,18 @@
-import dbConnect from '@/lib/mongodb';
-import ScholarshipQuestion from '@/models/ScholarshipQuestion';
-import TestSession from '@/models/TestSession';
+import mongoose from 'mongoose';
+import dbConnect from '../../../backend/lib/mongodb.js';
+import ScholarshipQuestion from '../../../backend/models/ScholarshipQuestion.js';
+import TestSession from '../../../backend/models/TestSession.js';
+import { setNoCacheHeaders } from '../../../backend/lib/apiSecurity.js';
+import { authorizeScholarshipRequest } from '../../../backend/lib/scholarshipAuth.js';
 
 export default async function handler(req, res) {
+    setNoCacheHeaders(res);
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, message: 'Method not allowed' });
     }
 
     try {
-        await dbConnect();
-
-        const { sessionId, questionId, answer, markedForReview } = req.body;
+        const { sessionId, questionId, answer, markedForReview } = req.body || {};
 
         if (!sessionId || !questionId) {
             return res.status(400).json({
@@ -19,9 +21,16 @@ export default async function handler(req, res) {
             });
         }
 
-        // Find test session
-        const testSession = await TestSession.findById(sessionId);
+        if (!mongoose.Types.ObjectId.isValid(String(sessionId))) {
+            return res.status(404).json({
+                success: false,
+                message: 'Examination session not found',
+            });
+        }
 
+        await dbConnect();
+
+        const testSession = await TestSession.findById(sessionId);
         if (!testSession) {
             return res.status(404).json({
                 success: false,
@@ -29,7 +38,20 @@ export default async function handler(req, res) {
             });
         }
 
-        // Check if test is still in progress
+        // Enforce strict session ownership (401 if unauthenticated/expired, 403 if wrong student)
+        const auth = authorizeScholarshipRequest(req, {
+            expectedApplicationNumber: testSession.registrationToken,
+            expectedStudentRef: testSession.studentReferenceId || (testSession.studentId ? String(testSession.studentId) : null),
+            expectedSessionId: String(testSession._id),
+        });
+        if (!auth.ok) {
+            return res.status(auth.statusCode).json({
+                success: false,
+                reason: auth.reason,
+                message: auth.message,
+            });
+        }
+
         if (testSession.status !== 'in_progress') {
             return res.status(400).json({
                 success: false,
@@ -46,13 +68,13 @@ export default async function handler(req, res) {
             await testSession.save();
             return res.status(400).json({
                 success: false,
+                testExpired: true,
                 message: 'Examination time has expired',
             });
         }
 
-        // Verify question belongs to this session
         const sessionQuestion = testSession.questions.find(
-            q => q.questionId.toString() === questionId.toString()
+            (q) => q.questionId.toString() === questionId.toString()
         );
 
         if (!sessionQuestion) {
@@ -62,16 +84,13 @@ export default async function handler(req, res) {
             });
         }
 
-        // Update marked for review status if provided
         if (markedForReview !== undefined) {
             sessionQuestion.markedForReview = Boolean(markedForReview);
         }
 
-        // Process answer update if provided in request body
         if (answer !== undefined) {
             const validAnswer = answer && ['A', 'B', 'C', 'D'].includes(answer) ? answer : null;
 
-            // Prefer immutable snapshot captured at exam start
             let correctAnswer = sessionQuestion.snapshot?.correctAnswer;
             let questionSubject = sessionQuestion.snapshot?.subject || sessionQuestion.subject;
 
@@ -88,12 +107,11 @@ export default async function handler(req, res) {
                 }
             }
 
-            // Map display label back to original label using stored shuffledOptions
             let isCorrect = false;
+            let originalSelected = validAnswer;
             if (validAnswer && correctAnswer) {
-                let originalSelected = validAnswer;
                 if (Array.isArray(sessionQuestion.shuffledOptions) && sessionQuestion.shuffledOptions.length === 4) {
-                    const match = sessionQuestion.shuffledOptions.find(o => o.displayLabel === validAnswer);
+                    const match = sessionQuestion.shuffledOptions.find((o) => o.displayLabel === validAnswer);
                     if (match) {
                         originalSelected = match.originalLabel;
                     }
@@ -101,16 +119,17 @@ export default async function handler(req, res) {
                 isCorrect = originalSelected === correctAnswer;
             }
 
-            // Find existing answer or create new
             const existingAnswerIndex = testSession.answers.findIndex(
-                a => a.questionId.toString() === questionId.toString()
+                (a) => a.questionId.toString() === questionId.toString()
             );
 
             const answerData = {
                 questionId,
                 subject: questionSubject || sessionQuestion.subject,
                 selectedAnswer: validAnswer,
+                originalSelectedAnswer: originalSelected,
                 isCorrect,
+                isMarkedForReview: Boolean(sessionQuestion.markedForReview),
                 timeTaken: 0,
             };
 
@@ -124,28 +143,27 @@ export default async function handler(req, res) {
         await testSession.save();
 
         const answeredCount = testSession.answers.filter(
-            a => a.selectedAnswer !== null && a.selectedAnswer !== ''
+            (a) => a.selectedAnswer !== null && a.selectedAnswer !== ''
         ).length;
-        const markedCount = testSession.questions.filter(q => q.markedForReview).length;
+        const markedCount = testSession.questions.filter((q) => q.markedForReview).length;
 
-        res.status(200).json({
+        // Never expose `isCorrect` or `correctAnswer` to the client during an active exam
+        return res.status(200).json({
             success: true,
             message: 'Answer updated successfully',
             data: {
                 questionId,
-                selectedAnswer: answer !== undefined ? (answer || null) : undefined,
+                selectedAnswer: answer !== undefined ? (answer && ['A', 'B', 'C', 'D'].includes(answer) ? answer : null) : undefined,
                 markedForReview: sessionQuestion.markedForReview,
                 answeredCount,
                 markedCount,
             },
         });
-
     } catch (error) {
-        console.error('Save answer error:', error);
-        res.status(500).json({
+        console.error('[Scholarship Save Answer Error]:', error?.name || 'Error');
+        return res.status(500).json({
             success: false,
             message: 'Failed to save answer',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined,
         });
     }
 }

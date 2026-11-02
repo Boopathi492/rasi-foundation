@@ -12,6 +12,7 @@ import Feedback from '@/backend/models/Feedback';
 import College from '@/backend/models/College';
 import AdminAuditLog from '@/backend/models/AdminAuditLog';
 import ReportExport from '@/backend/models/ReportExport';
+import { fetchAdminScholarshipDataset } from '@/backend/lib/sheetdb';
 
 export default withAuth(async function handler(req, res) {
   if (req.method !== 'POST' && req.method !== 'GET') {
@@ -201,6 +202,40 @@ export default withAuth(async function handler(req, res) {
         resourceType: d.resourceType || '',
         outcome: d.outcome,
         ip: d.ip || '',
+      }));
+    } else if (reportType === 'scholarships') {
+      title = 'Scholarship Candidates & Examination Scorecards Report';
+      const dataset = await fetchAdminScholarshipDataset();
+      let list = dataset.unified || [];
+      if (status && status !== 'all') {
+        list = list.filter((u) => u.status === status);
+      }
+      if (district && district !== 'all') {
+        list = list.filter((u) => u.studentId?.preferredDistrict === district);
+      }
+      columns = [
+        { header: 'Application No', key: 'applicationNumber', width: 18 },
+        { header: 'Candidate Name', key: 'studentName', width: 22 },
+        { header: 'Mobile', key: 'studentMobile', width: 15 },
+        { header: 'Preferred College', key: 'collegeName', width: 26 },
+        { header: 'Preferred Course', key: 'courseApplied', width: 24 },
+        { header: 'District', key: 'district', width: 16 },
+        { header: 'Aadhaar (Masked)', key: 'aadhaarNumber', width: 18 },
+        { header: 'Exam Status', key: 'status', width: 14 },
+        { header: 'Score', key: 'score', width: 12 },
+        { header: 'Percentage', key: 'percentage', width: 12 },
+      ];
+      rows = list.map((u) => ({
+        applicationNumber: u.registrationToken || '',
+        studentName: u.studentId?.name || '',
+        studentMobile: u.studentId?.studentMobile || '',
+        collegeName: u.studentId?.collegeName || '',
+        courseApplied: u.studentId?.admissionCourse || '',
+        district: u.studentId?.preferredDistrict || '',
+        aadhaarNumber: u.studentId?.maskedAadhaar || '',
+        status: u.status || 'registered',
+        score: u.status === 'completed' ? `${u.score}/${u.totalQuestions}` : '-',
+        percentage: u.status === 'completed' ? `${u.percentage}%` : '-',
       }));
     } else {
       return res.status(400).json({ success: false, message: `Unsupported report type: ${reportType}` });

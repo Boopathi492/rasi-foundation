@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Image from 'next/image';
+import { buildCandidateHeaders } from '@/frontend/lib/scholarshipSessionClient';
 import {
     FaClock,
     FaCheckCircle,
@@ -40,7 +41,10 @@ export default function ExamPage() {
     // Fetch exam data
     const fetchExamData = useCallback(async () => {
         try {
-            const response = await fetch(`/api/scholarship/questions?sessionId=${session}`);
+            const response = await fetch(`/api/scholarship/questions?sessionId=${encodeURIComponent(session)}`, {
+                credentials: 'same-origin',
+                headers: buildCandidateHeaders(),
+            });
             const data = await response.json();
 
             if (!response.ok) {
@@ -86,10 +90,12 @@ export default function ExamPage() {
     const handleSubmit = useCallback(async () => {
         if (submitting) return;
         setSubmitting(true);
+        setError('');
         try {
             const response = await fetch('/api/scholarship/submit-test', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                headers: buildCandidateHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ sessionId: session }),
             });
 
@@ -99,7 +105,7 @@ export default function ExamPage() {
                 throw new Error(data.message || 'Failed to submit examination');
             }
 
-            router.push(`/scholarship-test/result?session=${session}`);
+            router.push(`/scholarship-test/result?session=${encodeURIComponent(session)}`);
         } catch (err) {
             setError(err.message);
             setSubmitting(false);
@@ -146,7 +152,8 @@ export default function ExamPage() {
 
             await fetch('/api/scholarship/save-answer', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                headers: buildCandidateHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify(payload),
             });
         } catch (err) {
@@ -256,6 +263,19 @@ export default function ExamPage() {
             </Head>
 
             <div className="min-h-screen bg-[#f4f7f5] flex flex-col font-sans">
+                {error && examData && (
+                    <div role="alert" className="bg-red-50 border-b border-red-200 px-4 py-3 text-center text-xs sm:text-sm font-semibold text-crimson flex flex-wrap items-center justify-center gap-3">
+                        <span>{error}</span>
+                        <button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={submitting}
+                            className="rounded-lg bg-crimson px-3 py-1 text-xs font-bold text-white hover:bg-red-800 disabled:opacity-60"
+                        >
+                            {submitting ? 'Retrying…' : 'Retry Submit'}
+                        </button>
+                    </div>
+                )}
                 {/* Authoritative Examination Fixed Header */}
                 <header className="sticky top-0 z-40 border-b border-gray-200 bg-white shadow-sm">
                     <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">

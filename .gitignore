@@ -2,8 +2,12 @@ node_modules
 .next
 .next-dev
 .vercel
+.temp
 .env*
 *.txt
 storage/uploads/
+rasi-backup/
+data/**/backup_*.json
+*.bak
 *.log
 .DS_Store

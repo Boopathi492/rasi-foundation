@@ -182,6 +182,32 @@ export default function SheetDBSyncDashboardPage() {
                     </div>
                 )}
 
+                {/* Secret-Free Configuration Readiness Banner */}
+                {stats?.configStatus && (
+                    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
+                        <div className="flex items-center gap-2">
+                            <span className={`h-2.5 w-2.5 rounded-full ${stats.configStatus.ready ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                            <span className="font-bold text-slate-800">
+                                SheetDB Environment ({stats.configStatus.environment || 'runtime'}):
+                            </span>
+                            <span className="font-mono text-[11px] text-slate-500">
+                                {stats.sanitizedEndpoint || 'Endpoint Not Configured'}
+                            </span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${stats.configStatus.urlConfigured ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>
+                                SHEETDB_URL: {stats.configStatus.urlConfigured ? 'SET' : 'MISSING'}
+                            </span>
+                            <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${stats.configStatus.basicAuthConfigured ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}`}>
+                                BASIC AUTH: {stats.configStatus.basicAuthConfigured ? 'CONFIGURED' : 'NOT SET'}
+                            </span>
+                            <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${stats.configStatus.cronSecretConfigured ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}`}>
+                                CRON_SECRET: {stats.configStatus.cronSecretConfigured ? 'CONFIGURED' : 'NOT SET'}
+                            </span>
+                        </div>
+                    </div>
+                )}
+
                 {/* Top Metrics Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                     <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">

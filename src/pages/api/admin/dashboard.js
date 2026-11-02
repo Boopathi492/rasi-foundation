@@ -11,7 +11,7 @@ import CounsellingRecord from '@/backend/models/CounsellingRecord';
 import StudentDocument from '@/backend/models/StudentDocument';
 import ApplicationErrorLog from '@/backend/models/ApplicationErrorLog';
 import AdminAuditLog from '@/backend/models/AdminAuditLog';
-import ScholarshipStudent from '@/backend/models/ScholarshipStudent';
+import { getCachedScholarshipCount } from '@/backend/lib/sheetdb';
 
 async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -48,7 +48,7 @@ async function handler(req, res) {
       BioData.countDocuments(),
       BioData.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
       BioData.countDocuments({ status: 'pending' }),
-      ScholarshipStudent ? ScholarshipStudent.countDocuments().catch(() => 0) : 0,
+      getCachedScholarshipCount().catch(() => 0),
       Contact.countDocuments(),
       Contact.countDocuments({ status: 'new' }),
       Enquiry.countDocuments(),

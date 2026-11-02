@@ -12,6 +12,7 @@ import Faq from '@/frontend/components/Faq';
 import Reveal from '@/frontend/components/home/Reveal';
 import BannerCrop from '@/frontend/components/home/BannerCrop';
 import { CONTACT, ROUTES } from '@/data/siteConfig';
+import { saveCandidateAccessToken } from '@/frontend/lib/scholarshipSessionClient';
 
 // Test facts below are taken from the previous version of this page and the test flow in /scholarship-test/*.
 const FEATURES = [
@@ -56,17 +57,61 @@ export default function ScholarshipTestPage() {
   const router = useRouter();
   const [showTokenInput, setShowTokenInput] = useState(false);
   const [token, setToken] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState('');
 
-  const handleTokenSubmit = (e) => {
+  const handleTokenSubmit = async (e) => {
     e.preventDefault();
-    if (!token.trim()) {
+    const cleanToken = token.trim().toUpperCase();
+    const cleanMobile = mobile.replace(/\D/g, '');
+    if (!cleanToken) {
       setError('Please enter your registration token');
       return;
     }
+    if (!/^[6-9]\d{9}$/.test(cleanMobile)) {
+      setError('Please enter your registered 10-digit mobile number');
+      return;
+    }
+
+    setVerifying(true);
     setError('');
-    // Navigate to subject selection with token
-    router.push(`/scholarship-test/select-subject?token=${encodeURIComponent(token.trim())}`);
+
+    try {
+      const response = await fetch('/api/scholarship/verify-token', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: cleanToken, mobile: cleanMobile }),
+      });
+      const json = await response.json();
+
+      if (!response.ok) {
+        throw new Error(json.message || 'Unable to verify registration token');
+      }
+
+      if (json.data?.accessToken) {
+        saveCandidateAccessToken(json.data.accessToken);
+      }
+
+      if (json.testCompleted) {
+        const dest = json.sessionId
+          ? `/scholarship-test/result?session=${encodeURIComponent(json.sessionId)}`
+          : `/scholarship-test/result?token=${encodeURIComponent(cleanToken)}`;
+        router.push(dest);
+        return;
+      }
+
+      if (json.testInProgress && json.sessionId) {
+        router.push(`/scholarship-test/exam?session=${encodeURIComponent(json.sessionId)}`);
+        return;
+      }
+
+      router.push(`/scholarship-test/select-subject?token=${encodeURIComponent(cleanToken)}`);
+    } catch (err) {
+      setError(err.message);
+      setVerifying(false);
+    }
   };
 
   return (
@@ -108,12 +153,13 @@ export default function ScholarshipTestPage() {
         We help students learn about scholarship options, and you can register for the Rasi Foundation online scholarship test. Curriculum: Tamil Nadu State Board, Class 12.
       </PageBanner>
 
-      {/* Registered student login (existing token flow) */}
+      {/* Registered student login (verified token + registered mobile flow) */}
       {showTokenInput && (
         <section id="test-login" aria-labelledby="login-heading" className="bg-[#fbfaf6] pt-2">
           <div className="container mx-auto">
             <form onSubmit={handleTokenSubmit} noValidate className="mx-auto max-w-xl rounded-3xl border border-gray-100 bg-white p-6 shadow-card-hover">
-              <h2 id="login-heading" className="font-heading text-xl font-bold text-gray-900">Enter your registration token</h2>
+              <h2 id="login-heading" className="font-heading text-xl font-bold text-gray-900">Candidate Login (Start / Resume / View Scorecard)</h2>
+              <p className="mt-1 text-xs text-gray-500">Enter your official registration token and registered 10-digit student mobile number.</p>
               <label htmlFor="reg-token" className="mt-4 block text-sm font-medium text-gray-700">Registration token</label>
               <input
                 id="reg-token"
@@ -122,13 +168,27 @@ export default function ScholarshipTestPage() {
                 autoComplete="off"
                 value={token}
                 onChange={(e) => setToken(e.target.value.toUpperCase())}
-                placeholder="RASI-XXX-XXX"
+                placeholder="RASI-XXXX-XXX"
                 aria-invalid={Boolean(error)}
                 aria-describedby={error ? 'reg-token-error' : undefined}
                 className="mt-1 w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-center text-lg font-bold uppercase tracking-widest focus:border-forest focus:outline-none focus-visible:ring-2 focus-visible:ring-forest/30"
               />
+              <label htmlFor="reg-mobile" className="mt-3 block text-sm font-medium text-gray-700">Registered student mobile number</label>
+              <input
+                id="reg-mobile"
+                type="tel"
+                inputMode="numeric"
+                maxLength={10}
+                autoComplete="tel"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                placeholder="10-digit mobile number"
+                className="mt-1 w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-center text-base font-semibold tracking-wider focus:border-forest focus:outline-none focus-visible:ring-2 focus-visible:ring-forest/30"
+              />
               {error && <p id="reg-token-error" role="alert" className="mt-2 text-sm font-semibold text-crimson">{error}</p>}
-              <button type="submit" className="rf-btn-primary mt-4 w-full !rounded-full py-3">Begin Assessment <FaArrowRight aria-hidden="true" /></button>
+              <button type="submit" disabled={verifying} className="rf-btn-primary mt-4 w-full !rounded-full py-3 disabled:opacity-60">
+                {verifying ? 'Verifying Identity…' : 'Continue'} <FaArrowRight aria-hidden="true" />
+              </button>
             </form>
           </div>
         </section>

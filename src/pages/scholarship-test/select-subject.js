@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/frontend/components/Layout';
 import Link from 'next/link';
+import { saveCandidateAccessToken, buildCandidateHeaders } from '@/frontend/lib/scholarshipSessionClient';
 import {
     FaAtom,
     FaFlask,
@@ -39,6 +40,48 @@ export default function SelectSubjectPage() {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
+    const [needsMobileVerification, setNeedsMobileVerification] = useState(false);
+    const [verifyMobile, setVerifyMobile] = useState('');
+    const [verifyingIdentity, setVerifyingIdentity] = useState(false);
+
+    const applyVerifiedPayload = useCallback((studentJson, config) => {
+        if (studentJson.data?.accessToken) {
+            saveCandidateAccessToken(studentJson.data.accessToken);
+        }
+        if (studentJson.testCompleted) {
+            const dest = studentJson.sessionId
+                ? `/scholarship-test/result?session=${encodeURIComponent(studentJson.sessionId)}`
+                : `/scholarship-test/result?token=${encodeURIComponent(token)}`;
+            router.replace(dest);
+            return;
+        }
+        if (studentJson.testInProgress && studentJson.sessionId) {
+            router.replace(`/scholarship-test/exam?session=${encodeURIComponent(studentJson.sessionId)}`);
+            return;
+        }
+
+        const student = studentJson.data;
+        setStudentInfo(student);
+        setNeedsMobileVerification(false);
+
+        const availableElectives = config?.optionalSubjects?.map(s => s.name) || ['Mathematics', 'Biology'];
+        let initialElective = availableElectives[0] || 'Mathematics';
+
+        if (student.plus2Group === 'Vocational' && availableElectives.includes('Mathematics')) {
+            initialElective = 'Mathematics';
+        } else if (student.thirdSubject && availableElectives.includes(student.thirdSubject)) {
+            initialElective = student.thirdSubject;
+        }
+
+        setSelectedSubject(initialElective);
+
+        if (student.examLanguage) {
+            setLanguage(student.examLanguage);
+        }
+        if (student.pageSize) {
+            setPageSize(student.pageSize);
+        }
+    }, [router, token]);
 
     const fetchConfigAndStudent = useCallback(async () => {
         try {
@@ -48,38 +91,57 @@ export default function SelectSubjectPage() {
             const config = configJson.data || null;
             setExamConfig(config);
 
-            // Fetch student info by token
-            const studentRes = await fetch(`/api/scholarship/verify-token?token=${token}`);
+            // Verify candidate session for token
+            const studentRes = await fetch(`/api/scholarship/verify-token?token=${encodeURIComponent(token)}`, {
+                credentials: 'same-origin',
+                headers: buildCandidateHeaders(),
+            });
             const studentJson = await studentRes.json();
 
             if (!studentRes.ok) {
+                if (studentRes.status === 401 && studentJson.requiresVerification) {
+                    setNeedsMobileVerification(true);
+                    setError('');
+                    return;
+                }
                 throw new Error(studentJson.message || 'Invalid token');
             }
 
-            const student = studentJson.data;
-            setStudentInfo(student);
-
-            // Determine default elective subject dynamically from config
-            const availableElectives = config?.optionalSubjects?.map(s => s.name) || ['Mathematics', 'Biology'];
-            let initialElective = availableElectives[0] || 'Mathematics';
-
-            if (student.plus2Group === 'Vocational' && availableElectives.includes('Mathematics')) {
-                initialElective = 'Mathematics';
-            } else if (student.thirdSubject && availableElectives.includes(student.thirdSubject)) {
-                initialElective = student.thirdSubject;
-            }
-
-            setSelectedSubject(initialElective);
-
-            if (student.examLanguage) {
-                setLanguage(student.examLanguage);
-            }
+            applyVerifiedPayload(studentJson, config);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    }, [token]);
+    }, [token, applyVerifiedPayload]);
+
+    const handleIdentityVerify = async (e) => {
+        e.preventDefault();
+        const cleanMob = verifyMobile.replace(/\D/g, '');
+        if (!/^[6-9]\d{9}$/.test(cleanMob)) {
+            setError('Please enter your registered 10-digit mobile number');
+            return;
+        }
+        setVerifyingIdentity(true);
+        setError('');
+        try {
+            const res = await fetch('/api/scholarship/verify-token', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token, mobile: cleanMob }),
+            });
+            const json = await res.json();
+            if (!res.ok) {
+                throw new Error(json.message || 'Identity verification failed');
+            }
+            applyVerifiedPayload(json, examConfig);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setVerifyingIdentity(false);
+        }
+    };
 
     useEffect(() => {
         if (token) {
@@ -104,7 +166,8 @@ export default function SelectSubjectPage() {
         try {
             const response = await fetch('/api/scholarship/start-test', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                headers: buildCandidateHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({
                     registrationToken: token,
                     thirdSubject: selectedSubject,
@@ -117,6 +180,10 @@ export default function SelectSubjectPage() {
 
             if (!response.ok) {
                 throw new Error(data.message || 'Failed to start examination');
+            }
+
+            if (data.data?.accessToken) {
+                saveCandidateAccessToken(data.data.accessToken);
             }
 
             router.push(`/scholarship-test/exam?session=${data.data.sessionId}`);
@@ -149,6 +216,39 @@ export default function SelectSubjectPage() {
                         <div className="h-12 w-12 border-4 border-forest border-t-transparent rounded-full animate-spin mx-auto mb-3" />
                         <p className="text-sm font-semibold text-gray-700">Verifying registration token…</p>
                     </div>
+                </div>
+            </Layout>
+        );
+    }
+
+    if (needsMobileVerification && !studentInfo) {
+        return (
+            <Layout title="Verify Candidate Identity — Rasi Foundation" description="Verify your registered mobile number">
+                <div className="min-h-screen bg-[#f8faf9] flex items-center justify-center p-4">
+                    <form onSubmit={handleIdentityVerify} className="max-w-md w-full rounded-2xl border border-gray-200 bg-white p-8 shadow-md">
+                        <h1 className="text-xl font-bold text-gray-900 mb-1 text-center">Verify Candidate Identity</h1>
+                        <p className="text-xs text-gray-600 mb-5 text-center">
+                            Token <strong className="font-mono text-forest">{token}</strong> requires mobile verification before starting or viewing results.
+                        </p>
+                        <label className="block text-xs font-bold text-gray-800 mb-1">Registered 10-Digit Mobile Number</label>
+                        <input
+                            type="tel"
+                            inputMode="numeric"
+                            maxLength={10}
+                            value={verifyMobile}
+                            onChange={(e) => setVerifyMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                            placeholder="Enter 10-digit mobile number"
+                            className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm font-semibold focus:border-forest focus:ring-1 focus:ring-forest outline-none"
+                        />
+                        {error && <p className="mt-2 text-xs font-semibold text-crimson">{error}</p>}
+                        <button
+                            type="submit"
+                            disabled={verifyingIdentity}
+                            className="rf-btn-primary w-full mt-4 py-3 text-xs font-bold !rounded-xl"
+                        >
+                            {verifyingIdentity ? 'Verifying…' : 'Verify & Continue'}
+                        </button>
+                    </form>
                 </div>
             </Layout>
         );

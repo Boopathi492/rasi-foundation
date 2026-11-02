@@ -13,6 +13,7 @@ import TestSession from '../../models/TestSession.js';
 import ScholarshipExamFeedback from '../../models/ScholarshipExamFeedback.js';
 import { appendRow, searchRow, getSheetDBQuotaMetrics } from './sheetdb.service.js';
 import { SHEETDB_CONFIG } from './sheetdb.config.js';
+import { cacheStudentRow, cacheResultRow, cacheFeedbackRow } from './sheetdb.store.js';
 
 /**
  * Generates a unique worker identifier for distributed lock ownership
@@ -165,7 +166,12 @@ export async function processJob(jobId, explicitWorkerId = null) {
             job.lockedBy = null;
             await job.save();
 
-            // Update underlying operational model with sync timestamp
+            // Prime store cache and invalidate admin list snapshot
+            if (destinationTab === 'Scholarship_Students') cacheStudentRow(payload);
+            else if (destinationTab === 'Scholarship_Results') cacheResultRow(payload);
+            else if (destinationTab === 'Scholarship_Feedback') cacheFeedbackRow(payload);
+
+            // Update underlying operational/legacy model with sync timestamp
             if (mongoose.Types.ObjectId.isValid(recordReferenceId)) {
                 if (destinationTab === 'Scholarship_Students') {
                     await ScholarshipStudent.findByIdAndUpdate(recordReferenceId, {
@@ -175,9 +181,13 @@ export async function processJob(jobId, explicitWorkerId = null) {
                     });
                 } else if (destinationTab === 'Scholarship_Results') {
                     await TestSession.findByIdAndUpdate(recordReferenceId, {
-                        sheetdbSynced: true,
-                        sheetdbSyncedAt: new Date(),
-                        sheetdbError: null,
+                        $set: {
+                            sheetdbSynced: true,
+                            sheetdbSyncedAt: new Date(),
+                            sheetdbError: null,
+                            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                        },
+                        $unset: { questions: 1, answers: 1 },
                     });
                 } else if (destinationTab === 'Scholarship_Feedback') {
                     await ScholarshipExamFeedback.findByIdAndUpdate(recordReferenceId, {
@@ -191,22 +201,23 @@ export async function processJob(jobId, explicitWorkerId = null) {
             return { success: true, job };
         }
 
-        // Job failed: inspect status code
-        const isQuotaExhausted = writeResult.statusCode === 402;
-        const isAuthError = writeResult.statusCode === 401 || writeResult.statusCode === 403;
+        // Job failed: inspect status code & errorCode
+        const isQuotaExhausted = writeResult.statusCode === 402 || writeResult.errorCode === 'QUOTA_EXCEEDED';
+        const isAuthError = writeResult.statusCode === 401 || writeResult.statusCode === 403 || writeResult.errorCode === 'AUTH_FAILED';
+        const isConfigMissing = writeResult.errorCode === 'CONFIG_MISSING';
         const isMaxReached = job.attemptCount >= job.maxAttempts;
 
         let newStatus = 'failed';
-        if (isQuotaExhausted || isAuthError || isMaxReached) {
+        if (isQuotaExhausted || isAuthError || isConfigMissing || isMaxReached) {
             newStatus = 'requires_review';
         }
 
         const backoffMs = calculateBackoffMs(job.attemptCount);
 
         job.status = newStatus;
-        job.lastErrorCode = isQuotaExhausted ? 'QUOTA_EXCEEDED' : (isAuthError ? 'AUTH_FAILED' : String(writeResult.statusCode || 'ERR_SYNC'));
+        job.lastErrorCode = writeResult.errorCode || String(writeResult.statusCode || 'ERR_SYNC');
         job.lastErrorMessage = String(writeResult.error || 'Unknown SheetDB error').slice(0, 500);
-        job.nextRetryTime = (isQuotaExhausted || isAuthError) ? null : new Date(Date.now() + backoffMs);
+        job.nextRetryTime = (isQuotaExhausted || isAuthError || isConfigMissing) ? null : new Date(Date.now() + backoffMs);
         job.leaseExpiresAt = null;
         job.lockedBy = null;
         await job.save();
@@ -352,5 +363,7 @@ export async function getSyncDashboardStats() {
         perTab: perTabStats,
         recentErrors,
         quotaMetrics: getSheetDBQuotaMetrics(),
+        configStatus: SHEETDB_CONFIG.getStatus(),
+        sanitizedEndpoint: SHEETDB_CONFIG.getSanitizedUrl(),
     };
 }

@@ -25,7 +25,15 @@ export function verifyToken(req) {
   try {
     const decoded = jwt.verify(token, secret, { algorithms: ['HS256'] });
     if (decoded) {
-      decoded.role = roleFromTokenPayload(decoded) || 'admin';
+      // Never accept candidate/student-scoped tokens on administrative endpoints
+      if (decoded.purpose === 'scholarship_student') {
+        return null;
+      }
+      const resolvedRole = roleFromTokenPayload(decoded);
+      if (!resolvedRole) {
+        return null;
+      }
+      decoded.role = resolvedRole;
     }
     return decoded;
   } catch (error) {

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/frontend/components/Layout';
 import Link from 'next/link';
+import { saveCandidateAccessToken, buildCandidateHeaders } from '@/frontend/lib/scholarshipSessionClient';
 import {
     FaUser,
     FaCalendar,
@@ -61,6 +62,7 @@ export default function RegisterPage() {
     const [startingExam, setStartingExam] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(null);
+    const idempotencyKeyRef = useRef(`reg_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`);
 
     // Dynamic data from MongoDB
     const [collegesList, setCollegesList] = useState([]);
@@ -89,7 +91,7 @@ export default function RegisterPage() {
         board: 'Tamil Nadu State Board',
         expectedCutOff: '',
         lastStudiedSchool: '',
-        currentClass: '+2 / 12th Standard',
+        currentClass: '12th Standard (+2)',
         academicYear: '2025-2026',
         studiedInGovtSchool: false,
         firstGenerationGraduate: false,
@@ -143,6 +145,9 @@ export default function RegisterPage() {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
+        if (name === 'studentMobile' || name === 'studentEmail') {
+            idempotencyKeyRef.current = `reg_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+        }
         setFormData(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value
@@ -303,12 +308,17 @@ export default function RegisterPage() {
         const payload = {
             ...formData,
             preferredColleges,
+            idempotencyKey: idempotencyKeyRef.current,
         };
 
         try {
             const response = await fetch('/api/scholarship/register', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-idempotency-key': idempotencyKeyRef.current,
+                },
                 body: JSON.stringify(payload),
             });
 
@@ -318,6 +328,9 @@ export default function RegisterPage() {
                 throw new Error(data.message || 'Registration failed');
             }
 
+            if (data.data?.accessToken) {
+                saveCandidateAccessToken(data.data.accessToken);
+            }
             setSuccess(data.data);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
@@ -336,7 +349,8 @@ export default function RegisterPage() {
         try {
             const response = await fetch('/api/scholarship/start-test', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                headers: buildCandidateHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({
                     registrationToken: success.registrationToken,
                     thirdSubject: formData.thirdSubject,
@@ -349,6 +363,10 @@ export default function RegisterPage() {
 
             if (!response.ok) {
                 throw new Error(data.message || 'Failed to start examination session');
+            }
+
+            if (data.data?.accessToken) {
+                saveCandidateAccessToken(data.data.accessToken);
             }
 
             router.push(`/scholarship-test/exam?session=${data.data.sessionId}`);

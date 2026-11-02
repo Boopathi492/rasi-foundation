@@ -1,19 +1,22 @@
-import dbConnect from '@/lib/mongodb';
-import { withAuth } from '@/backend/lib/auth';
-import SheetDBSyncJob from '@/backend/models/SheetDBSyncJob';
-import ScholarshipStudent from '@/backend/models/ScholarshipStudent';
-import TestSession from '@/backend/models/TestSession';
-import ScholarshipExamFeedback from '@/backend/models/ScholarshipExamFeedback';
+import mongoose from 'mongoose';
+import dbConnect from '../../../../backend/lib/mongodb.js';
+import { withPermission } from '../../../../backend/lib/auth.js';
+import { can } from '../../../../backend/lib/rbac.js';
+import SheetDBSyncJob from '../../../../backend/models/SheetDBSyncJob.js';
+import ScholarshipStudent from '../../../../backend/models/ScholarshipStudent.js';
+import TestSession from '../../../../backend/models/TestSession.js';
+import ScholarshipExamFeedback from '../../../../backend/models/ScholarshipExamFeedback.js';
 import {
     getSyncDashboardStats,
     processJob,
     reconcilePendingJobs,
     enqueueAndDispatchSync,
+    searchRow,
     mapStudentToSheetRow,
     mapResultToSheetRow,
     mapFeedbackToSheetRow,
-} from '@/backend/lib/sheetdb';
-import { setNoCacheHeaders } from '@/backend/lib/apiSecurity';
+} from '../../../../backend/lib/sheetdb/index.js';
+import { setNoCacheHeaders } from '../../../../backend/lib/apiSecurity.js';
 
 async function handler(req, res) {
     setNoCacheHeaders(res);
@@ -56,28 +59,39 @@ async function handler(req, res) {
                     pages: Math.ceil(totalJobs / limitNum) || 1,
                 },
             });
-
         } catch (error) {
-            console.error('[Admin SheetDB Sync GET error]:', error);
+            console.error('[Admin SheetDB Sync GET error]:', error?.name || 'Error');
             return res.status(500).json({
                 success: false,
                 message: 'Failed to fetch SheetDB sync data',
-                error: process.env.NODE_ENV === 'development' ? error.message : undefined,
             });
         }
-    } else if (req.method === 'POST') {
+    }
+
+    if (req.method === 'POST') {
+        const hasWritePermission =
+            can(req.user?.role, 'scholarship_exam:edit') ||
+            can(req.user?.role, 'scholarship_exam:manage') ||
+            can(req.user?.role, 'settings:manage');
+
+        if (!hasWritePermission) {
+            return res.status(403).json({
+                success: false,
+                message: 'Forbidden: Insufficient privileges to run synchronization actions',
+            });
+        }
+
         try {
-            const { action, jobId } = req.body;
+            const { action, jobId } = req.body || {};
 
             if (action === 'retry_job') {
-                if (!jobId) {
-                    return res.status(400).json({ success: false, message: 'jobId is required' });
+                if (!jobId || !mongoose.Types.ObjectId.isValid(jobId)) {
+                    return res.status(400).json({ success: false, message: 'Valid jobId is required' });
                 }
 
-                // Reset job status to pending so worker can claim it
                 const job = await SheetDBSyncJob.findByIdAndUpdate(
                     jobId,
-                    { $set: { status: 'pending', nextRetryTime: new Date() } },
+                    { $set: { status: 'pending', nextRetryTime: new Date(), leaseExpiresAt: null } },
                     { new: true }
                 );
 
@@ -91,97 +105,144 @@ async function handler(req, res) {
                     message: processRes?.success ? 'Job retried and synced successfully' : 'Retry completed with warning',
                     result: processRes,
                 });
+            }
 
-            } else if (action === 'retry_all') {
-                // Reset failed jobs to pending
+            if (action === 'retry_all') {
                 await SheetDBSyncJob.updateMany(
                     { status: { $in: ['failed', 'requires_review'] } },
-                    { $set: { status: 'pending', nextRetryTime: new Date() } }
+                    { $set: { status: 'pending', nextRetryTime: new Date(), leaseExpiresAt: null } }
                 );
 
-                const results = await reconcilePendingJobs(50);
+                const results = await reconcilePendingJobs(25);
                 return res.status(200).json({
                     success: true,
                     message: `Retried jobs: ${results.completedCount} succeeded, ${results.failedCount} failed, ${results.reclaimedStaleCount} stale reclaimed.`,
                     data: results,
                 });
+            }
 
-            } else if (action === 'reconcile_missing') {
-                // Find any unsynced student records and enqueue them
+            if (action === 'reconcile_missing') {
+                let enqueuedStudents = 0;
+                let alreadyPresentStudents = 0;
                 const unsyncedStudents = await ScholarshipStudent.find({
                     $or: [{ sheetdbSynced: false }, { sheetdbSynced: { $exists: false } }],
-                }).limit(50);
+                }).limit(25);
 
-                let enqueuedStudents = 0;
                 for (const student of unsyncedStudents) {
+                    const existing = await searchRow(
+                        'Scholarship_Students',
+                        'application_number',
+                        student.registrationToken
+                    );
+                    if (existing.success && existing.found) {
+                        await ScholarshipStudent.updateOne(
+                            { _id: student._id },
+                            { $set: { sheetdbSynced: true, sheetdbSyncedAt: new Date() } }
+                        );
+                        alreadyPresentStudents++;
+                        continue;
+                    }
                     const payload = mapStudentToSheetRow(student);
-                    await enqueueAndDispatchSync({
+                    const job = await enqueueAndDispatchSync({
                         destinationTab: 'Scholarship_Students',
                         recordReferenceId: student._id.toString(),
                         payload,
                         operationType: 'insert',
                     });
+                    await processJob(job._id);
                     enqueuedStudents++;
                 }
 
-                // Find any unsynced completed test sessions and enqueue them
+                let enqueuedSessions = 0;
+                let alreadyPresentSessions = 0;
                 const unsyncedSessions = await TestSession.find({
                     status: 'completed',
                     $or: [{ sheetdbSynced: false }, { sheetdbSynced: { $exists: false } }],
-                }).limit(50);
+                }).limit(25);
 
-                let enqueuedSessions = 0;
                 for (const session of unsyncedSessions) {
-                    const student = await ScholarshipStudent.findById(session.studentId);
+                    const existing = await searchRow(
+                        'Scholarship_Results',
+                        'result_reference_id',
+                        session._id.toString()
+                    );
+                    if (existing.success && existing.found) {
+                        await TestSession.updateOne(
+                            { _id: session._id },
+                            { $set: { sheetdbSynced: true, sheetdbSyncedAt: new Date() } }
+                        );
+                        alreadyPresentSessions++;
+                        continue;
+                    }
+                    const student = session.studentId
+                        ? await ScholarshipStudent.findById(session.studentId).lean()
+                        : null;
                     const payload = mapResultToSheetRow(session, student || {});
-                    await enqueueAndDispatchSync({
+                    const job = await enqueueAndDispatchSync({
                         destinationTab: 'Scholarship_Results',
                         recordReferenceId: session._id.toString(),
                         payload,
                         operationType: 'insert',
                     });
+                    await processJob(job._id);
                     enqueuedSessions++;
                 }
 
-                // Find any unsynced feedback
+                let enqueuedFeedback = 0;
+                let alreadyPresentFeedback = 0;
                 const unsyncedFeedback = await ScholarshipExamFeedback.find({
                     $or: [{ sheetdbSynced: false }, { sheetdbSynced: { $exists: false } }],
-                }).limit(50);
+                }).limit(25);
 
-                let enqueuedFeedback = 0;
                 for (const fb of unsyncedFeedback) {
-                    const session = await TestSession.findById(fb.testSessionId);
-                    const student = await ScholarshipStudent.findById(fb.studentId);
+                    const existing = await searchRow(
+                        'Scholarship_Feedback',
+                        'feedback_reference_id',
+                        fb._id.toString()
+                    );
+                    if (existing.success && existing.found) {
+                        await ScholarshipExamFeedback.updateOne(
+                            { _id: fb._id },
+                            { $set: { sheetdbSynced: true, sheetdbSyncedAt: new Date() } }
+                        );
+                        alreadyPresentFeedback++;
+                        continue;
+                    }
+                    const session = fb.testSessionId ? await TestSession.findById(fb.testSessionId).lean() : null;
+                    const student = fb.studentId ? await ScholarshipStudent.findById(fb.studentId).lean() : null;
                     const payload = mapFeedbackToSheetRow(fb, student || {}, session || {});
-                    await enqueueAndDispatchSync({
+                    const job = await enqueueAndDispatchSync({
                         destinationTab: 'Scholarship_Feedback',
                         recordReferenceId: fb._id.toString(),
                         payload,
                         operationType: 'insert',
                     });
+                    await processJob(job._id);
                     enqueuedFeedback++;
                 }
 
                 return res.status(200).json({
                     success: true,
-                    message: `Reconciliation dispatched: ${enqueuedStudents} students, ${enqueuedSessions} exam results, ${enqueuedFeedback} feedback records.`,
+                    message: `Reconciliation complete: ${enqueuedStudents} students, ${enqueuedSessions} results, ${enqueuedFeedback} feedback processed (${alreadyPresentStudents + alreadyPresentSessions + alreadyPresentFeedback} already present in SheetDB).`,
                     enqueued: {
                         students: enqueuedStudents,
                         results: enqueuedSessions,
                         feedback: enqueuedFeedback,
                     },
+                    alreadyPresent: {
+                        students: alreadyPresentStudents,
+                        results: alreadyPresentSessions,
+                        feedback: alreadyPresentFeedback,
+                    },
                 });
-
-            } else {
-                return res.status(400).json({ success: false, message: `Unsupported action: '${action}'` });
             }
 
+            return res.status(400).json({ success: false, message: `Unsupported action: '${action}'` });
         } catch (error) {
-            console.error('[Admin SheetDB Sync POST error]:', error);
+            console.error('[Admin SheetDB Sync POST error]:', error?.name || 'Error');
             return res.status(500).json({
                 success: false,
                 message: 'Failed to execute sync action',
-                error: process.env.NODE_ENV === 'development' ? error.message : undefined,
             });
         }
     }
@@ -189,4 +250,4 @@ async function handler(req, res) {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
 }
 
-export default withAuth(handler);
+export default withPermission('scholarship_exam:view', handler);

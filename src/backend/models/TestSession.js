@@ -83,10 +83,17 @@ const SessionQuestionSchema = new mongoose.Schema({
 });
 
 const TestSessionSchema = new mongoose.Schema({
+    // Optional legacy reference; new SheetDB-persisted candidates use `studentReferenceId` instead.
     studentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'ScholarshipStudent',
-        required: true,
+        required: false,
+        default: null,
+        index: true,
+    },
+    studentReferenceId: {
+        type: String,
+        default: null,
         index: true,
     },
     registrationToken: {
@@ -94,6 +101,28 @@ const TestSessionSchema = new mongoose.Schema({
         required: true,
         unique: true,
         index: true,
+    },
+    // Minimal transient session context used only to construct the authoritative 22-column result row on submit;
+    // stripped immediately once SheetDB `Scholarship_Results` confirms persistence.
+    candidateName: {
+        type: String,
+        default: '',
+    },
+    studentMobile: {
+        type: String,
+        default: '',
+    },
+    plus2Group: {
+        type: String,
+        default: '',
+    },
+    admissionCourse: {
+        type: String,
+        default: '',
+    },
+    collegeName: {
+        type: String,
+        default: '',
     },
 
     // Subjects configuration
@@ -233,6 +262,12 @@ const TestSessionSchema = new mongoose.Schema({
     userAgent: String,
     ipAddress: String,
 
+    // Automatic TTL cleanup once completed & replicated to SheetDB so MongoDB does not retain duplicate scorecards
+    expiresAt: {
+        type: Date,
+        default: null,
+    },
+
     createdAt: {
         type: Date,
         default: Date.now,
@@ -242,6 +277,8 @@ const TestSessionSchema = new mongoose.Schema({
         default: Date.now,
     },
 });
+
+TestSessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 // Calculate score and metrics before saving
 TestSessionSchema.pre('save', function (next) {

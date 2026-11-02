@@ -4,7 +4,17 @@ import mongoose from 'mongoose';
 // storageKey (relative key, never an absolute path). Access is always through an authorised API route.
 const StudentDocumentSchema = new mongoose.Schema(
   {
-    biodataId: { type: mongoose.Schema.Types.ObjectId, ref: 'BioData', required: true, index: true },
+    biodataId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'BioData',
+      required: function () {
+        return !this.studentReferenceId;
+      },
+      default: null,
+      index: true,
+    },
+    studentReferenceId: { type: String, trim: true, default: null, index: true },
+    applicationNumber: { type: String, trim: true, default: null, index: true },
     documentType: {
       type: String,
       enum: [
