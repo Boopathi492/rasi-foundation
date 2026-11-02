@@ -722,11 +722,18 @@ function CollegeModal({ college, onClose }) {
         className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative bg-gradient-to-r from-forest to-forest-dark p-6 pr-14 text-white">
-          <button ref={closeRef} type="button" onClick={onClose} aria-label="Close dialog" className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 hover:bg-white/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+        <div className="relative overflow-hidden bg-gradient-to-r from-forest to-forest-dark p-6 pr-14 text-white">
+          <Image
+            src="/images/colleges/college-details-banner.webp"
+            alt="Collegiate campus architecture and academic guidance"
+            fill
+            sizes="(min-width: 640px) 512px, 100vw"
+            className="object-cover object-center opacity-20 mix-blend-overlay pointer-events-none"
+          />
+          <button ref={closeRef} type="button" onClick={onClose} aria-label="Close dialog" className="relative z-10 absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 hover:bg-white/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
             <FaTimes aria-hidden="true" />
           </button>
-          <div className="flex flex-wrap items-center gap-2 mb-2">
+          <div className="relative z-10 flex flex-wrap items-center gap-2 mb-2">
             <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-semibold">{college.type || 'Engineering'}</span>
             {college.specialization && (
               <span className="rounded-full bg-gold-400 text-forest-dark px-2.5 py-0.5 text-xs font-bold">
@@ -1144,8 +1151,8 @@ export default function Colleges({ collegesData }) {
           <Reveal className="relative">
             <div className="relative aspect-[8/7] w-full overflow-hidden rounded-[2.5rem] shadow-card-hover ring-8 ring-white/20">
               <Image
-                src="/images/colleges/colleges-header-campus.webp"
-                alt="Students walking on a premier college campus"
+                src="/images/colleges/colleges-banner.webp"
+                alt="Rasi Foundation - Students walking on a premier college campus"
                 fill
                 sizes="(min-width: 1024px) 40vw, 90vw"
                 className="h-full w-full object-cover object-center"
