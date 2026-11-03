@@ -48,6 +48,42 @@ const CollegeSchema = new mongoose.Schema({
     maxlength: [30, 'Academic year cannot be more than 30 characters'],
     default: '2026–2027',
   },
+  // Official Institutional / Admission Code (TNEA, AISHE, DOTE, NMC, DCI, PCI, INC, KEA, UGC, etc.)
+  codeType: {
+    type: String,
+    trim: true,
+    maxlength: [50, 'Code type cannot be more than 50 characters'],
+    default: '',
+  },
+  codeValue: {
+    type: String,
+    trim: true,
+    maxlength: [50, 'Code value cannot be more than 50 characters'],
+    default: '',
+  },
+  issuingAuthority: {
+    type: String,
+    trim: true,
+    maxlength: [150, 'Issuing authority cannot be more than 150 characters'],
+    default: '',
+  },
+  codeStatus: {
+    type: String,
+    enum: ['VERIFIED', 'NOT_AVAILABLE', 'PENDING_VERIFICATION', ''],
+    default: '',
+  },
+  codeExplanation: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Code explanation cannot be more than 500 characters'],
+    default: '',
+  },
+  verificationDate: {
+    type: String,
+    trim: true,
+    maxlength: [30, 'Verification date cannot be more than 30 characters'],
+    default: '2026-11-04',
+  },
   tneaCode: {
     type: String,
     maxlength: [20, 'TNEA Code cannot be more than 20 characters'],

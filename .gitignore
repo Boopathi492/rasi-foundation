@@ -11,3 +11,4 @@ data/**/backup_*.json
 *.bak
 *.log
 .DS_Store
+scratch/

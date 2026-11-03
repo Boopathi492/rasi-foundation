@@ -52,6 +52,12 @@ async function handler(req, res) {
       tneaCode,
       tneaStatus,
       tneaSourceYear,
+      codeType,
+      codeValue,
+      issuingAuthority,
+      codeStatus,
+      codeExplanation,
+      verificationDate,
       note,
       isActive,
       order,
@@ -74,6 +80,12 @@ async function handler(req, res) {
     if (tneaCode !== undefined) college.tneaCode = tneaCode.trim();
     if (tneaStatus !== undefined) college.tneaStatus = tneaStatus.trim();
     if (tneaSourceYear !== undefined) college.tneaSourceYear = tneaSourceYear.trim();
+    if (codeType !== undefined) college.codeType = codeType.trim();
+    if (codeValue !== undefined) college.codeValue = codeValue.trim();
+    if (issuingAuthority !== undefined) college.issuingAuthority = issuingAuthority.trim();
+    if (codeStatus !== undefined) college.codeStatus = codeStatus.trim();
+    if (codeExplanation !== undefined) college.codeExplanation = codeExplanation.trim();
+    if (verificationDate !== undefined) college.verificationDate = verificationDate.trim();
     if (note !== undefined) college.note = note.trim();
     if (isActive !== undefined) college.isActive = Boolean(isActive);
     if (order !== undefined) college.order = parseInt(order, 10) || 0;

@@ -121,6 +121,11 @@ const BengaluruColleges = () => {
                                         <div className="flex items-center gap-1 text-xs text-gray-500">
                                             <FaMapMarkerAlt /> {college.location}
                                         </div>
+                                        {college.codeValue && (
+                                            <span className="inline-block text-[10px] font-semibold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded mt-1">
+                                                {college.codeType || 'Code'}: {college.codeValue}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             ))}

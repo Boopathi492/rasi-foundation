@@ -4,7 +4,7 @@
     "location": "Guindy, Chennai",
     "district": "Chennai",
     "type": "Engineering",
-    "tneaCode": "1",
+    "tneaCode": "0001",
     "note": "Premier State University campus, Estd. 1794, NIRF Top 15, NBA & NAAC A++ accredited",
     "departments": [
       "B.E. Computer Science and Engineering",
@@ -22,14 +22,16 @@
     ],
     "website": "https://ceg.annauniv.edu",
     "isActive": true,
-    "order": 1
+    "order": 1,
+    "codeType": "TNEA",
+    "codeValue": "0001"
   },
   {
     "name": "Madras Institute of Technology (MIT), Anna University",
     "location": "Chromepet, Chennai",
     "district": "Chennai",
     "type": "Engineering",
-    "tneaCode": "4",
+    "tneaCode": "0004",
     "note": "Constituent college of Anna University, renowned for Aeronautical, Automobile and Rubber Technology",
     "departments": [
       "B.E. Aeronautical Engineering",
@@ -44,7 +46,9 @@
     ],
     "website": "https://mitindia.edu",
     "isActive": true,
-    "order": 2
+    "order": 2,
+    "codeType": "TNEA",
+    "codeValue": "0004"
   },
   {
     "name": "Madras Medical College (MMC)",
@@ -1108,7 +1112,11 @@
     ],
     "website": "https://gcesalem.edu.in",
     "isActive": true,
-    "order": 52
+    "order": 52,
+    "codeType": "TNEA",
+    "codeValue": "2615",
+    "issuingAuthority": "Directorate of Technical Education (DOTE) / Anna University",
+    "codeStatus": "VERIFIED"
   },
   {
     "name": "Government Mohan Kumaramangalam Medical College",
@@ -4107,7 +4115,11 @@
     ],
     "website": "https://panimalar.ac.in",
     "isActive": true,
-    "order": 194
+    "order": 194,
+    "codeType": "TNEA",
+    "codeValue": "1210",
+    "issuingAuthority": "Directorate of Technical Education (DOTE) / Anna University",
+    "codeStatus": "VERIFIED"
   },
   {
     "name": "St. Joseph's College of Engineering (Autonomous)",

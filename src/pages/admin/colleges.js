@@ -344,6 +344,9 @@ export default function AdminColleges() {
       (college.district || '').toLowerCase().includes(q) ||
       (college.type || '').toLowerCase().includes(q) ||
       (college.tneaCode && college.tneaCode.toLowerCase().includes(q)) ||
+      (college.codeValue && college.codeValue.toLowerCase().includes(q)) ||
+      (college.codeType && college.codeType.toLowerCase().includes(q)) ||
+      (college.issuingAuthority && college.issuingAuthority.toLowerCase().includes(q)) ||
       (Array.isArray(college.departments) && college.departments.some(d => d.toLowerCase().includes(q)));
 
     const matchesDistrict = districtFilter === 'all' || college.district === districtFilter;
@@ -546,7 +549,11 @@ export default function AdminColleges() {
                         </div>
                       </td>
                       <td className="py-3.5 px-4">
-                        {college.tneaStatus === 'verified' && college.tneaCode ? (
+                        {college.codeValue && college.codeStatus === 'VERIFIED' ? (
+                          <span className="inline-flex items-center gap-1 bg-gold-100 text-gold-700 px-2 py-0.5 rounded-md font-mono text-xs font-semibold" title={`${college.codeType || 'Official'} Code: ${college.codeValue} (${college.issuingAuthority || ''})`}>
+                            <FaCode className="text-[10px]" /> {college.codeType ? `${college.codeType} ` : ''}{college.codeValue}
+                          </span>
+                        ) : college.tneaStatus === 'verified' && college.tneaCode ? (
                           <span className="inline-flex items-center gap-1 bg-gold-100 text-gold-700 px-2 py-0.5 rounded-md font-mono text-xs font-semibold" title={`TNEA Code: ${college.tneaCode} (${college.tneaSourceYear || '2024'})`}>
                             <FaCode className="text-[10px]" /> {college.tneaCode}
                           </span>

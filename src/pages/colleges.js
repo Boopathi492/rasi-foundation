@@ -18,6 +18,36 @@ function collegeMatchesMedicalCategory(college, targetCategory) {
   }
   return false;
 }
+
+function getCodeBadgeStyle(codeType) {
+  switch (codeType) {
+    case 'TNEA':
+      return 'bg-amber-100 text-amber-900 border-amber-300';
+    case 'AISHE':
+      return 'bg-blue-100 text-blue-900 border-blue-300';
+    case 'DOTE':
+      return 'bg-purple-100 text-purple-900 border-purple-300';
+    case 'NMC':
+    case 'DCI':
+      return 'bg-emerald-100 text-emerald-900 border-emerald-300';
+    case 'PCI':
+      return 'bg-orange-100 text-orange-900 border-orange-300';
+    case 'INC':
+      return 'bg-rose-100 text-rose-900 border-rose-300';
+    case 'KEA':
+      return 'bg-sky-100 text-sky-900 border-sky-300';
+    case 'UGC':
+      return 'bg-teal-100 text-teal-900 border-teal-300';
+    case 'TNDALU':
+    case 'TNAU':
+    case 'TNTEU':
+    case 'TN_MGR':
+    case 'RGUHS':
+      return 'bg-indigo-100 text-indigo-900 border-indigo-300';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-300';
+  }
+}
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -714,6 +744,12 @@ export async function getStaticProps() {
           tneaCode: college.tneaCode || '',
           tneaStatus: college.tneaStatus || (college.tneaCode ? 'verified' : 'not_applicable'),
           tneaSourceYear: college.tneaSourceYear || '',
+          codeType: college.codeType || (college.tneaCode ? 'TNEA' : ''),
+          codeValue: college.codeValue || college.tneaCode || '',
+          issuingAuthority: college.issuingAuthority || (college.tneaCode ? 'Directorate of Technical Education (DOTE) / Anna University' : ''),
+          codeStatus: college.codeStatus || (college.tneaCode ? 'VERIFIED' : ''),
+          codeExplanation: college.codeExplanation || '',
+          verificationDate: college.verificationDate || '',
           note: college.note || '',
           departments: Array.isArray(college.departments) ? college.departments : [],
           website: college.website || '',
@@ -953,16 +989,26 @@ function CollegeModal({ college, onClose }) {
           </div>
           <h2 id="college-dialog-title" className="font-heading text-xl font-bold">{college.name}</h2>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-white/80"><FaMapMarkerAlt aria-hidden="true" /> {college.location}</p>
-          {college.tneaStatus === 'verified' && college.tneaCode && (
+          {college.codeValue && college.codeStatus === 'VERIFIED' ? (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 border border-white/30 backdrop-blur-sm px-3 py-1 text-xs font-semibold text-white">
+                <FaCode aria-hidden="true" /> {college.codeType || 'Official'}: {college.codeValue}
+              </span>
+              {college.issuingAuthority && (
+                <span className="text-xs text-white/90 font-medium">
+                  • {college.issuingAuthority}
+                </span>
+              )}
+            </div>
+          ) : college.tneaStatus === 'verified' && college.tneaCode ? (
             <p className="mt-1 text-sm text-gold-300 font-semibold">
               TNEA Code: {college.tneaCode} {college.tneaSourceYear ? `(${college.tneaSourceYear})` : ''}
             </p>
-          )}
-          {college.tneaStatus === 'pending_verification' && (
+          ) : college.tneaStatus === 'pending_verification' ? (
             <p className="mt-1 text-sm text-amber-200 font-medium">
               TNEA Code: Pending Verification
             </p>
-          )}
+          ) : null}
           {college.note && <p className="mt-1 text-xs text-white/80">{college.note}</p>}
         </div>
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
@@ -1186,6 +1232,9 @@ export default function Colleges({ collegesData }) {
         (c.specialization && c.specialization.toLowerCase().includes(q)) ||
         (c.institutionType && c.institutionType.toLowerCase().includes(q)) ||
         (c.tneaCode && c.tneaCode.toLowerCase().includes(q)) ||
+        (c.codeValue && c.codeValue.toLowerCase().includes(q)) ||
+        (c.codeType && c.codeType.toLowerCase().includes(q)) ||
+        (c.issuingAuthority && c.issuingAuthority.toLowerCase().includes(q)) ||
         (c.departments || []).some((d) => d.toLowerCase().includes(q))
       );
     });
@@ -1604,16 +1653,28 @@ export default function Colleges({ collegesData }) {
                       </span>
                     )}
                     <span className="rounded-full bg-forest/10 px-2.5 py-0.5 text-xs font-semibold text-forest">{c.zone}</span>
-                    {c.tneaStatus === 'verified' && c.tneaCode && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-gold-100 px-2.5 py-0.5 text-xs font-semibold text-gold-700" title={`Verified TNEA Code: ${c.tneaCode}${c.tneaSourceYear ? ` (${c.tneaSourceYear})` : ''}`}>
+                    {c.codeValue && c.codeStatus === 'VERIFIED' ? (
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${getCodeBadgeStyle(c.codeType)}`}
+                        title={`Verified ${c.codeType} Code: ${c.codeValue}${c.issuingAuthority ? ` (${c.issuingAuthority})` : ''}`}
+                      >
+                        <FaCode aria-hidden="true" /> {c.codeType ? `${c.codeType} ` : ''}{c.codeValue}
+                      </span>
+                    ) : c.tneaStatus === 'verified' && c.tneaCode ? (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-900"
+                        title={`Verified TNEA Code: ${c.tneaCode}${c.tneaSourceYear ? ` (${c.tneaSourceYear})` : ''}`}
+                      >
                         <FaCode aria-hidden="true" /> TNEA {c.tneaCode}
                       </span>
-                    )}
-                    {c.tneaStatus === 'pending_verification' && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800" title="TNEA counselling code pending verification">
+                    ) : c.tneaStatus === 'pending_verification' ? (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800"
+                        title="TNEA counselling code pending verification"
+                      >
                         <FaCode aria-hidden="true" /> TNEA Pending
                       </span>
-                    )}
+                    ) : null}
                     {c.note && <span className="rounded-full bg-crimson/10 px-2.5 py-0.5 text-xs font-semibold text-crimson">{c.note}</span>}
                   </div>
                   <div className="mt-auto flex flex-wrap items-center gap-3 pt-4">
