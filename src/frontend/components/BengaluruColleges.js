@@ -13,7 +13,7 @@ const BengaluruColleges = () => {
                 const response = await fetch('/api/colleges');
                 const data = await response.json();
                 // Filter for Bengaluru Colleges from the grouped data
-                const bengaluruData = data.find(item => item.district === 'Bengaluru Zone');
+                const bengaluruData = data.find(item => item.district === 'Bengaluru Urban' || item.district === 'Bengaluru' || item.district === 'Bengaluru Zone');
                 if (bengaluruData) {
                     setColleges(bengaluruData.colleges);
                 }

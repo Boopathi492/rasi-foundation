@@ -8,7 +8,9 @@
     "eligibility": "10+2 with Physics, Chemistry, Biology (PCB) with minimum 50% marks (40% for reserved categories) and qualifying rank in NEET-UG. Check specific institution and NMC guidelines.",
     "description": "Premier undergraduate medical qualification preparing students to diagnose, treat, and prevent human illnesses through rigorous clinical training, anatomy, pathology, pharmacology, and a mandatory 1-year rotating internship.",
     "isActive": true,
-    "order": 1
+    "order": 1,
+    "medicalCategory": "MBBS / BDS",
+    "academicYear": "2026–2027"
   },
   {
     "name": "BDS",
@@ -19,7 +21,9 @@
     "eligibility": "10+2 with PCB and valid NEET-UG score. Check DCI and university-specific admission requirements.",
     "description": "Bachelor of Dental Surgery training students in comprehensive oral healthcare, maxillofacial surgery, prosthodontics, periodontics, and dental therapeutics with clinical chairside practice.",
     "isActive": true,
-    "order": 2
+    "order": 2,
+    "medicalCategory": "MBBS / BDS",
+    "academicYear": "2026–2027"
   },
   {
     "name": "BAMS",
@@ -30,7 +34,9 @@
     "eligibility": "10+2 with PCB and qualifying rank in NEET-UG. Check NCISM guidelines for specific eligibility.",
     "description": "Bachelor of Ayurvedic Medicine and Surgery integrating traditional Ayurvedic principles with modern clinical diagnostics, pharmacology, Panchakarma, and holistic healing systems.",
     "isActive": true,
-    "order": 3
+    "order": 3,
+    "medicalCategory": "AYUSH",
+    "academicYear": "2026–2027"
   },
   {
     "name": "BHMS",
@@ -41,7 +47,9 @@
     "eligibility": "10+2 with PCB and NEET-UG qualification. Check NCH and admission authority guidelines.",
     "description": "Bachelor of Homeopathic Medicine and Surgery focusing on holistic alternative healthcare, homeopathic repertory, materia medica, clinical pathology, and organon of medicine.",
     "isActive": true,
-    "order": 4
+    "order": 4,
+    "medicalCategory": "AYUSH",
+    "academicYear": "2026–2027"
   },
   {
     "name": "BSMS",
@@ -52,7 +60,9 @@
     "eligibility": "10+2 with PCB, Tamil language proficiency at 10th/12th level, and NEET-UG qualification. Check TN Health and NCISM criteria.",
     "description": "Bachelor of Siddha Medicine and Surgery rooted in ancient Tamil medicine, herbal formulations, Varmam therapy, diagnostic pulse reading, and holistic health science.",
     "isActive": true,
-    "order": 5
+    "order": 5,
+    "medicalCategory": "AYUSH",
+    "academicYear": "2026–2027"
   },
   {
     "name": "BNYS",
@@ -63,7 +73,9 @@
     "eligibility": "10+2 with PCB with minimum 50% marks. NEET or state merit criteria as notified by health universities.",
     "description": "Bachelor of Naturopathy and Yogic Sciences emphasizing drugless natural healing, hydrotherapy, mud therapy, therapeutic dietetics, acupuncture, and yogic therapy.",
     "isActive": true,
-    "order": 6
+    "order": 6,
+    "medicalCategory": "AYUSH",
+    "academicYear": "2026–2027"
   },
   {
     "name": "BUMS",
@@ -74,7 +86,9 @@
     "eligibility": "10+2 with PCB, Urdu language proficiency at 10th/12th, and NEET-UG qualification. Check regulatory guidelines.",
     "description": "Bachelor of Unani Medicine and Surgery based on Greco-Arabic medicine principles, humoral therapy, herbal pharmacology, and clinical diagnostics.",
     "isActive": true,
-    "order": 7
+    "order": 7,
+    "medicalCategory": "AYUSH",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Nursing",
@@ -85,7 +99,9 @@
     "eligibility": "10+2 with PCB and English with minimum 45% aggregate marks. State entrance or NEET-UG as per institution norms.",
     "description": "Professional nursing degree offering hands-on patient care training, pharmacology, medical-surgical nursing, community health, pediatrics, and critical intensive care.",
     "isActive": true,
-    "order": 8
+    "order": 8,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "Post Basic B.Sc Nursing",
@@ -96,7 +112,9 @@
     "eligibility": "Registered Nurse and Registered Midwife (RNRM) with GNM diploma certificate. Check state nursing council criteria.",
     "description": "Advanced degree program for practicing diploma nurses to upgrade clinical competencies, nursing research skills, healthcare leadership, and hospital administration.",
     "isActive": true,
-    "order": 9
+    "order": 9,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "M.Sc Medical-Surgical Nursing",
@@ -107,7 +125,9 @@
     "eligibility": "B.Sc Nursing / Post Basic B.Sc Nursing with minimum 55% marks and at least 1 year of clinical experience. Check INC norms.",
     "description": "Specialized postgraduate nursing program focusing on adult intensive care, oncology, cardiology, nephrology, advanced clinical assessment, and nursing education.",
     "isActive": true,
-    "order": 10
+    "order": 10,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "M.Sc Pediatric Nursing",
@@ -118,7 +138,9 @@
     "eligibility": "B.Sc Nursing or PB B.Sc Nursing with 55% marks and clinical experience. Check INC and university guidelines.",
     "description": "Postgraduate program in child healthcare, neonatal intensive care (NICU), pediatric emergencies, growth and development assessment, and pediatric pharmacology.",
     "isActive": true,
-    "order": 11
+    "order": 11,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "M.Sc Obstetrics and Gynecological Nursing",
@@ -129,7 +151,9 @@
     "eligibility": "B.Sc Nursing / PB B.Sc Nursing with minimum 55% marks and 1 year experience. Check INC norms.",
     "description": "Advanced clinical specialization in maternal health, antenatal care, high-risk labor management, neonatal resuscitation, and women healthcare leadership.",
     "isActive": true,
-    "order": 12
+    "order": 12,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "M.Sc Community Health Nursing",
@@ -140,7 +164,9 @@
     "eligibility": "B.Sc Nursing / PB B.Sc Nursing with 55% aggregate and 1 year clinical work experience.",
     "description": "Public health and epidemiology-focused nursing specialization addressing preventive healthcare, family health welfare, rural healthcare delivery, and health policy.",
     "isActive": true,
-    "order": 13
+    "order": 13,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "M.Sc Psychiatric Nursing",
@@ -151,7 +177,9 @@
     "eligibility": "B.Sc Nursing or Post Basic B.Sc Nursing with 55% aggregate marks and clinical experience.",
     "description": "Mental health nursing program focusing on psychiatric assessment, psychopharmacology, psychotherapy, addiction counseling, and rehabilitation care.",
     "isActive": true,
-    "order": 14
+    "order": 14,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "GNM (General Nursing and Midwifery)",
@@ -162,7 +190,9 @@
     "eligibility": "10+2 in any stream (preferably PCB/English) with minimum 40% aggregate marks. Check state nursing board norms.",
     "description": "Foundational nursing diploma qualifying candidates to deliver patient care, assist in surgical units, administer medications, and provide maternal-child healthcare.",
     "isActive": true,
-    "order": 15
+    "order": 15,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "ANM (Auxiliary Nurse Midwifery)",
@@ -173,7 +203,9 @@
     "eligibility": "10+2 in any stream with minimum 40% marks. Age criteria as per state nursing council.",
     "description": "Community-oriented healthcare training focusing on basic healthcare delivery, maternal care, child immunization, and primary health centre support.",
     "isActive": true,
-    "order": 16
+    "order": 16,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Pharm",
@@ -184,7 +216,9 @@
     "eligibility": "10+2 with PCM or PCB with minimum 50% marks. Lateral entry available for D.Pharm holders.",
     "description": "Undergraduate pharmaceutical degree covering medicinal chemistry, drug formulation, industrial manufacturing, pharmacology, biopharmaceutics, and clinical trials.",
     "isActive": true,
-    "order": 17
+    "order": 17,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Pharm (Lateral Entry)",
@@ -195,7 +229,9 @@
     "eligibility": "Pass in D.Pharm from a PCI-approved institution with minimum 50% marks.",
     "description": "Direct entry into the second year of B.Pharm for diploma graduates to attain a professional graduate degree in pharmaceutical sciences.",
     "isActive": true,
-    "order": 18
+    "order": 18,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "Pharm.D",
@@ -206,7 +242,9 @@
     "eligibility": "10+2 with PCM or PCB with 50% marks or D.Pharm pass. Check PCI and university norms.",
     "description": "Doctor of Pharmacy professional doctorate program focusing on clinical pharmacy, hospital therapeutics, patient counseling, adverse drug monitoring, and clinical research.",
     "isActive": true,
-    "order": 19
+    "order": 19,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "Pharm.D (Post Baccalaureate)",
@@ -217,7 +255,9 @@
     "eligibility": "Pass in B.Pharm from a recognized PCI-approved college or university.",
     "description": "Postgraduate clinical pharmacy doctorate enabling B.Pharm graduates to achieve clinical doctor of pharmacy credentials with 2 years didactic and 1 year residency.",
     "isActive": true,
-    "order": 20
+    "order": 20,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "M.Pharm Pharmaceutics",
@@ -228,7 +268,9 @@
     "eligibility": "B.Pharm with minimum 55% marks and GPAT / university entrance. Check PCI norms.",
     "description": "Advanced study of novel drug delivery systems (NDDS), nanomedicine, industrial formulation design, biopharmaceutics, and scale-up manufacturing.",
     "isActive": true,
-    "order": 21
+    "order": 21,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "M.Pharm Pharmacology",
@@ -239,7 +281,9 @@
     "eligibility": "B.Pharm with minimum 55% marks and qualifying GPAT or state PG entrance.",
     "description": "Specialization in drug mechanisms, toxicological screening, pre-clinical animal models, molecular pharmacology, and clinical trial monitoring.",
     "isActive": true,
-    "order": 22
+    "order": 22,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "M.Pharm Pharmaceutical Chemistry",
@@ -250,7 +294,9 @@
     "eligibility": "B.Pharm degree with 55% marks from an accredited institution.",
     "description": "Focuses on computer-aided drug design (CADD), organic synthesis of new chemical entities, spectral analysis, and structure-activity relationships.",
     "isActive": true,
-    "order": 23
+    "order": 23,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "M.Pharm Regulatory Affairs",
@@ -261,7 +307,9 @@
     "eligibility": "B.Pharm with minimum 55% marks. Check PCI guidelines.",
     "description": "Postgraduate study of global drug registration, USFDA / EMA documentation, dossier compilation (CTD/eCTD), intellectual property rights, and pharmaceutical audits.",
     "isActive": true,
-    "order": 24
+    "order": 24,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "M.Pharm Pharmaceutical Analysis",
@@ -272,7 +320,9 @@
     "eligibility": "B.Pharm with minimum 55% aggregate marks.",
     "description": "Expertise in modern instrumental analytical techniques (HPLC, LC-MS, GC, NMR), method validation, quality control, and stability testing of drugs.",
     "isActive": true,
-    "order": 25
+    "order": 25,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "D.Pharm",
@@ -283,7 +333,9 @@
     "eligibility": "10+2 with PCM or PCB from a recognized state or central board.",
     "description": "Foundational pharmacy diploma qualifying students as registered retail and hospital pharmacists competent in drug dispensing and community pharmacy management.",
     "isActive": true,
-    "order": 26
+    "order": 26,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "BPT (Bachelor of Physiotherapy)",
@@ -294,7 +346,9 @@
     "eligibility": "10+2 with PCB with minimum 50% marks. 4.5 years includes 6 months compulsory rotatory clinical internship.",
     "description": "Physical therapy degree developing expertise in neuro-rehabilitation, orthopedic mobilization, sports biomechanics, electrotherapy, and exercise therapy.",
     "isActive": true,
-    "order": 27
+    "order": 27,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "MPT Orthopedics",
@@ -305,7 +359,9 @@
     "eligibility": "BPT degree with 50% aggregate marks and completion of 6 months internship.",
     "description": "Specialization in musculo-skeletal rehabilitation, joint mobilization, spine disorders, sports trauma recovery, and post-surgical orthopedic therapy.",
     "isActive": true,
-    "order": 28
+    "order": 28,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "MPT Neurology",
@@ -316,7 +372,9 @@
     "eligibility": "Pass in BPT with internship completion from a recognized university.",
     "description": "Focuses on rehabilitation of stroke, traumatic brain injury, spinal cord lesions, cerebral palsy, Parkinsonism, and peripheral nerve disorders.",
     "isActive": true,
-    "order": 29
+    "order": 29,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "MPT Cardio-Respiratory",
@@ -327,7 +385,9 @@
     "eligibility": "BPT degree from a recognized institution with 50% aggregate marks.",
     "description": "Expertise in intensive care chest physiotherapy, cardiac rehabilitation, pulmonary function recovery, and post-CABG physical reconditioning.",
     "isActive": true,
-    "order": 30
+    "order": 30,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "MPT Sports Physiotherapy",
@@ -338,7 +398,9 @@
     "eligibility": "BPT with 50% aggregate marks from an accredited college/university.",
     "description": "Focused on athletic conditioning, acute sports injury assessment, biomechanical motion analysis, taping techniques, and rapid return-to-play protocols.",
     "isActive": true,
-    "order": 31
+    "order": 31,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "BOT (Bachelor of Occupational Therapy)",
@@ -349,7 +411,9 @@
     "eligibility": "10+2 with PCB with minimum 50% marks. Includes 6 months mandatory internship.",
     "description": "Prepares practitioners to assist individuals with physical, cognitive, or sensory challenges in regaining functional independence and daily living skills.",
     "isActive": true,
-    "order": 32
+    "order": 32,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "MOT (Master of Occupational Therapy)",
@@ -360,7 +424,9 @@
     "eligibility": "BOT with minimum 50% marks and completed internship.",
     "description": "Advanced occupational therapy specializing in developmental disabilities, sensory integration therapy, hand rehabilitation, and geriatric ergonomics.",
     "isActive": true,
-    "order": 33
+    "order": 33,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Medical Laboratory Technology",
@@ -371,7 +437,9 @@
     "eligibility": "10+2 with PCB or vocational MLT with 50% marks.",
     "description": "Diagnostic laboratory science program teaching automated clinical biochemistry, medical microbiology, hematology, histopathology, and blood banking.",
     "isActive": true,
-    "order": 34
+    "order": 34,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "M.Sc Medical Laboratory Technology",
@@ -382,7 +450,9 @@
     "eligibility": "B.Sc MLT with minimum 50% marks from a recognized university.",
     "description": "Postgraduate diagnostic laboratory specialization in advanced molecular diagnostics, clinical immunology, automated cytology, and lab accreditation management.",
     "isActive": true,
-    "order": 35
+    "order": 35,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Radiology and Imaging Technology",
@@ -393,7 +463,9 @@
     "eligibility": "10+2 with Physics, Chemistry, Biology / Mathematics with 50% marks.",
     "description": "Teaches medical imaging modalities including digital radiography, computed tomography (CT), magnetic resonance imaging (MRI), mammography, and ultrasound.",
     "isActive": true,
-    "order": 36
+    "order": 36,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Operation Theatre and Anaesthesia Technology",
@@ -404,7 +476,9 @@
     "eligibility": "10+2 with PCB with minimum 50% marks.",
     "description": "Trains surgical technologists in sterilization, surgical instrumentation, anesthesia workstation setup, intra-operative monitoring, and patient recovery care.",
     "isActive": true,
-    "order": 37
+    "order": 37,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Cardiac Care Technology",
@@ -415,7 +489,9 @@
     "eligibility": "10+2 with PCB with minimum 50% aggregate marks.",
     "description": "Cardiovascular diagnostics program covering electrocardiography (ECG), echocardiography, treadmill testing, cardiac catheterization lab assistance, and pacemaker checks.",
     "isActive": true,
-    "order": 38
+    "order": 38,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Perfusion Technology",
@@ -426,7 +502,9 @@
     "eligibility": "10+2 with PCB with minimum 50% marks.",
     "description": "Specialized clinical discipline training technologist in managing heart-lung bypass machines and ECMO support during open-heart surgeries and critical care.",
     "isActive": true,
-    "order": 39
+    "order": 39,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Renal Dialysis Technology",
@@ -437,7 +515,9 @@
     "eligibility": "10+2 with PCB with minimum 50% aggregate marks.",
     "description": "Prepares hemodialysis technologists in dialyzer reprocessing, vascular access management, peritoneal dialysis, water treatment plants, and renal care monitoring.",
     "isActive": true,
-    "order": 40
+    "order": 40,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Optometry",
@@ -448,7 +528,9 @@
     "eligibility": "10+2 with PCB / PCM with 50% marks. 4-year program includes 1-year clinical internship.",
     "description": "Comprehensive primary eye and vision care degree covering refractive errors, contact lens fitting, binocular vision therapy, low vision aids, and ocular disease detection.",
     "isActive": true,
-    "order": 41
+    "order": 41,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "Master of Optometry (M.Optom)",
@@ -459,7 +541,9 @@
     "eligibility": "B.Sc Optometry / B.Optom from a recognized university with minimum 50% marks.",
     "description": "Advanced postgraduate vision science specializing in pediatric optometry, specialty contact lenses, ocular therapeutics, binocular vision anomalies, and clinical research.",
     "isActive": true,
-    "order": 42
+    "order": 42,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Physician Assistant",
@@ -470,7 +554,9 @@
     "eligibility": "10+2 with PCB with minimum 50% aggregate marks.",
     "description": "Trains healthcare professionals to perform diagnostic exams, assist in medical surgeries, interpret routine lab tests, and coordinate patient treatment under doctors.",
     "isActive": true,
-    "order": 43
+    "order": 43,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Respiratory Therapy",
@@ -481,7 +567,9 @@
     "eligibility": "10+2 with PCB with 50% aggregate marks.",
     "description": "Focuses on mechanical ventilation, arterial blood gas analysis, aerosol medications, pulmonary rehabilitation, and intensive care airway management.",
     "isActive": true,
-    "order": 44
+    "order": 44,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Critical Care Technology",
@@ -492,7 +580,9 @@
     "eligibility": "10+2 with PCB with minimum 50% aggregate marks.",
     "description": "Prepares ICU technologists in advanced vital monitoring, hemodynamic support systems, infusion management, and resuscitation protocols for critically ill patients.",
     "isActive": true,
-    "order": 45
+    "order": 45,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Emergency and Trauma Care Technology",
@@ -503,7 +593,9 @@
     "eligibility": "10+2 with PCB with minimum 50% aggregate marks.",
     "description": "Emergency medicine technology program training students in acute triage, polytrauma stabilization, basic and advanced life support, and emergency room coordination.",
     "isActive": true,
-    "order": 46
+    "order": 46,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Neuro Electrophysiology",
@@ -514,7 +606,9 @@
     "eligibility": "10+2 with PCB with minimum 50% aggregate marks.",
     "description": "Trains technologists in EEG, EMG, nerve conduction velocity (NCV), polysomnography (sleep studies), and intraoperative neuromonitoring.",
     "isActive": true,
-    "order": 47
+    "order": 47,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Nuclear Medicine Technology",
@@ -525,7 +619,9 @@
     "eligibility": "10+2 with PCB or PCM with minimum 50% aggregate marks.",
     "description": "Focuses on diagnostic and therapeutic radiopharmaceuticals, gamma cameras, SPECT-CT, PET-CT scans, and radiation safety protocols.",
     "isActive": true,
-    "order": 48
+    "order": 48,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.Sc Medical Record Science",
@@ -536,7 +632,9 @@
     "eligibility": "10+2 with any stream / Science with minimum 45% aggregate marks.",
     "description": "Health information management program covering ICD-10 clinical coding, electronic health records (EHR), hospital statistics, medicolegal compliance, and data analytics.",
     "isActive": true,
-    "order": 49
+    "order": 49,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "BASLP",
@@ -547,7 +645,9 @@
     "eligibility": "10+2 with PCB / PCM with 50% marks. RCI-approved curriculum including 1-year clinical internship.",
     "description": "Bachelor of Audiology and Speech-Language Pathology training professionals to evaluate and rehabilitate hearing loss, speech disorders, stammering, and voice pathologies.",
     "isActive": true,
-    "order": 50
+    "order": 50,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "MASLP",
@@ -558,7 +658,9 @@
     "eligibility": "Pass in BASLP / B.Sc (Speech & Hearing) with minimum 50% marks from an RCI-recognized institution.",
     "description": "Postgraduate specialization in cochlear implants, pediatric audiology, neurogenic communication disorders, dysphagia management, and voice science.",
     "isActive": true,
-    "order": 51
+    "order": 51,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "Diploma in Medical Laboratory Technology (DMLT)",
@@ -569,7 +671,9 @@
     "eligibility": "10+2 with PCB / Science with minimum 40% aggregate marks.",
     "description": "Paramedical diploma training laboratory technicians in basic routine hematology, urine analysis, clinical microbiology, and biochemical testing.",
     "isActive": true,
-    "order": 52
+    "order": 52,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "Diploma in X-Ray and Radiology Technology",
@@ -580,7 +684,9 @@
     "eligibility": "10+2 with Science (PCB/PCM) with minimum 40% marks.",
     "description": "Practical training in radiographic positioning, darkroom and digital imaging procedures, radiation safety, and routine diagnostic X-ray operation.",
     "isActive": true,
-    "order": 53
+    "order": 53,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "Diploma in Operation Theatre Technology",
@@ -591,7 +697,9 @@
     "eligibility": "10+2 with Science stream from a recognized board.",
     "description": "Diploma course covering surgical theater disinfection, instrument packaging, suction apparatus handling, and assisting surgeons in routine procedures.",
     "isActive": true,
-    "order": 54
+    "order": 54,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "Diploma in Dialysis Technology",
@@ -602,7 +710,9 @@
     "eligibility": "10+2 with Science subjects with minimum 40% marks.",
     "description": "Focuses on machine setup, dialyzer priming, vital sign monitoring during dialysis sessions, and emergency management of dialysis complications.",
     "isActive": true,
-    "order": 55
+    "order": 55,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "Diploma in Health Inspector / Sanitary Inspector",
@@ -613,7 +723,9 @@
     "eligibility": "10+2 with Science subjects or equivalent from a recognized board.",
     "description": "Public health sanitation training covering municipal waste disposal, food hygiene inspection, water quality testing, disease surveillance, and epidemic control.",
     "isActive": true,
-    "order": 56
+    "order": 56,
+    "medicalCategory": "Paramedical / Allied Health Sciences",
+    "academicYear": "2026–2027"
   },
   {
     "name": "B.E. Computer Science and Engineering",

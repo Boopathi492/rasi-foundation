@@ -8,8 +8,8 @@ import {
 import Reveal from './Reveal';
 import { usePrefersReducedMotion } from './Marquee';
 
-// The six admission steps, their order, wording and destinations are unchanged (verified workflow).
-// Only the visual presentation was redesigned: a connected milestone timeline instead of the old serpentine road.
+// The six admission steps reordered per requirement:
+// 01 Explore Programs -> 02 Fill the Form -> 03 Upload Documents -> 04 Attend Counselling -> 05 Admission Guidance -> 06 Make the Payment
 const STEPS = [
   {
     num: '01',
@@ -21,14 +21,6 @@ const STEPS = [
   },
   {
     num: '02',
-    title: 'Make the Payment',
-    text: 'Pay the required fee, where applicable, through our secure online payment system.',
-    Icon: FaCreditCard,
-    tone: 'green',
-    href: '/biodata',
-  },
-  {
-    num: '03',
     title: 'Fill the Form',
     text: 'Complete the enquiry or application details to get started.',
     Icon: FaFileAlt,
@@ -36,7 +28,7 @@ const STEPS = [
     href: '/contact',
   },
   {
-    num: '04',
+    num: '03',
     title: 'Upload Documents',
     text: 'Submit the academic and identification documents needed for verification.',
     Icon: FaFolderOpen,
@@ -44,7 +36,7 @@ const STEPS = [
     href: '/biodata',
   },
   {
-    num: '05',
+    num: '04',
     title: 'Attend Counselling',
     text: 'Get guidance from our experts about course options, college selection, eligibility and more.',
     Icon: FaComments,
@@ -52,12 +44,20 @@ const STEPS = [
     href: '/book-counselling',
   },
   {
-    num: '06',
+    num: '05',
     title: 'Admission Guidance',
     text: 'Get help with your next steps and confirmation from the relevant institution.',
     Icon: FaUniversity,
     tone: 'gold',
     href: '/colleges',
+  },
+  {
+    num: '06',
+    title: 'Make the Payment',
+    text: 'Pay the required fee, where applicable, through our secure online payment system.',
+    Icon: FaCreditCard,
+    tone: 'green',
+    href: '/payment',
   },
 ];
 

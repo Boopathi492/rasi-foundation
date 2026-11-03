@@ -16,6 +16,38 @@ const CollegeSchema = new mongoose.Schema({
     required: [true, 'Please provide district'],
     maxlength: [100, 'District cannot be more than 100 characters'],
   },
+  state: {
+    type: String,
+    trim: true,
+    maxlength: [50, 'State cannot be more than 50 characters'],
+    default: 'Tamil Nadu',
+  },
+  medicalCategory: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Medical category cannot be more than 100 characters'],
+    default: '',
+  },
+  isWomenCentric: {
+    type: Boolean,
+    default: false,
+  },
+  isDeemedUniversity: {
+    type: Boolean,
+    default: false,
+  },
+  fees: {
+    tuitionFeeGovt: { type: String, default: '' },
+    tuitionFeeMgmt: { type: String, default: '' },
+    hostelFee: { type: String, default: '' },
+    academicYear: { type: String, default: '2026–2027' },
+  },
+  academicYear: {
+    type: String,
+    trim: true,
+    maxlength: [30, 'Academic year cannot be more than 30 characters'],
+    default: '2026–2027',
+  },
   tneaCode: {
     type: String,
     maxlength: [20, 'TNEA Code cannot be more than 20 characters'],

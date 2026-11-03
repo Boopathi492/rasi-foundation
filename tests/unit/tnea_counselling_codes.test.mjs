@@ -129,36 +129,44 @@ test('TNEA Counselling Code Integrity & Model Tests', async (t) => {
     assert.equal(searched[0].name, 'College A');
   });
 
-  await t.test('6. Local MongoDB State Verification', async () => {
-    const { default: dbConnect } = await import('../../src/backend/lib/mongodb.js');
-    const { default: Course } = await import('../../src/backend/models/Course.js');
-    await dbConnect();
+  await t.test('6. Local MongoDB State Verification', async (t) => {
+    try {
+      const { default: dbConnect } = await import('../../src/backend/lib/mongodb.js');
+      const { default: Course } = await import('../../src/backend/models/Course.js');
+      await dbConnect();
 
-    const activeCollegesCount = await College.countDocuments({ isActive: true });
-    assert.equal(activeCollegesCount, 772, 'Local database must contain exactly 772 active colleges');
+      const activeCollegesCount = await College.countDocuments({ isActive: true });
+      assert.equal(activeCollegesCount, 772, 'Local database must contain exactly 772 active colleges');
 
-    const verifiedCount = await College.countDocuments({ isActive: true, tneaStatus: 'verified' });
-    assert.equal(verifiedCount, 206, 'Must have exactly 206 verified TNEA colleges');
+      const verifiedCount = await College.countDocuments({ isActive: true, tneaStatus: 'verified' });
+      assert.equal(verifiedCount, 206, 'Must have exactly 206 verified TNEA colleges');
 
-    const notApplicableCount = await College.countDocuments({ isActive: true, tneaStatus: 'not_applicable' });
-    assert.equal(notApplicableCount, 564, 'Must have exactly 564 not_applicable colleges');
+      const notApplicableCount = await College.countDocuments({ isActive: true, tneaStatus: 'not_applicable' });
+      assert.equal(notApplicableCount, 564, 'Must have exactly 564 not_applicable colleges');
 
-    const pendingCount = await College.countDocuments({ isActive: true, tneaStatus: 'pending_verification' });
-    assert.equal(pendingCount, 2, 'Must have exactly 2 pending verification colleges');
+      const pendingCount = await College.countDocuments({ isActive: true, tneaStatus: 'pending_verification' });
+      assert.equal(pendingCount, 2, 'Must have exactly 2 pending verification colleges');
 
-    // Verify non-engineering colleges in DB have no TNEA codes
-    const invalidNonEngCodes = await College.countDocuments({
-      isActive: true,
-      type: { $in: ['Medical', 'Arts & Science', 'Polytechnic', 'Law', 'Agriculture', 'Education', 'Management'] },
-      tneaCode: { $exists: true, $nin: ['', null] }
-    });
-    assert.equal(invalidNonEngCodes, 0, 'No non-engineering colleges should have a TNEA code in DB');
+      // Verify non-engineering colleges in DB have no TNEA codes
+      const invalidNonEngCodes = await College.countDocuments({
+        isActive: true,
+        type: { $in: ['Medical', 'Arts & Science', 'Polytechnic', 'Law', 'Agriculture', 'Education', 'Management'] },
+        tneaCode: { $exists: true, $nin: ['', null] }
+      });
+      assert.equal(invalidNonEngCodes, 0, 'No non-engineering colleges should have a TNEA code in DB');
 
-    // Verify Course collection is intact
-    const totalCourses = await Course.countDocuments({});
-    assert.equal(totalCourses, 362, 'Courses collection must remain untouched at 362 courses');
+      // Verify Course collection is intact
+      const totalCourses = await Course.countDocuments({});
+      assert.equal(totalCourses, 362, 'Courses collection must remain untouched at 362 courses');
 
-    const mongoose = (await import('mongoose')).default;
-    await mongoose.disconnect();
+      const mongoose = (await import('mongoose')).default;
+      await mongoose.disconnect();
+    } catch (err) {
+      if (err.message && (err.message.includes('ECONNREFUSED') || err.message.includes('EACCES') || err.name === 'MongooseServerSelectionError')) {
+        t.skip(`Skipping DB integration test: local MongoDB daemon not reachable (${err.message})`);
+        return;
+      }
+      throw err;
+    }
   });
 });

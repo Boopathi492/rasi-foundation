@@ -1,3 +1,10 @@
+
+function getMedicalCategory(name, code, specialization) {
+  const norm = ((name || '') + ' ' + (code || '') + ' ' + (specialization || '')).toLowerCase();
+  if (norm.includes('mbbs') || norm.includes('bds') || norm.includes('mds')) return 'MBBS / BDS';
+  if (norm.includes('bams') || norm.includes('bhms') || norm.includes('bums') || norm.includes('bsms') || norm.includes('bnys') || norm.includes('ayush')) return 'AYUSH';
+  return 'Paramedical / Allied Health Sciences';
+}
 import { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -849,6 +856,7 @@ function enrichCourse(c) {
     code: c.code || '',
     fullName: c.fullName || (c.code ? `${c.name} (${c.code})` : c.name),
     category: cat,
+    medicalCategory: c.medicalCategory || (cat === 'medical' ? getMedicalCategory(c.name, c.code, c.specialization) : ''),
     specialization: c.specialization || '',
     duration: c.duration || '3-4 years',
     eligibility: c.eligibility || 'Contact counsellor for eligibility',
@@ -867,6 +875,7 @@ export default function Courses({ initialCourses = [] }) {
       : COURSES.map(enrichCourse)
   );
   const [activeCategory, setActiveCategory] = useState('all');
+  const [selectedMedicalCategory, setSelectedMedicalCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [duration, setDuration] = useState('all');
   const [qualificationLevel, setQualificationLevel] = useState('all');
@@ -924,6 +933,7 @@ export default function Courses({ initialCourses = [] }) {
 
     return coursesList.filter((course) => {
       if (activeCategory !== 'all' && course.category !== activeCategory) return false;
+      if (activeCategory === 'medical' && selectedMedicalCategory !== 'all' && course.medicalCategory !== selectedMedicalCategory) return false;
       if (qualificationLevel !== 'all' && course.level !== qualificationLevel) return false;
       if (duration !== 'all' && course.duration !== duration) return false;
       if (specialization !== 'all' && (course.specialization || '').toLowerCase() !== specLower) return false;
@@ -947,7 +957,7 @@ export default function Courses({ initialCourses = [] }) {
         (course.specialization || '').toLowerCase().includes(q)
       );
     });
-  }, [coursesList, activeCategory, qualificationLevel, duration, specialization, district, searchQuery]);
+  }, [coursesList, activeCategory, qualificationLevel, duration, specialization, district, searchQuery, selectedMedicalCategory]);
 
   // Calculate dynamic category counts across actual active courses in coursesList
   const categoryCounts = useMemo(() => {
@@ -970,12 +980,14 @@ export default function Courses({ initialCourses = [] }) {
 
   const chooseCategory = (id) => {
     setActiveCategory(id);
+    setSelectedMedicalCategory('all');
     setSpecialization('all');
     discoveryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const clearFilters = () => {
     setActiveCategory('all');
+    setSelectedMedicalCategory('all');
     setSearchQuery('');
     setDuration('all');
     setQualificationLevel('all');
@@ -1167,6 +1179,30 @@ export default function Courses({ initialCourses = [] }) {
                 </select>
               </div>
             </div>
+            {activeCategory === 'medical' && (
+              <div role="group" aria-label="Filter by medical category" className="mt-3 flex flex-wrap items-center gap-2 rounded-2xl bg-red-50/70 p-3 border border-red-100">
+                <span className="text-xs font-bold uppercase tracking-wider text-red-900 mr-1">Medical Stream:</span>
+                {[
+                  { id: 'all', label: 'All Medical' },
+                  { id: 'MBBS / BDS', label: 'MBBS / BDS' },
+                  { id: 'AYUSH', label: 'AYUSH' },
+                  { id: 'Paramedical / Allied Health Sciences', label: 'Paramedical / Allied Health Sciences' },
+                ].map((mc) => (
+                  <button
+                    key={mc.id}
+                    type="button"
+                    onClick={() => setSelectedMedicalCategory(mc.id)}
+                    className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
+                      selectedMedicalCategory === mc.id
+                        ? 'bg-crimson text-white shadow-sm'
+                        : 'bg-white text-gray-700 hover:bg-red-100/70 border border-red-200'
+                    }`}
+                  >
+                    {mc.label}
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div role="group" aria-label="Filter by category" className="mt-4 flex flex-wrap gap-2 pt-2 border-t border-gray-100">
               {[{ id: 'all', name: 'All Streams' }, ...CATEGORIES].map((cat) => (

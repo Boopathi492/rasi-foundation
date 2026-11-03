@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   await dbConnect();
 
   try {
-    const { level, category, specialization, duration, district, collegeId, search, limit, page } = req.query;
+    const { level, category, medicalCategory, specialization, duration, district, collegeId, search, limit, page } = req.query;
     const query = { isActive: true };
 
     if (level && level !== 'all') {
@@ -19,6 +19,9 @@ export default async function handler(req, res) {
     if (category && category !== 'all') {
       // Allow exact match or case-insensitive match
       query.category = { $regex: `^${category.trim()}$`, $options: 'i' };
+    }
+    if (medicalCategory && medicalCategory !== 'all') {
+      query.medicalCategory = { $regex: new RegExp(`^${medicalCategory.trim()}$`, 'i') };
     }
     if (specialization && specialization !== 'all') {
       query.specialization = { $regex: specialization.trim(), $options: 'i' };

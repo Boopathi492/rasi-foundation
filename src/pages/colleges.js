@@ -1,3 +1,23 @@
+
+function collegeMatchesMedicalCategory(college, targetCategory) {
+  if (!targetCategory || targetCategory === 'all') return true;
+  if (college.medicalCategory && college.medicalCategory.toLowerCase() === targetCategory.toLowerCase()) return true;
+  if (Array.isArray(college.courses)) {
+    const hasMatch = college.courses.some(cr => (cr.medicalCategory || '').toLowerCase() === targetCategory.toLowerCase());
+    if (hasMatch) return true;
+  }
+  const normDepts = (college.departments || []).join(' ').toLowerCase();
+  if (targetCategory === 'MBBS / BDS') {
+    return normDepts.includes('mbbs') || normDepts.includes('bds') || normDepts.includes('dental');
+  }
+  if (targetCategory === 'AYUSH') {
+    return normDepts.includes('bams') || normDepts.includes('bhms') || normDepts.includes('bums') || normDepts.includes('bsms') || normDepts.includes('bnys') || normDepts.includes('ayush') || normDepts.includes('yoga');
+  }
+  if (targetCategory === 'Paramedical / Allied Health Sciences') {
+    return normDepts.includes('nursing') || normDepts.includes('pharm') || normDepts.includes('physio') || normDepts.includes('cardiac') || normDepts.includes('dialysis') || normDepts.includes('allied') || normDepts.includes('radiology') || normDepts.includes('optometry') || normDepts.includes('mlt') || normDepts.includes('operation theatre');
+  }
+  return false;
+}
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -42,28 +62,211 @@ const fallbackData = [
         ]
       },
       {
-        name: 'Paavai Engineering College / Paavai College of Technology',
-        location: 'Namakkal',
+        name: 'Paavai Engineering College (Autonomous)',
+        location: 'NH-44, Pachal, Namakkal',
+        district: 'Namakkal',
+        state: 'Tamil Nadu',
+        type: 'Engineering',
+        tneaCode: '2611',
+        institutionType: 'Autonomous',
+        website: 'https://pec.paavai.edu.in',
         departments: [
           'B.E. Computer Science and Engineering',
-          'B.E. CSE (AI & ML)',
-          'B.E. CSE (IoT)',
+          'B.E. Artificial Intelligence and Machine Learning',
           'B.E. Cyber Security',
+          'B.Tech. Artificial Intelligence and Data Science',
+          'B.Tech. Information Technology',
           'B.E. Electronics and Communication Engineering',
           'B.E. Electrical and Electronics Engineering',
           'B.E. Mechanical Engineering',
           'B.E. Mechatronics Engineering',
           'B.E. Civil Engineering',
-          'B.E. Aeronautical Engineering',
           'B.E. Biomedical Engineering',
-          'B.E. Robotics & Automation',
-          'B.Tech. Information Technology',
-          'B.Tech. Artificial Intelligence & Data Science',
+          'B.E. Medical Electronics',
+          'B.E. Robotics and Automation',
+          'B.E. Aeronautical Engineering',
+          'B.E. Agriculture Engineering',
           'B.Tech. Biotechnology',
           'B.Tech. Chemical Engineering',
           'B.Tech. Food Technology',
-          'B.Tech. Agricultural Engineering',
-          'B.Tech. Pharmaceutical Technology'
+          'B.Tech. Pharmaceutical Technology',
+          'M.E. Applied Electronics',
+          'M.E. Communication Systems',
+          'M.E. Computer Science and Engineering',
+          'M.E. Power Electronics and Drives',
+          'M.E. Structural Engineering',
+          'M.E. VLSI Design',
+          'M.B.A.',
+          'M.C.A.'
+        ]
+      },
+      {
+        name: 'Paavai College of Engineering',
+        location: 'NH-44, Pachal, Namakkal',
+        district: 'Namakkal',
+        state: 'Tamil Nadu',
+        type: 'Engineering',
+        tneaCode: '2628',
+        institutionType: 'Private / Self-Financing',
+        website: 'https://pce.paavai.edu.in',
+        departments: [
+          'B.E. Computer Science and Engineering',
+          'B.E. Electronics and Communication Engineering',
+          'B.E. Electrical and Electronics Engineering',
+          'B.E. Mechanical Engineering',
+          'B.Tech. Information Technology',
+          'B.Tech. Artificial Intelligence and Data Science',
+          'M.E. Computer Science and Engineering',
+          'M.E. Power Electronics and Drives'
+        ]
+      },
+      {
+        name: 'Pavai College of Technology',
+        location: 'NH-44, Pachal, Namakkal',
+        district: 'Namakkal',
+        state: 'Tamil Nadu',
+        type: 'Engineering',
+        tneaCode: '2657',
+        institutionType: 'Private / Self-Financing',
+        website: 'https://pct.paavai.edu.in',
+        departments: [
+          'B.E. Computer Science and Engineering',
+          'B.E. Electronics and Communication Engineering',
+          'B.E. Mechanical Engineering',
+          'B.Tech. Artificial Intelligence and Data Science',
+          'B.Tech. Information Technology',
+          'B.Tech. Safety and Fire Engineering'
+        ]
+      },
+      {
+        name: 'Paavai College of Pharmacy and Research',
+        location: 'NH-44, Pachal, Namakkal',
+        district: 'Namakkal',
+        state: 'Tamil Nadu',
+        type: 'Medical',
+        medicalCategory: 'Paramedical / Allied Health Sciences',
+        specialization: 'Pharmacy',
+        website: 'https://pharmacy.paavai.edu.in',
+        departments: [
+          'B.Pharm (Bachelor of Pharmacy)',
+          'B.Pharm (Lateral Entry)',
+          'D.Pharm (Diploma in Pharmacy)',
+          'Pharm.D (Doctor of Pharmacy)',
+          'M.Pharm Pharmaceutics',
+          'M.Pharm Pharmacology'
+        ]
+      },
+      {
+        name: 'Paavai College of Nursing and Research',
+        location: 'NH-44, Pachal, Namakkal',
+        district: 'Namakkal',
+        state: 'Tamil Nadu',
+        type: 'Medical',
+        medicalCategory: 'Paramedical / Allied Health Sciences',
+        specialization: 'Nursing',
+        website: 'https://nursing.paavai.edu.in',
+        departments: [
+          'B.Sc. Nursing',
+          'Post Basic B.Sc. Nursing',
+          'M.Sc. Nursing'
+        ]
+      },
+      {
+        name: 'Paavai Institute of Allied Health Sciences',
+        location: 'NH-44, Pachal, Namakkal',
+        district: 'Namakkal',
+        state: 'Tamil Nadu',
+        type: 'Medical',
+        medicalCategory: 'Paramedical / Allied Health Sciences',
+        specialization: 'Allied Health Sciences',
+        website: 'https://ahs.paavai.edu.in',
+        departments: [
+          'B.Sc. Cardiac Technology',
+          'B.Sc. Dialysis Technology',
+          'B.Sc. Operation Theatre and Anaesthesia Technology',
+          'B.Sc. Radiology and Imaging Technology',
+          'B.Sc. Medical Laboratory Technology',
+          'B.Sc. Physician Assistant',
+          'B.Sc. Critical Care Technology',
+          'B.Sc. Emergency Care Technology',
+          'B.Sc. Optometry',
+          'B.Sc. Respiratory Therapy',
+          'B.Sc. Neuro Electrophysiology'
+        ]
+      },
+      {
+        name: 'Paavai College of Physiotherapy',
+        location: 'NH-44, Pachal, Namakkal',
+        district: 'Namakkal',
+        state: 'Tamil Nadu',
+        type: 'Medical',
+        medicalCategory: 'Paramedical / Allied Health Sciences',
+        specialization: 'Physiotherapy',
+        website: 'https://physiotherapy.paavai.edu.in',
+        departments: [
+          'Bachelor of Physiotherapy (BPT)',
+          'Master of Physiotherapy (MPT)'
+        ]
+      },
+      {
+        name: 'Paavai College of Education',
+        location: 'NH-44, Pachal, Namakkal',
+        district: 'Namakkal',
+        state: 'Tamil Nadu',
+        type: 'Education',
+        specialization: 'Teacher Education',
+        website: 'https://education.paavai.edu.in',
+        departments: [
+          'Bachelor of Education (B.Ed.)',
+          'Master of Education (M.Ed.)'
+        ]
+      },
+      {
+        name: 'Paavai Arts and Science College for Women',
+        location: 'NH-44, Pachal, Namakkal',
+        district: 'Namakkal',
+        state: 'Tamil Nadu',
+        type: 'Arts & Science',
+        isWomenCentric: true,
+        specialization: 'Arts, Science & Commerce',
+        website: 'https://pascw.paavai.edu.in',
+        departments: [
+          'B.A. English',
+          'B.A. Tamil',
+          'B.Sc. Mathematics',
+          'B.Sc. Physics',
+          'B.Sc. Chemistry',
+          'B.Sc. Computer Science',
+          'B.Sc. Information Technology',
+          'B.Sc. Biotechnology',
+          'B.Sc. Nutrition and Dietetics',
+          'B.Com (General)',
+          'B.Com (Computer Applications)',
+          'B.B.A.',
+          'B.C.A.',
+          'M.A. English',
+          'M.Sc. Mathematics',
+          'M.Sc. Computer Science',
+          'M.Com'
+        ]
+      },
+      {
+        name: 'Paavai Polytechnic College',
+        location: 'NH-44, Pachal, Namakkal',
+        district: 'Namakkal',
+        state: 'Tamil Nadu',
+        type: 'Polytechnic',
+        specialization: 'Polytechnic Diploma',
+        website: 'https://polytechnic.paavai.edu.in',
+        departments: [
+          'Diploma in Mechanical Engineering',
+          'Diploma in Civil Engineering',
+          'Diploma in Electrical and Electronics Engineering',
+          'Diploma in Electronics and Communication Engineering',
+          'Diploma in Computer Engineering',
+          'Diploma in Automobile Engineering',
+          'Diploma in Mechatronics Engineering',
+          'Diploma in Artificial Intelligence and Machine Learning'
         ]
       },
       {
@@ -425,24 +628,24 @@ const fallbackData = [
     ]
   },
   {
-    district: 'Bengaluru Zone',
+    district: 'Bengaluru Urban',
     colleges: [
-      { name: 'Akash Group of Institutions', location: 'Bengaluru' },
-      { name: 'East Point College', location: 'Bengaluru' },
-      { name: 'Alliance University', location: 'Bengaluru' },
-      { name: 'Adithya Institute of Technology', location: 'Bengaluru' },
-      { name: 'SEA College of Engineering & Technology', location: 'Bengaluru' },
-      { name: 'T. John Group of Institutions', location: 'Bengaluru' },
-      { name: 'S-VYASA University', location: 'Bengaluru' },
-      { name: 'RR Institutions', location: 'Bengaluru' },
-      { name: 'Harsha Institutions', location: 'Bengaluru' },
-      { name: 'Atria Institute of Technology', location: 'Bengaluru' },
-      { name: 'Garden City University', location: 'Bengaluru' },
-      { name: 'Spurthy Institutions', location: 'Bengaluru' },
-      { name: 'Yenepoya University', location: 'Bengaluru' },
-      { name: 'Krupanidhi Group of Institutions', location: 'Bengaluru' },
-      { name: 'ISBR Bangalore', location: 'Bengaluru' },
-      { name: 'MVJ College of Engineering', location: 'Bengaluru' }
+      { name: 'Akash Group of Institutions', location: 'Devanahalli, Bengaluru', state: 'Karnataka', type: 'Medical', medicalCategory: 'Paramedical / Allied Health Sciences', departments: ['MBBS', 'B.Sc. Nursing', 'Bachelor of Physiotherapy (BPT)', 'B.Sc. Medical Laboratory Technology', 'B.Sc. Cardiac Technology'] },
+      { name: 'East Point College of Higher Education', location: 'Bidarahalli, Bengaluru', state: 'Karnataka', type: 'Engineering', departments: ['B.E. Computer Science and Engineering', 'B.Tech. Artificial Intelligence and Data Science', 'B.Pharm', 'Pharm.D', 'B.Sc. Nursing'] },
+      { name: 'Alliance University', location: 'Chandapura-Anekal Main Road, Bengaluru', state: 'Karnataka', type: 'Management', isDeemedUniversity: true, departments: ['B.B.A.', 'M.B.A.', 'B.Tech. Computer Science and Engineering', 'B.A. LL.B (Hons)'] },
+      { name: 'Adithya Institute of Technology (Bengaluru)', location: 'Nelamangala, Bengaluru', state: 'Karnataka', type: 'Engineering', departments: ['B.E. Computer Science and Engineering', 'B.E. Electronics and Communication Engineering', 'B.E. Mechanical Engineering'] },
+      { name: 'SEA College of Engineering & Technology', location: 'K.R. Puram, Bengaluru', state: 'Karnataka', type: 'Engineering', departments: ['B.E. Computer Science and Engineering', 'B.E. Artificial Intelligence and Machine Learning', 'B.E. Electronics and Communication Engineering'] },
+      { name: 'T. John Group of Institutions', location: 'Bannerghatta Road, Bengaluru', state: 'Karnataka', type: 'Management', departments: ['B.Pharm', 'Pharm.D', 'B.Sc. Nursing', 'Bachelor of Physiotherapy (BPT)', 'B.B.A.', 'M.B.A.'] },
+      { name: 'S-VYASA Deemed to be University', location: 'Jigani, Bengaluru', state: 'Karnataka', type: 'Medical', medicalCategory: 'AYUSH', isDeemedUniversity: true, departments: ['BNYS', 'Bachelor of Physiotherapy (BPT)', 'B.Sc. Medical Laboratory Technology'] },
+      { name: 'RR Institutions', location: 'Chikkabanavara, Bengaluru', state: 'Karnataka', type: 'Medical', medicalCategory: 'Paramedical / Allied Health Sciences', departments: ['B.Sc. Nursing', 'B.Pharm', 'Pharm.D', 'Bachelor of Physiotherapy (BPT)', 'B.Sc. Cardiac Technology'] },
+      { name: 'Harsha Institutions', location: 'Nelamangala, Bengaluru', state: 'Karnataka', type: 'Medical', medicalCategory: 'Paramedical / Allied Health Sciences', departments: ['B.Sc. Nursing', 'Bachelor of Physiotherapy (BPT)', 'B.Sc. Operation Theatre and Anaesthesia Technology', 'B.Sc. Medical Laboratory Technology'] },
+      { name: 'Atria Institute of Technology', location: 'Hebbal, Bengaluru', state: 'Karnataka', type: 'Engineering', institutionType: 'Autonomous', departments: ['B.E. Computer Science and Engineering', 'B.Tech. Artificial Intelligence and Machine Learning', 'B.Tech. Artificial Intelligence and Data Science'] },
+      { name: 'Garden City University', location: 'K.R. Puram, Bengaluru', state: 'Karnataka', type: 'Arts & Science', isDeemedUniversity: true, departments: ['Bachelor of Physiotherapy (BPT)', 'B.Sc. Medical Laboratory Technology', 'B.Sc. Dialysis Technology', 'B.B.A.', 'M.B.A.'] },
+      { name: 'Spurthy Institutions', location: 'Marasur Gate, Anekal Main Road, Bengaluru', state: 'Karnataka', type: 'Medical', medicalCategory: 'Paramedical / Allied Health Sciences', departments: ['B.Sc. Nursing', 'B.Pharm', 'D.Pharm', 'Pharm.D'] },
+      { name: 'Yenepoya (Deemed to be University) – Bengaluru Campus', location: 'Bhartiya City, Thanisandra, Bengaluru', state: 'Karnataka', type: 'Medical', medicalCategory: 'Paramedical / Allied Health Sciences', isDeemedUniversity: true, departments: ['B.Sc. Cardiac Technology', 'B.Sc. Dialysis Technology', 'B.Sc. Medical Laboratory Technology', 'B.Sc. Respiratory Therapy'] },
+      { name: 'Krupanidhi Group of Institutions', location: 'Sarjapur Road, Bengaluru', state: 'Karnataka', type: 'Medical', medicalCategory: 'Paramedical / Allied Health Sciences', departments: ['B.Pharm', 'Pharm.D', 'Bachelor of Physiotherapy (BPT)', 'B.Sc. Nursing', 'M.B.A.'] },
+      { name: 'ISBR Business School (ISBR Bangalore)', location: 'Electronic City Phase 1, Bengaluru', state: 'Karnataka', type: 'Management', departments: ['B.B.A.', 'B.Com', 'M.B.A.', 'PGDM'] },
+      { name: 'MVJ College of Engineering', location: 'Whitefield, Bengaluru', state: 'Karnataka', type: 'Engineering', institutionType: 'Autonomous', departments: ['B.E. Computer Science and Engineering', 'B.E. Artificial Intelligence and Machine Learning', 'B.E. Aeronautical Engineering', 'B.E. Electronics and Communication Engineering'] }
     ]
   },
 ];
@@ -584,6 +787,9 @@ export const INSTITUTION_TYPES = [
 
 export const STREAM_SPECIALIZATIONS = {
   Medical: [
+    'MBBS / BDS',
+    'AYUSH',
+    'Paramedical / Allied Health Sciences',
     'Pharmacy',
     'Nursing',
     'Dentistry',
@@ -654,9 +860,14 @@ export const STREAM_SPECIALIZATIONS = {
 
 export const STREAM_COURSES = {
   Medical: [
-    'MBBS', 'BDS', 'B.Pharm', 'Pharm.D', 'B.Sc Nursing', 'BPT', 'BOT',
-    'B.Sc MLT', 'B.Sc Operation Theatre and Anaesthesia', 'B.Sc Cardiac Care',
-    'B.Sc Radiology', 'M.Pharm', 'MDS', 'B.V.Sc', 'B.F.Sc'
+    'MBBS', 'BDS', 'BAMS', 'BHMS', 'BUMS', 'BSMS', 'BNYS',
+    'B.Pharm', 'D.Pharm', 'Pharm.D', 'B.Sc Nursing', 'ANM', 'GNM',
+    'BPT', 'BOT', 'BASLP', 'B.Optom', 'B.Sc MLT',
+    'B.Sc Operation Theatre and Anaesthesia', 'B.Sc Cardiac Technology',
+    'B.Sc Dialysis Technology', 'B.Sc Radiology', 'B.Sc Respiratory Therapy',
+    'B.Sc Neuro Electrophysiology', 'B.Sc Physician Assistant',
+    'B.Sc Critical Care Technology', 'B.Sc Emergency Care Technology',
+    'M.Pharm', 'MDS', 'B.V.Sc', 'B.F.Sc'
   ],
   Engineering: [
     'B.E. Computer Science and Engineering',
@@ -819,6 +1030,7 @@ export default function Colleges({ collegesData }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [zone, setZone] = useState('all');
   const [selectedStream, setSelectedStream] = useState('all');
+  const [selectedMedicalCategory, setSelectedMedicalCategory] = useState('all');
   const [selectedSpecialization, setSelectedSpecialization] = useState('all');
   const [selectedCourse, setSelectedCourse] = useState('all');
   const [selectedInstitutionType, setSelectedInstitutionType] = useState('all');
@@ -1211,6 +1423,38 @@ export default function Colleges({ collegesData }) {
               );
             })}
           </div>
+
+          {/* Medical Category Sub-Filter Pills */}
+          {selectedStream === 'Medical' && (
+            <div role="group" aria-label="Filter by medical category" className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl bg-red-50/70 p-3.5 border border-red-100">
+              <span className="text-xs font-bold uppercase tracking-wider text-red-900 mr-2">Medical Category:</span>
+              {[
+                { id: 'all', label: 'All Medical' },
+                { id: 'MBBS / BDS', label: 'MBBS / BDS' },
+                { id: 'AYUSH', label: 'AYUSH' },
+                { id: 'Paramedical / Allied Health Sciences', label: 'Paramedical / Allied Health Sciences' },
+              ].map((mc) => {
+                const isMcSelected = selectedMedicalCategory === mc.id;
+                const count = mc.id === 'all'
+                  ? allColleges.filter((c) => (c.type || 'Engineering') === 'Medical').length
+                  : allColleges.filter((c) => (c.type || 'Engineering') === 'Medical' && collegeMatchesMedicalCategory(c, mc.id)).length;
+                return (
+                  <button
+                    key={mc.id}
+                    type="button"
+                    onClick={() => setSelectedMedicalCategory(mc.id)}
+                    className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
+                      isMcSelected
+                        ? 'bg-crimson text-white shadow-sm ring-2 ring-crimson ring-offset-1'
+                        : 'bg-white text-gray-700 hover:bg-red-100/70 border border-red-200'
+                    }`}
+                  >
+                    {mc.label} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* Combined Filters Panel */}
           <div className="mt-4 rounded-3xl border border-gray-100 bg-white p-5 shadow-card space-y-3">

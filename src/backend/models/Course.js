@@ -8,7 +8,9 @@ const CourseSchema = new mongoose.Schema(
     code: { type: String, trim: true, uppercase: true, maxlength: 20, default: '' },
     level: { type: String, enum: ['Diploma', 'UG', 'PG', 'Doctorate', 'Certificate', 'Other'], default: 'UG' },
     category: { type: String, trim: true, maxlength: 100, default: '' }, // department / stream
+    medicalCategory: { type: String, trim: true, enum: ['MBBS / BDS', 'AYUSH', 'Paramedical / Allied Health Sciences', ''], default: '' },
     specialization: { type: String, trim: true, maxlength: 100, default: '' },
+    academicYear: { type: String, trim: true, maxlength: 30, default: '2026–2027' },
     description: { type: String, trim: true, maxlength: 1500, default: '' },
     eligibility: { type: String, trim: true, maxlength: 600, default: '' },
     duration: { type: String, trim: true, maxlength: 40, default: '' },

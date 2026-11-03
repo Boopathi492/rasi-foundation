@@ -11,13 +11,50 @@ export default async function handler(req, res) {
     try {
       await dbConnect();
 
-      const { district, type, search, format, specialization, course, institutionType } = req.query;
+      const { district, type, search, format, specialization, course, institutionType, medicalCategory, state } = req.query;
 
       const query = { isActive: true };
 
       if (district && district !== 'all') {
         const escapedDistrict = escapeRegex(district.trim());
         query.district = { $regex: new RegExp(`^${escapedDistrict}$`, 'i') };
+      }
+
+      if (state && state !== 'all') {
+        const escapedState = escapeRegex(state.trim());
+        query.state = { $regex: new RegExp(`^${escapedState}$`, 'i') };
+      }
+
+      if (medicalCategory && medicalCategory !== 'all') {
+        const escapedMed = escapeRegex(medicalCategory.trim());
+        const medRegex = new RegExp(escapedMed, 'i');
+        const matchedMedCourses = await Course.find({
+          isActive: true,
+          $or: [
+            { medicalCategory: medRegex },
+            { specialization: medRegex },
+            { name: medRegex }
+          ]
+        }).select('_id colleges').lean();
+
+        const medCollegeIds = Array.from(
+          new Set(matchedMedCourses.flatMap(mc => (mc.colleges || []).map(id => String(id))))
+        );
+
+        const medConditions = [
+          { medicalCategory: medRegex },
+          { specialization: medRegex },
+          { departments: medRegex }
+        ];
+        if (medCollegeIds.length > 0) {
+          medConditions.push({ _id: { $in: medCollegeIds } });
+        }
+        if (query.$or) {
+          query.$and = [{ $or: query.$or }, { $or: medConditions }];
+          delete query.$or;
+        } else {
+          query.$or = medConditions;
+        }
       }
 
       if (type && type !== 'all') {
@@ -143,9 +180,15 @@ export default async function handler(req, res) {
           name: college.name,
           location: college.location,
           district: college.district,
+          state: college.state || 'Tamil Nadu',
+          medicalCategory: college.medicalCategory || '',
           type: college.type || 'Engineering',
           specialization: college.specialization || '',
           institutionType: college.institutionType || '',
+          isWomenCentric: Boolean(college.isWomenCentric),
+          isDeemedUniversity: Boolean(college.isDeemedUniversity),
+          fees: college.fees || null,
+          academicYear: college.academicYear || '2026–2027',
           courses: resolvedCourses,
           tneaCode: college.tneaCode || '',
           tneaStatus: college.tneaStatus || 'not_applicable',
