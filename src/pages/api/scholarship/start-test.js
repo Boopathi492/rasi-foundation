@@ -327,6 +327,7 @@ export default async function handler(req, res) {
             registrationToken: cleanToken,
             candidateName: student.name,
             studentMobile: student.studentMobile,
+            studentEmail: student.studentEmail || '',
             plus2Group: student.plus2Group,
             admissionCourse: student.admissionCourse,
             collegeName: student.collegeName,

@@ -4,6 +4,7 @@ node_modules
 .vercel
 .temp
 .env*
+!.env.example
 *.txt
 storage/uploads/
 rasi-backup/
@@ -12,3 +13,8 @@ data/**/backup_*.json
 *.log
 .DS_Store
 scratch/
+reports/
+coverage/
+dist/
+build/
+*.tsbuildinfo

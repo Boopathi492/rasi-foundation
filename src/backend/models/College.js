@@ -22,6 +22,10 @@ const CollegeSchema = new mongoose.Schema({
     maxlength: [50, 'State cannot be more than 50 characters'],
     default: 'Tamil Nadu',
   },
+  academicLevels: {
+    type: [String],
+    default: [],
+  },
   medicalCategory: {
     type: String,
     trim: true,
@@ -167,6 +171,8 @@ const CollegeSchema = new mongoose.Schema({
 
 CollegeSchema.index({ isActive: 1, district: 1, order: 1 });
 CollegeSchema.index({ type: 1, district: 1 });
+CollegeSchema.index({ type: 1, medicalCategory: 1 });
+CollegeSchema.index({ academicLevels: 1 });
 CollegeSchema.index({ courses: 1 });
 CollegeSchema.index({ tneaCode: 1 });
 CollegeSchema.index({ name: 1, district: 1 }, { unique: true, collation: { locale: 'en', strength: 2 } });

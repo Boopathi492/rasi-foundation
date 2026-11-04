@@ -48,18 +48,21 @@ export const HERO_SLIDES = [
   {
     id: "tamil-guidance",
     src: "/images/banners/hero-1-tamil-campus-admissions.png",
+    mobileSrc: "/images/rasi-foundation/01-student-hero.webp",
     alt: "உங்கள் கல்வி பயணத்திற்கு நம்பிக்கையான துணை. Your trusted partner for your education journey: college admission, career guidance, scholarship guidance and personalised counselling, with a smiling student holding books in front of a college building.",
     cta: { label: "இப்போதே ஆலோசனை பெறுங்கள்", href: "/book-counselling", box: { left: 4.1, top: 78.67, width: 29.25, height: 10.93 } },
   },
   {
     id: "brighter-future",
     src: "/images/banners/hero-4-step-into-brighter-future.png",
+    mobileSrc: "/images/rasi-foundation/04-course-selection.webp",
     alt: "Step Into Your Brighter Future. Right guidance, right college, right career. Personalised career counselling, top college recommendations, scholarship support for eligible students and a wide range of courses.",
     cta: { label: "Explore Courses & Get Guidance", href: "/courses", box: { left: 4.35, top: 78.67, width: 25.15, height: 10.13 } },
   },
   {
     id: "students-tomorrow",
     src: "/images/banners/hero-5-students-today-leaders-tomorrow.png",
+    mobileSrc: "/images/rasi-foundation/07-campus-ready-students.webp",
     alt: "உங்கள் கனவுக்கு சரியான பாதை இங்கே. The right path for your dream: the right colleges, the right course, scholarship opportunities and personalised guidance. A group of smiling students on a college campus. Students today, leaders tomorrow.",
     cta: { label: "Start Your Admission Journey", href: "/book-counselling", box: { left: 4.6, top: 78.0, width: 25.3, height: 10.93 } },
   },

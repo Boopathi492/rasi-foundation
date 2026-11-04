@@ -11,9 +11,14 @@ export default async function handler(req, res) {
     try {
       await dbConnect();
 
-      const { district, type, search, format, specialization, course, institutionType, medicalCategory, state } = req.query;
+      const { district, type, search, format, specialization, course, institutionType, medicalCategory, state, academicLevel } = req.query;
 
       const query = { isActive: true };
+
+      if (academicLevel && academicLevel !== 'all') {
+        const cleanLevel = academicLevel.trim();
+        query.academicLevels = cleanLevel;
+      }
 
       if (district && district !== 'all') {
         const escapedDistrict = escapeRegex(district.trim());
@@ -192,9 +197,10 @@ export default async function handler(req, res) {
           isDeemedUniversity: Boolean(college.isDeemedUniversity),
           fees: college.fees || null,
           academicYear: college.academicYear || '2026–2027',
+          academicLevels: Array.isArray(college.academicLevels) ? college.academicLevels : [],
           courses: resolvedCourses,
-          tneaCode: college.tneaCode || '',
-          tneaStatus: college.tneaStatus || 'not_applicable',
+          tneaCode: college.type === 'Medical' ? '' : (college.tneaCode || ''),
+          tneaStatus: college.type === 'Medical' ? 'not_applicable' : (college.tneaStatus || 'not_applicable'),
           tneaSourceYear: college.tneaSourceYear || '',
           codeType: college.codeType || (college.tneaCode ? 'TNEA' : ''),
           codeValue: college.codeValue || college.tneaCode || '',

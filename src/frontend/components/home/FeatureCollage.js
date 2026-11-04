@@ -11,24 +11,24 @@ import { ROUTES } from '@/data/siteConfig';
 
 const COLLAGE_IMAGES = {
   primary: {
-    src: '/images/banners/hero-3-explore-perfect-course.png',
+    src: '/images/rasi-foundation/01-student-hero.webp',
     alt: 'A smiling student holding books on a college campus',
-    region: { x: 880, y: 60, w: 420, h: 520 },
+    objectPosition: 'center 20%',
   },
   topRight: {
-    src: '/images/banners/hero-4-step-into-brighter-future.png',
+    src: '/images/rasi-foundation/02-career-counselling.webp',
     alt: 'A student speaking with a career counsellor one-to-one',
-    region: { x: 1490, y: 58, w: 250, h: 134 },
+    objectPosition: 'center',
   },
   bottomLeft: {
-    src: '/images/banners/hero-4-step-into-brighter-future.png',
+    src: '/images/rasi-foundation/04-course-selection.webp',
     alt: 'Students discussing their college choices together',
-    region: { x: 1490, y: 210, w: 250, h: 134 },
+    objectPosition: 'center',
   },
   bottomRight: {
-    src: '/images/banners/hero-5-students-today-leaders-tomorrow.png',
+    src: '/images/rasi-foundation/07-campus-ready-students.webp',
     alt: 'Smiling students walking together on a college campus',
-    region: { x: 890, y: 90, w: 540, h: 450 },
+    objectPosition: 'center',
   },
 };
 
@@ -73,9 +73,9 @@ export default function FeatureCollage() {
               <BannerCrop
                 src={COLLAGE_IMAGES.primary.src}
                 alt={COLLAGE_IMAGES.primary.alt}
-                region={COLLAGE_IMAGES.primary.region}
                 sizes="(min-width: 1024px) 380px, 65vw"
-                className="w-full rounded-lg"
+                className="aspect-[4/5] w-full rounded-lg"
+                objectPosition={COLLAGE_IMAGES.primary.objectPosition}
               />
             </div>
           </motion.div>
@@ -89,9 +89,9 @@ export default function FeatureCollage() {
               <BannerCrop
                 src={COLLAGE_IMAGES.topRight.src}
                 alt={COLLAGE_IMAGES.topRight.alt}
-                region={COLLAGE_IMAGES.topRight.region}
                 sizes="(min-width: 640px) 250px, 45vw"
-                className="w-full rounded-lg"
+                className="aspect-[16/10] w-full rounded-lg"
+                objectPosition={COLLAGE_IMAGES.topRight.objectPosition}
               />
               <p className="mt-1.5 px-1 pb-0.5 text-[10.5px] font-semibold text-crimson sm:text-[11px]">
                 1-to-1 Career Counselling
@@ -108,9 +108,9 @@ export default function FeatureCollage() {
               <BannerCrop
                 src={COLLAGE_IMAGES.bottomLeft.src}
                 alt={COLLAGE_IMAGES.bottomLeft.alt}
-                region={COLLAGE_IMAGES.bottomLeft.region}
                 sizes="(min-width: 640px) 250px, 45vw"
-                className="w-full rounded-lg"
+                className="aspect-[16/10] w-full rounded-lg"
+                objectPosition={COLLAGE_IMAGES.bottomLeft.objectPosition}
               />
               <p className="mt-1.5 px-1 pb-0.5 text-[10.5px] font-semibold text-forest sm:text-[11px]">
                 Informed Course Selection
@@ -127,9 +127,9 @@ export default function FeatureCollage() {
               <BannerCrop
                 src={COLLAGE_IMAGES.bottomRight.src}
                 alt={COLLAGE_IMAGES.bottomRight.alt}
-                region={COLLAGE_IMAGES.bottomRight.region}
                 sizes="(min-width: 640px) 240px, 44vw"
-                className="w-full rounded-lg"
+                className="aspect-[16/10] w-full rounded-lg"
+                objectPosition={COLLAGE_IMAGES.bottomRight.objectPosition}
               />
               <div className="mt-1.5 flex items-center justify-between px-1 pb-0.5">
                 <span className="text-[10.5px] font-semibold text-gray-800 sm:text-[11px]">Campus Ready</span>

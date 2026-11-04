@@ -285,7 +285,16 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
                   transition={reduced ? { duration: 0 } : { duration: 0.35, ease: 'easeOut' }}
                   className="h-full w-full"
                 >
-                  {activeMeta?.region && !activeSlide.isDynamic ? (
+                  {activeSlide.mobileSrc ? (
+                    <Image
+                      src={activeSlide.mobileSrc}
+                      alt={activeSlide.alt}
+                      fill
+                      priority={index === 0}
+                      sizes="100vw"
+                      className="h-full w-full object-cover object-center"
+                    />
+                  ) : activeMeta?.region && !activeSlide.isDynamic ? (
                     <BannerCrop
                       src={activeSlide.src}
                       alt={activeSlide.alt}
@@ -297,7 +306,7 @@ export default function HeroCarousel({ slides = HERO_SLIDES }) {
                     />
                   ) : (
                     <Image
-                      src={activeSlide.mobileSrc || activeSlide.src}
+                      src={activeSlide.src}
                       alt={activeSlide.alt}
                       fill
                       unoptimized={Boolean(activeSlide.isDynamic)}

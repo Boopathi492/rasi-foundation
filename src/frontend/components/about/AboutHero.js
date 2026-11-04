@@ -57,11 +57,11 @@ export default function AboutHero() {
           className="relative mx-auto w-full max-w-sm lg:max-w-md"
         >
           <BannerCrop
-            src="/images/banners/hero-1-tamil-campus-admissions.png"
+            src="/images/rasi-foundation/01-student-hero.webp"
             alt="A smiling student holding books in front of a college building"
-            region={{ x: 900, y: 60, w: 480, h: 480 }}
             sizes="(min-width: 1024px) 28rem, 24rem"
             priority
+            objectPosition="center 15%"
             className="aspect-square rounded-[2rem] shadow-2xl ring-4 ring-white/80"
           />
           <span className="absolute -bottom-4 -left-3 flex h-20 w-20 items-center justify-center rounded-full bg-white p-1.5 shadow-xl ring-2 ring-gold-300 sm:h-24 sm:w-24">

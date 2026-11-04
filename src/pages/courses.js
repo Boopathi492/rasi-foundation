@@ -709,8 +709,8 @@ const PAGE_SIZE = 12;
 
 // Category cards: label, icon and a photo crop from the supplied banners (4:3 regions on the 2000x750 grid).
 const CATEGORIES = [
-  { id: 'medical', name: 'Medical', icon: FaStethoscope, src: '/images/banners/hero-2-right-guidance.png', region: { x: 880, y: 60, w: 320, h: 240 } },
-  { id: 'engineering', name: 'Engineering', icon: FaCog, src: '/images/banners/hero-5-students-today-leaders-tomorrow.png', region: { x: 1260, y: 270, w: 440, h: 330 } },
+  { id: 'medical', name: 'Medical', icon: FaStethoscope, src: '/images/rasi-foundation/05-medical-student.webp', objectPosition: 'center 15%' },
+  { id: 'engineering', name: 'Engineering', icon: FaCog, src: '/images/rasi-foundation/06-engineering-student.webp', objectPosition: 'center 15%' },
   { id: 'management', name: 'Management', icon: FaChartLine, src: '/images/banners/hero-5-students-today-leaders-tomorrow.png', region: { x: 880, y: 260, w: 480, h: 360 } },
   { id: 'arts', name: 'Arts & Science', icon: FaFlask, src: '/images/banners/hero-5-students-today-leaders-tomorrow.png', region: { x: 900, y: 30, w: 480, h: 360 } },
   { id: 'law', name: 'Law', icon: FaBalanceScale, src: '/images/banners/hero-4-step-into-brighter-future.png', region: { x: 810, y: 70, w: 280, h: 210 } },
@@ -1043,11 +1043,11 @@ export default function Courses({ initialCourses = [] }) {
           <Reveal>
             <div className="relative mx-auto aspect-[5/6] max-h-[420px] w-full overflow-hidden rounded-[3rem] shadow-card-hover ring-8 ring-white/20">
               <Image
-                src="/images/courses/Bright Campus Walkway with Students.png"
-                alt="A smiling student holding a book on a bright campus walkway with other students"
+                src="/images/rasi-foundation/04-course-selection.webp"
+                alt="Students reviewing course selection options together on campus"
                 fill
                 sizes="(min-width: 1024px) 35vw, 90vw"
-                className="object-cover object-[78%_center]"
+                className="object-cover object-center"
                 priority
               />
             </div>
@@ -1072,7 +1072,7 @@ export default function Courses({ initialCourses = [] }) {
                     onClick={() => chooseCategory(cat.id)}
                     className="group relative block w-full overflow-hidden rounded-3xl text-left shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2"
                   >
-                    <BannerCrop src={cat.src} alt="" region={cat.region} sizes="(min-width: 1280px) 22vw, (min-width: 768px) 30vw, 46vw" className="aspect-[4/3] w-full transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none" />
+                    <BannerCrop src={cat.src} alt="" region={cat.region} objectPosition={cat.objectPosition || 'center'} sizes="(min-width: 1280px) 22vw, (min-width: 768px) 30vw, 46vw" className="aspect-[4/3] w-full transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none" />
                     <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-forest-dark/90 via-forest-dark/30 to-transparent" />
                     <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-4 text-white">
                       <span>

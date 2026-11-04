@@ -13,9 +13,9 @@ const CARDS = [
     badgeLabel: 'Trusted Career Guidance',
     text: 'To be the most trusted and preferred education consultancy, recognised for transforming lives through quality guidance and creating successful professionals who contribute to society.',
     image: {
-      src: '/images/banners/hero-5-students-today-leaders-tomorrow.png',
-      alt: 'Students walking together on a college campus',
-      region: { x: 860, y: 70, w: 720, h: 360 },
+      src: '/images/rasi-foundation/03-student-teamwork-campus.webp',
+      alt: 'Students walking and collaborating together on a modern college campus',
+      objectPosition: 'center',
     },
     accentBorder: 'border-t-4 border-t-forest',
     iconClass: 'bg-forest/10 text-forest',
@@ -30,9 +30,9 @@ const CARDS = [
     badgeLabel: 'Student-First Support',
     text: 'To empower students with the knowledge, guidance and support they need to make informed career decisions and secure admissions in institutions that align with their aspirations and potential.',
     image: {
-      src: '/images/banners/hero-2-right-guidance.png',
-      alt: 'A smiling student holding books on campus',
-      region: { x: 820, y: 30, w: 680, h: 340 },
+      src: '/images/rasi-foundation/01-student-hero.webp',
+      alt: 'A smiling student holding books on a vibrant campus',
+      objectPosition: 'center 20%',
     },
     accentBorder: 'border-t-4 border-t-crimson',
     iconClass: 'bg-crimson/10 text-crimson',
@@ -117,6 +117,7 @@ export default function VisionMission() {
                       fill
                       sizes="(min-width: 1024px) 560px, 95vw"
                       className="h-full w-full"
+                      objectPosition={image.objectPosition || 'center'}
                     />
                     <span
                       aria-hidden="true"

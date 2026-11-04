@@ -9,68 +9,26 @@ import Reveal from './Reveal';
 import { usePrefersReducedMotion } from './Marquee';
 import { ROUTES, TN_DISTRICTS } from '@/data/siteConfig';
 
-// Verified figures derived directly from the project's actual course, stream, district and roadmap data
-const VERIFIED_STATS = [
-  {
-    id: 'courses',
-    target: 61,
-    suffix: '',
-    label: 'Courses Listed',
-    detail: 'UG, PG & Diploma programs across major career streams',
-    Icon: FaBookOpen,
-    accent: 'text-gold-300 bg-white/10 border-white/20',
-  },
-  {
-    id: 'streams',
-    target: 7,
-    suffix: '',
-    label: 'Academic Streams',
-    detail: 'Medical, Engineering, Management, Law, Arts, Education & Agri',
-    Icon: FaLayerGroup,
-    accent: 'text-emerald-300 bg-white/10 border-white/20',
-  },
-  {
-    id: 'districts',
-    target: TN_DISTRICTS.length,
-    suffix: '',
-    label: 'TN Districts Covered',
-    detail: 'Admission guidance accessible across all Tamil Nadu districts',
-    Icon: FaMapMarkedAlt,
-    accent: 'text-rose-200 bg-white/10 border-white/20',
-  },
-  {
-    id: 'stages',
-    target: 6,
-    suffix: '-Step',
-    label: 'Admission Roadmap',
-    detail: 'Structured support from course exploration to college guidance',
-    Icon: FaRoute,
-    accent: 'text-gold-300 bg-white/10 border-white/20',
-  },
-];
-
 function AnimatedCounter({ target, suffix = '', inView, reduced }) {
   const [display, setDisplay] = useState(0);
-  const hasAnimatedRef = useRef(false);
 
   useEffect(() => {
-    if (!inView || hasAnimatedRef.current) return undefined;
-    hasAnimatedRef.current = true;
-
+    if (!inView) return undefined;
     if (reduced) {
       setDisplay(target);
       return undefined;
     }
 
     let rafId;
-    const duration = 1350;
+    const duration = 1200;
     const startTime = performance.now();
+    const startVal = 0;
 
     const step = (now) => {
       const progress = Math.min((now - startTime) / duration, 1);
       // Cubic ease-out
       const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplay(Math.round(eased * target));
+      setDisplay(Math.round(startVal + (target - startVal) * eased));
       if (progress < 1) {
         rafId = requestAnimationFrame(step);
       }
@@ -82,7 +40,7 @@ function AnimatedCounter({ target, suffix = '', inView, reduced }) {
 
   return (
     <span>
-      {reduced || hasAnimatedRef.current ? display : 0}
+      {inView ? display : 0}
       {suffix}
     </span>
   );
@@ -92,6 +50,72 @@ export default function StatsBanner() {
   const bannerRef = useRef(null);
   const inView = useInView(bannerRef, { once: true, margin: '0px 0px -60px 0px' });
   const reduced = usePrefersReducedMotion();
+
+  const [statsData, setStatsData] = useState({
+    coursesListed: 361,
+    academicStreams: 8,
+    districtsCovered: TN_DISTRICTS.length || 38,
+    admissionRoadmapSteps: 6,
+  });
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/statistics')
+      .then((res) => res.json())
+      .then((json) => {
+        if (active && json?.success && json?.data) {
+          setStatsData({
+            coursesListed: Number(json.data.coursesListed) || 361,
+            academicStreams: Number(json.data.academicStreams) || 8,
+            districtsCovered: Number(json.data.districtsCovered) || TN_DISTRICTS.length || 38,
+            admissionRoadmapSteps: Number(json.data.admissionRoadmapSteps) || 6,
+          });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const statsItems = [
+    {
+      id: 'courses',
+      target: statsData.coursesListed,
+      suffix: '',
+      label: 'Courses Listed',
+      detail: 'UG, PG & Diploma programs across major career streams',
+      Icon: FaBookOpen,
+      accent: 'text-gold-300 bg-white/10 border-white/20',
+    },
+    {
+      id: 'streams',
+      target: statsData.academicStreams,
+      suffix: '',
+      label: 'Academic Streams',
+      detail: 'Medical, Engineering, Management, Law, Arts, Education & Agri',
+      Icon: FaLayerGroup,
+      accent: 'text-emerald-300 bg-white/10 border-white/20',
+    },
+    {
+      id: 'districts',
+      target: statsData.districtsCovered,
+      suffix: '',
+      label: 'TN Districts Covered',
+      detail: 'Admission guidance accessible across all Tamil Nadu districts',
+      Icon: FaMapMarkedAlt,
+      accent: 'text-rose-200 bg-white/10 border-white/20',
+    },
+    {
+      id: 'stages',
+      target: statsData.admissionRoadmapSteps,
+      suffix: '-Step',
+      label: 'Admission Roadmap',
+      detail: 'Structured support from course exploration to college guidance',
+      Icon: FaRoute,
+      accent: 'text-gold-300 bg-white/10 border-white/20',
+    },
+  ];
 
   return (
     <section
@@ -139,7 +163,7 @@ export default function StatsBanner() {
 
         {/* Balanced Horizontal Counter Cards */}
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {VERIFIED_STATS.map(({ id, target, suffix, label, detail, Icon }, idx) => (
+          {statsItems.map(({ id, target, suffix, label, detail, Icon }, idx) => (
             <Reveal
               key={id}
               delay={idx * 0.06}

@@ -15,6 +15,7 @@ import {
 } from '../../../backend/lib/sheetdb/index.js';
 import { setNoCacheHeaders } from '../../../backend/lib/apiSecurity.js';
 import { authorizeScholarshipRequest } from '../../../backend/lib/scholarshipAuth.js';
+import { sendScholarshipScorecardEmail } from '../../../backend/lib/email.js';
 
 const inFlightSubmissions = new Set();
 
@@ -291,26 +292,32 @@ export default async function handler(req, res) {
             await testSession.save();
         }
 
-        // Resolve candidate identity details for the 22-column result row
+        // Resolve candidate identity details for the 22-column result row and automatic email
         let candidateInfo = {
             student_reference_id: testSession.studentReferenceId || (testSession.studentId ? String(testSession.studentId) : ''),
             application_number: testSession.registrationToken,
             name: testSession.candidateName || '',
             studentMobile: testSession.studentMobile || '',
+            studentEmail: testSession.studentEmail || '',
             examLanguage: testSession.language || 'English',
             selectedElective: testSession.optionalSubject || testSession.subjects?.[2] || 'Mathematics',
+            lastStudiedSchool: '',
+            collegeName: testSession.collegeName || '',
         };
 
-        if (!candidateInfo.name || !candidateInfo.student_reference_id) {
+        if (!candidateInfo.name || !candidateInfo.student_reference_id || !candidateInfo.studentEmail) {
             const stuLookup = await findScholarshipStudentByToken(testSession.registrationToken);
             if (stuLookup.ok && stuLookup.found && stuLookup.student) {
                 candidateInfo = {
-                    student_reference_id: stuLookup.student.studentReferenceId,
-                    application_number: stuLookup.student.registrationToken,
-                    name: stuLookup.student.name,
-                    studentMobile: stuLookup.student.studentMobile,
+                    student_reference_id: stuLookup.student.studentReferenceId || candidateInfo.student_reference_id,
+                    application_number: stuLookup.student.registrationToken || candidateInfo.application_number,
+                    name: stuLookup.student.name || candidateInfo.name,
+                    studentMobile: stuLookup.student.studentMobile || candidateInfo.studentMobile,
+                    studentEmail: stuLookup.student.studentEmail || stuLookup.student.email || candidateInfo.studentEmail,
                     examLanguage: testSession.language || stuLookup.student.examLanguage,
                     selectedElective: testSession.optionalSubject || stuLookup.student.selectedElective,
+                    lastStudiedSchool: stuLookup.student.lastStudiedSchool || '',
+                    collegeName: stuLookup.student.collegeName || candidateInfo.collegeName,
                 };
             }
         }
@@ -443,6 +450,72 @@ export default async function handler(req, res) {
 
         const perSubjectTotal = Math.max(1, Math.round(totalQ / (testSession.subjects?.length || 3)));
         const subjectScores = buildSubjectScoresArray(testSession.subjects, subjectWiseMap, perSubjectTotal);
+
+        // 6. Automatic Rasi Foundation branded Scoreboard Email dispatch with PDF scorecard
+        if (testSession.emailStatus !== 'sent' && candidateInfo.studentEmail) {
+            try {
+                const emailResult = await sendScholarshipScorecardEmail({
+                    recipientEmail: candidateInfo.studentEmail,
+                    candidateName: candidateInfo.name,
+                    applicationNumber: testSession.registrationToken,
+                    examDate: new Date(testSession.endTime || Date.now()).toLocaleDateString('en-IN', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                    }),
+                    resultReferenceId: String(testSession._id),
+                    language: testSession.language || 'English',
+                    preferredCollege: candidateInfo.collegeName || 'N/A',
+                    lastStudiedSchool: candidateInfo.lastStudiedSchool || 'N/A',
+                    scoreboard: {
+                        totalQuestions: totalQ,
+                        attemptedQuestions: calculatedAttempted,
+                        correctAnswers: calculatedCorrect,
+                        wrongAnswers: calculatedWrong,
+                        unattemptedQuestions: calculatedUnattempted,
+                        totalMarks: totalQ * Number(testSession.configSnapshot?.marksPerQuestion || 1),
+                        score: calculatedScore,
+                        percentage: calculatedPercentage,
+                    },
+                    subjectScores,
+                });
+
+                if (emailResult.success) {
+                    await TestSession.updateOne(
+                        { _id: testSession._id },
+                        {
+                            $set: {
+                                emailStatus: 'sent',
+                                emailSentAt: new Date(),
+                                emailMessageId: emailResult.messageId || null,
+                                emailError: null,
+                            },
+                        }
+                    ).catch(() => {});
+                } else if (!emailResult.skipped) {
+                    await TestSession.updateOne(
+                        { _id: testSession._id },
+                        {
+                            $set: {
+                                emailStatus: 'failed',
+                                emailError: emailResult.error || 'Failed to dispatch email',
+                            },
+                        }
+                    ).catch(() => {});
+                }
+            } catch (emailErr) {
+                console.error('[Automatic Result Email Dispatch Error]:', emailErr?.message || emailErr);
+                await TestSession.updateOne(
+                    { _id: testSession._id },
+                    {
+                        $set: {
+                            emailStatus: 'failed',
+                            emailError: emailErr?.message || 'Unexpected email error',
+                        },
+                    }
+                ).catch(() => {});
+            }
+        }
 
         return res.status(200).json({
             success: true,

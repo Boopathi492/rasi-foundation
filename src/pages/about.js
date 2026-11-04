@@ -112,31 +112,31 @@ export default function About() {
         <div className="container mx-auto grid items-center gap-12 px-4 sm:px-6 lg:grid-cols-2">
           <Reveal className="mx-auto grid w-full max-w-lg grid-cols-2 gap-4">
             <BannerCrop
-              src="/images/banners/hero-1-tamil-campus-admissions.png"
+              src="/images/rasi-foundation/01-student-hero.webp"
               alt="A smiling student holding books in front of a college building"
-              region={{ x: 900, y: 60, w: 480, h: 480 }}
               sizes="(min-width: 1024px) 20vw, 45vw"
+              objectPosition="center 15%"
               className={`aspect-square rounded-[2rem] ${shot}`}
             />
             <BannerCrop
-              src="/images/banners/hero-5-students-today-leaders-tomorrow.png"
-              alt="Students walking together on a campus"
-              region={{ x: 900, y: 100, w: 580, h: 580 }}
+              src="/images/rasi-foundation/03-student-teamwork-campus.webp"
+              alt="Students walking and collaborating on campus"
               sizes="(min-width: 1024px) 20vw, 45vw"
+              objectPosition="center"
               className={`aspect-square rounded-[2rem] ${shot}`}
             />
             <BannerCrop
-              src="/images/banners/hero-2-right-guidance.png"
-              alt="A student smiling with books"
-              region={{ x: 900, y: 50, w: 300, h: 300 }}
+              src="/images/rasi-foundation/04-course-selection.webp"
+              alt="Students exploring courses and college options together"
               sizes="(min-width: 1024px) 20vw, 45vw"
+              objectPosition="center"
               className={`aspect-square rounded-[2rem] ${shot}`}
             />
             <BannerCrop
-              src="/images/banners/hero-5-students-today-leaders-tomorrow.png"
-              alt="Students gathered outside a college building"
-              region={{ x: 980, y: 20, w: 360, h: 360 }}
+              src="/images/rasi-foundation/07-campus-ready-students.webp"
+              alt="Campus-ready students gathered outside a college building"
               sizes="(min-width: 1024px) 20vw, 45vw"
+              objectPosition="center"
               className={`aspect-square rounded-[2rem] ${shot}`}
             />
           </Reveal>
@@ -237,32 +237,32 @@ export default function About() {
 
           <Reveal className="mx-auto grid w-full max-w-md grid-cols-2 gap-4">
             <BannerCrop
-              src="/images/banners/hero-3-explore-perfect-course.png"
+              src="/images/rasi-foundation/01-student-hero.webp"
               alt="A smiling student holding books on a college campus"
-              region={{ x: 880, y: 80, w: 400, h: 500 }}
               sizes="(min-width: 1024px) 18vw, 45vw"
+              objectPosition="center 15%"
               className={`row-span-2 aspect-[4/5] rounded-[2rem] ${shot}`}
             />
             <BannerCrop
-              src="/images/banners/hero-4-step-into-brighter-future.png"
-              alt="A student speaking with a counsellor"
-              region={{ x: 1490, y: 58, w: 250, h: 134 }}
+              src="/images/rasi-foundation/02-career-counselling.webp"
+              alt="A student and parent in a one-to-one career counselling session"
               sizes="(min-width: 1024px) 18vw, 45vw"
-              className={`aspect-[250/134] rounded-2xl ${shot}`}
+              objectPosition="center"
+              className={`aspect-[16/10] rounded-2xl ${shot}`}
             />
             <BannerCrop
-              src="/images/banners/hero-4-step-into-brighter-future.png"
-              alt="Students discussing their college choices together"
-              region={{ x: 1490, y: 210, w: 250, h: 134 }}
+              src="/images/rasi-foundation/03-student-teamwork-campus.webp"
+              alt="Students collaborating on their academic pathway"
               sizes="(min-width: 1024px) 18vw, 45vw"
-              className={`aspect-[250/134] rounded-2xl ${shot}`}
+              objectPosition="center"
+              className={`aspect-[16/10] rounded-2xl ${shot}`}
             />
             <BannerCrop
-              src="/images/banners/hero-5-students-today-leaders-tomorrow.png"
-              alt="Students together on a college campus"
-              region={{ x: 1000, y: 380, w: 520, h: 330 }}
+              src="/images/rasi-foundation/07-campus-ready-students.webp"
+              alt="Campus-ready students walking together on campus"
               sizes="(min-width: 1024px) 18vw, 45vw"
-              className={`col-span-2 aspect-[520/330] rounded-[2rem] ${shot}`}
+              objectPosition="center"
+              className={`col-span-2 aspect-[16/9] rounded-[2rem] ${shot}`}
             />
           </Reveal>
         </div>

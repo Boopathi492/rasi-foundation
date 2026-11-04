@@ -141,11 +141,11 @@ export default function ScholarshipTestPage() {
         aside={
           <Reveal>
             <BannerCrop
-              src="/images/banners/hero-5-students-today-leaders-tomorrow.png"
-              alt="Students walking together on a college campus"
-              region={{ x: 900, y: 100, w: 580, h: 580 }}
+              src="/images/rasi-foundation/07-campus-ready-students.webp"
+              alt="Campus-ready students preparing for scholarship exams and higher education"
               sizes="(min-width: 1024px) 35vw, 90vw"
               className="mx-auto aspect-square max-w-sm rounded-[3rem] shadow-card-hover ring-8 ring-white/20"
+              objectPosition="center"
             />
           </Reveal>
         }

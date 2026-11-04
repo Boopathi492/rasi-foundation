@@ -32,8 +32,8 @@ const COURSE_CATEGORIES = [
     name: 'Engineering',
     stream: 'UG & Diploma',
     courses: ['B.E. CSE', 'B.Tech AI & DS', 'B.E. ECE', 'B.E. Mechanical'],
-    src: '/images/banners/hero-5-students-today-leaders-tomorrow.png',
-    region: { x: 1470, y: 60, w: 260, h: 416 },
+    src: '/images/rasi-foundation/06-engineering-student.webp',
+    objectPosition: 'center 15%',
     badgeTone: 'bg-forest/10 text-forest',
   },
   {
@@ -41,8 +41,8 @@ const COURSE_CATEGORIES = [
     name: 'Medical',
     stream: 'Health & Allied',
     courses: ['MBBS', 'BDS', 'B.Sc Nursing', 'B.Pharm'],
-    src: '/images/banners/hero-2-right-guidance.png',
-    region: { x: 860, y: 0, w: 350, h: 560 },
+    src: '/images/rasi-foundation/05-medical-student.webp',
+    objectPosition: 'center 15%',
     badgeTone: 'bg-crimson/10 text-crimson',
   },
   {
@@ -119,9 +119,9 @@ const SUPPORT_PANELS = [
     ctaHref: ROUTES.counselling,
     tone: 'forest',
     image: {
-      src: '/images/banners/hero-3-explore-perfect-course.png',
-      alt: 'A smiling student holding books on a college campus',
-      region: { x: 850, y: 40, w: 660, h: 350 },
+      src: '/images/rasi-foundation/07-campus-ready-students.webp',
+      alt: 'A smiling group of students on a college campus receiving guidance',
+      objectPosition: 'center',
     },
   },
   {
@@ -135,9 +135,9 @@ const SUPPORT_PANELS = [
     ctaHref: ROUTES.enquiry,
     tone: 'crimson',
     image: {
-      src: '/images/banners/hero-4-step-into-brighter-future.png',
-      alt: 'A student and parent speaking with a career counsellor',
-      region: { x: 1490, y: 58, w: 250, h: 134 },
+      src: '/images/rasi-foundation/02-career-counselling.webp',
+      alt: 'A student and parent speaking with a career counsellor one-to-one',
+      objectPosition: 'center',
     },
   },
 ];
@@ -339,7 +339,7 @@ export default function Home() {
                 Explore Popular <span className="text-forest">Courses</span>
               </h2>
               <p className="mt-2 max-w-xl text-sm text-gray-600">
-                Choose from undergraduate, postgraduate and diploma programs across 7 major academic streams.
+                Choose from undergraduate, postgraduate and diploma programs across major academic streams.
               </p>
             </div>
             <Link
@@ -352,7 +352,7 @@ export default function Home() {
           </Reveal>
 
           <Marquee label="Popular course categories" speed={0.5} arrows className="py-1.5">
-            {COURSE_CATEGORIES.map(({ icon: Icon, name, stream, courses, src, region, badgeTone }) => (
+            {COURSE_CATEGORIES.map(({ icon: Icon, name, stream, courses, src, region, badgeTone, objectPosition }) => (
               <Link
                 key={name}
                 href="/courses"
@@ -397,6 +397,7 @@ export default function Home() {
                     fill
                     sizes="180px"
                     className="h-full w-full"
+                    objectPosition={region ? undefined : (objectPosition || 'center')}
                   />
                 </span>
               </Link>
@@ -413,14 +414,12 @@ export default function Home() {
         <div className="container mx-auto grid items-center gap-10 px-4 lg:grid-cols-2">
           <Reveal className="relative aspect-[840/580] overflow-hidden rounded-xl border border-gray-200 bg-gray-100 shadow-card">
             <Image
-              src="/images/banners/hero-5-students-today-leaders-tomorrow.png"
-              alt="Students walking together on a college campus"
-              width={2048}
-              height={768}
+              src="/images/rasi-foundation/03-student-teamwork-campus.webp"
+              alt="Students collaborating and reviewing scholarship guidance on campus"
+              fill
               loading="lazy"
               sizes="(min-width: 1024px) 50vw, 100vw"
-              className="absolute max-w-none"
-              style={{ width: '238.1%', height: 'auto', left: '-104.76%', top: '-20.7%' }}
+              className="h-full w-full object-cover object-center"
             />
           </Reveal>
           <Reveal delay={0.08}>
@@ -478,6 +477,7 @@ export default function Home() {
                         fill
                         sizes="(min-width: 1024px) 540px, 95vw"
                         className="h-full w-full"
+                        objectPosition={image.objectPosition || 'center'}
                       />
                       <span
                         aria-hidden="true"
@@ -582,11 +582,12 @@ export default function Home() {
                 {/* Campus / Student Image Header */}
                 <div className="relative mb-5 aspect-[16/9] w-full overflow-hidden rounded-lg bg-gray-100">
                   <BannerCrop
-                    src="/images/banners/hero-2-right-guidance.png"
+                    src="/images/rasi-foundation/02-career-counselling.webp"
                     alt="Students receiving career counselling from Rasi Foundation advisors"
-                    region={{ x: 860, y: 0, w: 420, h: 360 }}
+                    fill
                     sizes="(min-width: 1024px) 35vw, 90vw"
                     className="h-full w-full"
+                    objectPosition="center"
                   />
                   <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                   <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-md bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-forest shadow-sm">

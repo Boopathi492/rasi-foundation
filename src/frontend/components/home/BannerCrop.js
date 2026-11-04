@@ -12,14 +12,17 @@ export default function BannerCrop({
   fill = false,
   sizes = '(min-width: 1024px) 40vw, 90vw',
   className = '',
+  imageClassName = '',
+  objectPosition = 'center',
   priority = false,
 }) {
   // Standalone mode: when region is omitted, render clean responsive Next.js Image
   if (!region) {
+    const hasCustomAspect = className.includes('aspect-');
     return (
       <div
         className={`relative overflow-hidden bg-brand-100 ${className}`}
-        style={fill ? undefined : { aspectRatio: '4 / 3' }}
+        style={fill || hasCustomAspect ? undefined : { aspectRatio: '4 / 3' }}
       >
         <Image
           src={src}
@@ -28,8 +31,9 @@ export default function BannerCrop({
           sizes={sizes}
           priority={priority}
           loading={priority ? undefined : 'lazy'}
-          quality={85}
-          className="h-full w-full object-cover"
+          quality={90}
+          className={`h-full w-full object-cover ${imageClassName}`}
+          style={{ objectPosition }}
         />
       </div>
     );

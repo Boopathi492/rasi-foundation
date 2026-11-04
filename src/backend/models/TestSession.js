@@ -112,6 +112,10 @@ const TestSessionSchema = new mongoose.Schema({
         type: String,
         default: '',
     },
+    studentEmail: {
+        type: String,
+        default: '',
+    },
     plus2Group: {
         type: String,
         default: '',
@@ -254,6 +258,26 @@ const TestSessionSchema = new mongoose.Schema({
         default: null,
     },
     sheetdbError: {
+        type: String,
+        default: null,
+    },
+
+    // Automatic Scoreboard Email delivery tracking
+    emailStatus: {
+        type: String,
+        enum: ['pending', 'sent', 'failed'],
+        default: 'pending',
+        index: true,
+    },
+    emailSentAt: {
+        type: Date,
+        default: null,
+    },
+    emailMessageId: {
+        type: String,
+        default: null,
+    },
+    emailError: {
         type: String,
         default: null,
     },

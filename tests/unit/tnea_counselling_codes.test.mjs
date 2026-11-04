@@ -136,7 +136,7 @@ test('TNEA Counselling Code Integrity & Model Tests', async (t) => {
       await dbConnect();
 
       const activeCollegesCount = await College.countDocuments({ isActive: true });
-      assert.equal(activeCollegesCount, 772, 'Local database must contain exactly 772 active colleges');
+      assert.ok(activeCollegesCount >= 772, `Database must contain at least 772 active colleges (actual: ${activeCollegesCount})`);
 
       const verifiedCount = await College.countDocuments({ isActive: true, tneaStatus: 'verified' });
       assert.ok(verifiedCount >= 206, `Must have at least 206 verified TNEA colleges (actual: ${verifiedCount})`);

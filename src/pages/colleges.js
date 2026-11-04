@@ -7,14 +7,17 @@ function collegeMatchesMedicalCategory(college, targetCategory) {
     if (hasMatch) return true;
   }
   const normDepts = (college.departments || []).join(' ').toLowerCase();
+  const normSpec = (college.specialization || '').toLowerCase();
+  const combined = `${normDepts} ${normSpec} ${(college.name || '').toLowerCase()}`;
+
   if (targetCategory === 'MBBS / BDS') {
-    return normDepts.includes('mbbs') || normDepts.includes('bds') || normDepts.includes('dental');
+    return combined.includes('mbbs') || combined.includes('bds') || combined.includes('dental') || combined.includes('mds') || (combined.includes('medical college') && !combined.includes('naturopathy') && !combined.includes('siddha') && !combined.includes('ayurved') && !combined.includes('homoeo'));
   }
   if (targetCategory === 'AYUSH') {
-    return normDepts.includes('bams') || normDepts.includes('bhms') || normDepts.includes('bums') || normDepts.includes('bsms') || normDepts.includes('bnys') || normDepts.includes('ayush') || normDepts.includes('yoga');
+    return combined.includes('bams') || combined.includes('bhms') || combined.includes('bums') || combined.includes('bsms') || combined.includes('bnys') || combined.includes('ayush') || combined.includes('siddha') || combined.includes('ayurved') || combined.includes('homoeo') || combined.includes('unani') || combined.includes('yoga') || combined.includes('naturopath');
   }
   if (targetCategory === 'Paramedical / Allied Health Sciences') {
-    return normDepts.includes('nursing') || normDepts.includes('pharm') || normDepts.includes('physio') || normDepts.includes('cardiac') || normDepts.includes('dialysis') || normDepts.includes('allied') || normDepts.includes('radiology') || normDepts.includes('optometry') || normDepts.includes('mlt') || normDepts.includes('operation theatre');
+    return combined.includes('nursing') || combined.includes('pharm') || combined.includes('physio') || combined.includes('cardiac') || combined.includes('dialysis') || combined.includes('allied') || combined.includes('radiology') || combined.includes('optom') || combined.includes('mlt') || combined.includes('operation theatre') || combined.includes('anaesthesia') || combined.includes('perfusion') || combined.includes('respiratory') || combined.includes('physician assistant') || combined.includes('gnm') || combined.includes('anm') || combined.includes('d.pharm') || combined.includes('b.pharm');
   }
   return false;
 }
@@ -738,16 +741,18 @@ export async function getStaticProps() {
           location: college.location || '',
           district: college.district || '',
           type: college.type || 'Engineering',
+          medicalCategory: college.medicalCategory || '',
+          academicLevels: Array.isArray(college.academicLevels) ? college.academicLevels : [],
           specialization: college.specialization || '',
           institutionType: college.institutionType || '',
           courses: resolvedCourses,
-          tneaCode: college.tneaCode || '',
-          tneaStatus: college.tneaStatus || (college.tneaCode ? 'verified' : 'not_applicable'),
-          tneaSourceYear: college.tneaSourceYear || '',
-          codeType: college.codeType || (college.tneaCode ? 'TNEA' : ''),
-          codeValue: college.codeValue || college.tneaCode || '',
-          issuingAuthority: college.issuingAuthority || (college.tneaCode ? 'Directorate of Technical Education (DOTE) / Anna University' : ''),
-          codeStatus: college.codeStatus || (college.tneaCode ? 'VERIFIED' : ''),
+          tneaCode: college.type === 'Medical' ? '' : (college.tneaCode || ''),
+          tneaStatus: college.type === 'Medical' ? 'not_applicable' : (college.tneaStatus || (college.tneaCode ? 'verified' : 'not_applicable')),
+          tneaSourceYear: college.type === 'Medical' ? '' : (college.tneaSourceYear || ''),
+          codeType: college.codeType || (college.tneaCode && college.type !== 'Medical' ? 'TNEA' : ''),
+          codeValue: college.codeValue || (college.type !== 'Medical' ? college.tneaCode : '') || '',
+          issuingAuthority: college.issuingAuthority || (college.tneaCode && college.type !== 'Medical' ? 'Directorate of Technical Education (DOTE) / Anna University' : ''),
+          codeStatus: college.codeStatus || (college.tneaCode && college.type !== 'Medical' ? 'VERIFIED' : ''),
           codeExplanation: college.codeExplanation || '',
           verificationDate: college.verificationDate || '',
           note: college.note || '',
@@ -820,6 +825,96 @@ export const INSTITUTION_TYPES = [
   { id: 'Autonomous', label: 'Autonomous' },
   { id: 'Private', label: 'Private / Self-Financing' }
 ];
+
+export const ACADEMIC_LEVELS = [
+  { id: 'all', label: 'All Levels' },
+  { id: 'UG', label: 'Undergraduate (UG)' },
+  { id: 'PG', label: 'Postgraduate (PG)' },
+  { id: 'Diploma', label: 'Diploma' }
+];
+
+export const MEDICAL_CATEGORIES = [
+  { id: 'all', label: 'All Medical' },
+  { id: 'MBBS / BDS', label: 'MBBS / BDS' },
+  { id: 'AYUSH', label: 'AYUSH' },
+  { id: 'Paramedical / Allied Health Sciences', label: 'Paramedical / Allied Health Sciences' }
+];
+
+export const AYUSH_COURSES = [
+  { id: 'BAMS', label: 'BAMS – Ayurvedic Medicine & Surgery' },
+  { id: 'BHMS', label: 'BHMS – Homoeopathic Medicine & Surgery' },
+  { id: 'BUMS', label: 'BUMS – Unani Medicine & Surgery' },
+  { id: 'BSMS', label: 'BSMS – Siddha Medicine & Surgery' },
+  { id: 'BNYS', label: 'BNYS – Naturopathy & Yogic Sciences' }
+];
+
+export const MBBS_BDS_COURSES = [
+  { id: 'MBBS', label: 'MBBS – Bachelor of Medicine & Surgery' },
+  { id: 'BDS', label: 'BDS – Bachelor of Dental Surgery' },
+  { id: 'MDS', label: 'MDS – Master of Dental Surgery (PG)' }
+];
+
+export const PARAMEDICAL_DEPARTMENTS = [
+  { id: 'all', label: 'All Paramedical Departments' },
+  { id: 'Nursing', label: 'Nursing' },
+  { id: 'Pharmacy', label: 'Pharmacy' },
+  { id: 'Physiotherapy', label: 'Physiotherapy' },
+  { id: 'Allied Health Sciences', label: 'Allied Health Sciences' }
+];
+
+export const PARAMEDICAL_COURSES_BY_DEPT = {
+  Nursing: [
+    'B.Sc Nursing',
+    'Post Basic B.Sc Nursing',
+    'GNM (General Nursing and Midwifery)',
+    'ANM (Auxiliary Nurse Midwifery)',
+    'M.Sc Medical-Surgical Nursing',
+    'M.Sc Pediatric Nursing',
+    'M.Sc Obstetrics and Gynecological Nursing',
+    'M.Sc Community Health Nursing',
+    'M.Sc Psychiatric Nursing'
+  ],
+  Pharmacy: [
+    'B.Pharm',
+    'D.Pharm',
+    'Pharm.D',
+    'Pharm.D (Post Baccalaureate)',
+    'M.Pharm Pharmaceutics',
+    'M.Pharm Pharmacology',
+    'M.Pharm Pharmaceutical Chemistry',
+    'M.Pharm Regulatory Affairs',
+    'M.Pharm Pharmaceutical Analysis'
+  ],
+  Physiotherapy: [
+    'BPT (Bachelor of Physiotherapy)',
+    'MPT Orthopedics',
+    'MPT Neurology',
+    'MPT Cardio-Respiratory',
+    'MPT Sports Physiotherapy',
+    'MPT Paediatrics'
+  ],
+  'Allied Health Sciences': [
+    'BOT (Bachelor of Occupational Therapy)',
+    'MOT (Master of Occupational Therapy)',
+    'BASLP',
+    'B.Optom',
+    'B.Sc Medical Laboratory Technology',
+    'Diploma in Medical Laboratory Technology (DMLT)',
+    'B.Sc Radiology and Imaging Technology',
+    'Diploma in X-Ray and Radiology Technology',
+    'B.Sc Operation Theatre and Anaesthesia Technology',
+    'Diploma in Operation Theatre Technology',
+    'B.Sc Cardiac Care Technology',
+    'B.Sc Renal Dialysis Technology',
+    'Diploma in Dialysis Technology',
+    'B.Sc Respiratory Therapy',
+    'B.Sc Neuro Electrophysiology',
+    'B.Sc Perfusion Technology',
+    'B.Sc Physician Assistant',
+    'B.Sc Critical Care Technology',
+    'B.Sc Emergency and Trauma Care Technology'
+  ]
+};
 
 export const STREAM_SPECIALIZATIONS = {
   Medical: [
@@ -1076,13 +1171,38 @@ export default function Colleges({ collegesData }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [zone, setZone] = useState('all');
   const [selectedStream, setSelectedStream] = useState('all');
+  const [academicLevel, setAcademicLevel] = useState('all');
   const [selectedMedicalCategory, setSelectedMedicalCategory] = useState('all');
+  const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [selectedSpecialization, setSelectedSpecialization] = useState('all');
   const [selectedCourse, setSelectedCourse] = useState('all');
   const [selectedInstitutionType, setSelectedInstitutionType] = useState('all');
   const [onlyTnea, setOnlyTnea] = useState(false);
   const [visible, setVisible] = useState(PAGE_SIZE);
   const directoryRef = useRef(null);
+
+  const handleStreamChange = (newStream) => {
+    setSelectedStream(newStream);
+    setSelectedMedicalCategory('all');
+    setSelectedDepartment('all');
+    setSelectedSpecialization('all');
+    setSelectedCourse('all');
+    if (newStream === 'Medical') {
+      setOnlyTnea(false);
+    }
+  };
+
+  const handleMedicalCategoryChange = (newMedCat) => {
+    setSelectedMedicalCategory(newMedCat);
+    setSelectedDepartment('all');
+    setSelectedSpecialization('all');
+    setSelectedCourse('all');
+  };
+
+  const handleDepartmentChange = (newDept) => {
+    setSelectedDepartment(newDept);
+    setSelectedCourse('all');
+  };
 
   // Client-side hydration from /api/colleges
   useEffect(() => {
@@ -1115,6 +1235,8 @@ export default function Colleges({ collegesData }) {
           ...c,
           zone: group.district,
           type: c.type || 'Engineering',
+          medicalCategory: c.medicalCategory || '',
+          academicLevels: Array.isArray(c.academicLevels) ? c.academicLevels : [],
           specialization: c.specialization || '',
           institutionType: c.institutionType || '',
           courses: Array.isArray(c.courses) ? c.courses : [],
@@ -1155,8 +1277,51 @@ export default function Colleges({ collegesData }) {
     return Array.from(specs).sort();
   }, [selectedStream, allColleges]);
 
-  // Available courses based on selected stream
+  // Available courses based on selected stream & medical subcategories
   const availableCourses = useMemo(() => {
+    if (selectedStream === 'Medical') {
+      if (selectedMedicalCategory === 'MBBS / BDS') {
+        return ['MBBS', 'BDS', 'MDS'];
+      }
+      if (selectedMedicalCategory === 'AYUSH') {
+        return ['BAMS', 'BHMS', 'BUMS', 'BSMS', 'BNYS'];
+      }
+      if (selectedMedicalCategory === 'Paramedical / Allied Health Sciences') {
+        if (selectedDepartment !== 'all' && PARAMEDICAL_COURSES_BY_DEPT[selectedDepartment]) {
+          return PARAMEDICAL_COURSES_BY_DEPT[selectedDepartment];
+        }
+        return [
+          'B.Sc Nursing',
+          'Post Basic B.Sc Nursing',
+          'GNM (General Nursing and Midwifery)',
+          'ANM (Auxiliary Nurse Midwifery)',
+          'M.Sc Medical-Surgical Nursing',
+          'B.Pharm',
+          'D.Pharm',
+          'Pharm.D',
+          'M.Pharm Pharmaceutics',
+          'BPT (Bachelor of Physiotherapy)',
+          'MPT Orthopedics',
+          'BOT (Bachelor of Occupational Therapy)',
+          'BASLP',
+          'B.Optom',
+          'B.Sc Medical Laboratory Technology',
+          'Diploma in Medical Laboratory Technology (DMLT)',
+          'B.Sc Radiology and Imaging Technology',
+          'B.Sc Operation Theatre and Anaesthesia Technology',
+          'B.Sc Cardiac Care Technology',
+          'B.Sc Renal Dialysis Technology',
+          'B.Sc Respiratory Therapy',
+          'B.Sc Physician Assistant',
+          'B.Sc Critical Care Technology',
+          'B.Sc Emergency and Trauma Care Technology',
+          'B.Sc Neuro Electrophysiology',
+          'B.Sc Perfusion Technology'
+        ];
+      }
+      return STREAM_COURSES.Medical;
+    }
+
     if (selectedStream !== 'all' && STREAM_COURSES[selectedStream]) {
       return STREAM_COURSES[selectedStream];
     }
@@ -1167,7 +1332,7 @@ export default function Colleges({ collegesData }) {
       });
     });
     return Array.from(coursesSet).slice(0, 30).sort();
-  }, [selectedStream, allColleges]);
+  }, [selectedStream, selectedMedicalCategory, selectedDepartment, allColleges]);
 
   const filtered = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
@@ -1182,7 +1347,64 @@ export default function Colleges({ collegesData }) {
       // 2. Stream
       if (selectedStream !== 'all' && (c.type || 'Engineering') !== selectedStream) return false;
 
-      // 3. Institution Type
+      // 3. Academic Level Filter (UG / PG / Diploma)
+      if (academicLevel !== 'all') {
+        const inLevels = Array.isArray(c.academicLevels) && c.academicLevels.includes(academicLevel);
+        const inCourses = Array.isArray(c.courses) && c.courses.some((cr) => cr.level === academicLevel);
+        if (!inLevels && !inCourses) {
+          const deptsText = (c.departments || []).join(' ').toUpperCase();
+          if (academicLevel === 'Diploma') {
+            if (!deptsText.includes('DIPLOMA') && !deptsText.includes('D.PHARM') && !deptsText.includes('GNM') && !deptsText.includes('ANM') && !deptsText.includes('DMLT') && c.type !== 'Polytechnic') return false;
+          } else if (academicLevel === 'PG') {
+            if (!/M\.E|M\.TECH|M\.D|M\.S|MDS|M\.SC|M\.PHARM|MPT|MOT|MBA|MCA|M\.COM|M\.A|M\.ED/i.test(deptsText)) return false;
+          } else if (academicLevel === 'UG') {
+            if (!/B\.E|B\.TECH|MBBS|BDS|BAMS|BHMS|BSMS|BNYS|BUMS|B\.SC|B\.PHARM|BPT|BOT|BASLP|BBA|B\.COM|B\.A|BCA|B\.ED|LL\.B|PHARM\.D/i.test(deptsText) && c.type === 'Polytechnic') return false;
+          }
+        }
+      }
+
+      // 4. Medical Category (when selectedStream is Medical or All)
+      if (selectedStream === 'Medical' && selectedMedicalCategory !== 'all') {
+        if (!collegeMatchesMedicalCategory(c, selectedMedicalCategory)) return false;
+      }
+
+      // 5. Paramedical Department Filter (when in Paramedical category)
+      if (selectedStream === 'Medical' && selectedMedicalCategory === 'Paramedical / Allied Health Sciences' && selectedDepartment !== 'all') {
+        const normDepts = (c.departments || []).join(' ').toLowerCase();
+        const normSpec = (c.specialization || '').toLowerCase();
+        const text = `${normDepts} ${normSpec} ${(c.name || '').toLowerCase()}`;
+        if (selectedDepartment === 'Nursing' && !text.includes('nursing') && !text.includes('gnm') && !text.includes('anm')) return false;
+        if (selectedDepartment === 'Pharmacy' && !text.includes('pharm')) return false;
+        if (selectedDepartment === 'Physiotherapy' && !text.includes('physio') && !text.includes('bpt') && !text.includes('mpt')) return false;
+        if (selectedDepartment === 'Allied Health Sciences') {
+          if (!/allied|cardiac|dialysis|radiology|optom|mlt|anaesthesia|operation theatre|perfusion|respiratory|emergency|critical care|physician assistant/i.test(text)) return false;
+        }
+      }
+
+      // 6. Course Filter
+      if (selectedCourse !== 'all') {
+        const colDepts = (c.departments || []).map((d) => d.toLowerCase());
+        const colSpec = (c.specialization || '').toLowerCase();
+        const colCourses = (c.courses || []).map((cr) => (cr.name || '').toLowerCase());
+        const colCodes = (c.courses || []).map((cr) => (cr.code || '').toLowerCase());
+
+        const match =
+          colDepts.some((d) => d.includes(courseLower)) ||
+          colSpec.includes(courseLower) ||
+          colCourses.some((cn) => cn.includes(courseLower)) ||
+          colCodes.some((code) => code === courseLower);
+        if (!match) return false;
+      }
+
+      // 7. General Specialization Filter (for non-medical streams)
+      if (selectedStream !== 'Medical' && selectedSpecialization !== 'all') {
+        const colSpec = (c.specialization || '').toLowerCase();
+        const colDepts = (c.departments || []).map((d) => d.toLowerCase());
+        const match = colSpec.includes(specLower) || colDepts.some((d) => d.includes(specLower));
+        if (!match) return false;
+      }
+
+      // 8. Institution Type
       if (selectedInstitutionType !== 'all') {
         const cType = (c.institutionType || '').toLowerCase();
         const cName = (c.name || '').toLowerCase();
@@ -1197,57 +1419,67 @@ export default function Colleges({ collegesData }) {
         }
       }
 
-      // 4. Specialization
-      if (selectedSpecialization !== 'all') {
-        const colSpec = (c.specialization || '').toLowerCase();
-        const colDepts = (c.departments || []).map((d) => d.toLowerCase());
-        const match =
-          colSpec.includes(specLower) ||
-          colDepts.some((d) => d.includes(specLower));
-        if (!match) return false;
+      // 9. TNEA code filter (only if selectedStream !== 'Medical')
+      if (onlyTnea) {
+        if (c.type === 'Medical') return false;
+        if (c.tneaStatus !== 'verified' || !c.tneaCode) return false;
       }
 
-      // 5. Course
-      if (selectedCourse !== 'all') {
-        const colDepts = (c.departments || []).map((d) => d.toLowerCase());
-        const colSpec = (c.specialization || '').toLowerCase();
-        const colCourses = (c.courses || []).map((cr) => (cr.name || '').toLowerCase());
-        const match =
-          colDepts.some((d) => d.includes(courseLower)) ||
-          colSpec.includes(courseLower) ||
-          colCourses.some((cn) => cn.includes(courseLower));
-        if (!match) return false;
-      }
-
-      // 6. TNEA code
-      if (onlyTnea && (c.tneaStatus !== 'verified' || !c.tneaCode)) return false;
-
-      // 7. Search keyword
+      // 10. Search query
       if (!q) return true;
+      const deptsJoined = (c.departments || []).join(' ').toLowerCase();
+      const coursesJoined = (c.courses || []).map(cr => `${cr.name} ${cr.code || ''}`).join(' ').toLowerCase();
       return (
         c.name.toLowerCase().includes(q) ||
         (c.location || '').toLowerCase().includes(q) ||
         (c.zone || '').toLowerCase().includes(q) ||
         (c.type || '').toLowerCase().includes(q) ||
+        (c.medicalCategory || '').toLowerCase().includes(q) ||
         (c.specialization && c.specialization.toLowerCase().includes(q)) ||
         (c.institutionType && c.institutionType.toLowerCase().includes(q)) ||
-        (c.tneaCode && c.tneaCode.toLowerCase().includes(q)) ||
         (c.codeValue && c.codeValue.toLowerCase().includes(q)) ||
         (c.codeType && c.codeType.toLowerCase().includes(q)) ||
         (c.issuingAuthority && c.issuingAuthority.toLowerCase().includes(q)) ||
-        (c.departments || []).some((d) => d.toLowerCase().includes(q))
+        deptsJoined.includes(q) ||
+        coursesJoined.includes(q)
       );
     });
-  }, [allColleges, searchTerm, zone, selectedStream, selectedSpecialization, selectedCourse, selectedInstitutionType, onlyTnea]);
+  }, [
+    allColleges,
+    searchTerm,
+    zone,
+    selectedStream,
+    academicLevel,
+    selectedMedicalCategory,
+    selectedDepartment,
+    selectedSpecialization,
+    selectedCourse,
+    selectedInstitutionType,
+    onlyTnea,
+  ]);
 
   useEffect(() => {
     setVisible(PAGE_SIZE);
-  }, [searchTerm, zone, selectedStream, selectedSpecialization, selectedCourse, selectedInstitutionType, onlyTnea]);
+  }, [
+    searchTerm,
+    zone,
+    selectedStream,
+    academicLevel,
+    selectedMedicalCategory,
+    selectedDepartment,
+    selectedSpecialization,
+    selectedCourse,
+    selectedInstitutionType,
+    onlyTnea,
+  ]);
 
   const clearFilters = () => {
     setSearchTerm('');
     setZone('all');
     setSelectedStream('all');
+    setAcademicLevel('all');
+    setSelectedMedicalCategory('all');
+    setSelectedDepartment('all');
     setSelectedSpecialization('all');
     setSelectedCourse('all');
     setSelectedInstitutionType('all');
@@ -1258,6 +1490,13 @@ export default function Colleges({ collegesData }) {
     Boolean(searchTerm) ||
     zone !== 'all' ||
     selectedStream !== 'all' ||
+    academicLevel !== 'all' ||
+    selectedMedicalCategory !== 'all' ||
+    selectedDepartment !== 'all' ||
+    selectedSpecialization !== 'all' ||
+    selectedCourse !== 'all' ||
+    selectedInstitutionType !== 'all' ||
+    onlyTnea;
     selectedSpecialization !== 'all' ||
     selectedCourse !== 'all' ||
     selectedInstitutionType !== 'all' ||
@@ -1460,7 +1699,7 @@ export default function Colleges({ collegesData }) {
                 <button
                   key={s.id}
                   type="button"
-                  onClick={() => setSelectedStream(s.id)}
+                  onClick={() => handleStreamChange(s.id)}
                   className={`rounded-full px-4 py-2 text-xs font-bold transition-all ${
                     isSelected
                       ? 'bg-forest text-white shadow-sm ring-2 ring-forest ring-offset-2'
@@ -1477,12 +1716,7 @@ export default function Colleges({ collegesData }) {
           {selectedStream === 'Medical' && (
             <div role="group" aria-label="Filter by medical category" className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl bg-red-50/70 p-3.5 border border-red-100">
               <span className="text-xs font-bold uppercase tracking-wider text-red-900 mr-2">Medical Category:</span>
-              {[
-                { id: 'all', label: 'All Medical' },
-                { id: 'MBBS / BDS', label: 'MBBS / BDS' },
-                { id: 'AYUSH', label: 'AYUSH' },
-                { id: 'Paramedical / Allied Health Sciences', label: 'Paramedical / Allied Health Sciences' },
-              ].map((mc) => {
+              {MEDICAL_CATEGORIES.map((mc) => {
                 const isMcSelected = selectedMedicalCategory === mc.id;
                 const count = mc.id === 'all'
                   ? allColleges.filter((c) => (c.type || 'Engineering') === 'Medical').length
@@ -1491,7 +1725,7 @@ export default function Colleges({ collegesData }) {
                   <button
                     key={mc.id}
                     type="button"
-                    onClick={() => setSelectedMedicalCategory(mc.id)}
+                    onClick={() => handleMedicalCategoryChange(mc.id)}
                     className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
                       isMcSelected
                         ? 'bg-crimson text-white shadow-sm ring-2 ring-crimson ring-offset-1'
@@ -1507,8 +1741,9 @@ export default function Colleges({ collegesData }) {
 
           {/* Combined Filters Panel */}
           <div className="mt-4 rounded-3xl border border-gray-100 bg-white p-5 shadow-card space-y-3">
-            <div className="grid gap-3 md:grid-cols-[1.5fr_1fr_1fr]">
-              <div className="relative">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {/* Search */}
+              <div className="relative sm:col-span-2 lg:col-span-1">
                 <label htmlFor="college-search" className="sr-only">Search colleges by name, location, course or specialization</label>
                 <FaSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
                 <input
@@ -1516,15 +1751,16 @@ export default function Colleges({ collegesData }) {
                   type="search"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search by college name, city, branch, degree..."
+                  placeholder="Search college, degree, city..."
                   className={`${field} pl-11`}
                 />
               </div>
 
+              {/* District */}
               <div>
                 <label htmlFor="college-zone" className="sr-only">Filter by district</label>
                 <select id="college-zone" value={zone} onChange={(e) => setZone(e.target.value)} className={field}>
-                  <option value="all">All Tamil Nadu Districts & Zones ({allColleges.length})</option>
+                  <option value="all">All Districts & Zones ({allColleges.length})</option>
                   <optgroup label="Official Tamil Nadu Districts (38)">
                     {officialDistricts.map((d) => {
                       const count = allColleges.filter((c) => c.zone === d).length;
@@ -1536,7 +1772,7 @@ export default function Colleges({ collegesData }) {
                     })}
                   </optgroup>
                   {legacyZones.length > 0 && (
-                    <optgroup label="Legacy Zones & Regional Clusters">
+                    <optgroup label="Regional Clusters & Other Zones">
                       {legacyZones.map((z) => {
                         const count = allColleges.filter((c) => c.zone === z).length;
                         return (
@@ -1550,6 +1786,29 @@ export default function Colleges({ collegesData }) {
                 </select>
               </div>
 
+              {/* Academic Level */}
+              <div>
+                <label htmlFor="college-academic-level" className="sr-only">Filter by academic level</label>
+                <select
+                  id="college-academic-level"
+                  value={academicLevel}
+                  onChange={(e) => setAcademicLevel(e.target.value)}
+                  className={field}
+                >
+                  {ACADEMIC_LEVELS.map((lvl) => {
+                    const count = lvl.id === 'all'
+                      ? allColleges.length
+                      : allColleges.filter((c) => Array.isArray(c.academicLevels) && c.academicLevels.includes(lvl.id)).length;
+                    return (
+                      <option key={lvl.id} value={lvl.id}>
+                        {lvl.label} ({count})
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              {/* Institution Type */}
               <div>
                 <label htmlFor="college-inst-type" className="sr-only">Filter by institution type</label>
                 <select
@@ -1567,52 +1826,120 @@ export default function Colleges({ collegesData }) {
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-[1.2fr_1.2fr_auto] items-center pt-1 border-t border-gray-100">
-              <div>
-                <label htmlFor="college-specialization" className="sr-only">Filter by specialization</label>
-                <select
-                  id="college-specialization"
-                  value={selectedSpecialization}
-                  onChange={(e) => setSelectedSpecialization(e.target.value)}
-                  className={field}
-                >
-                  <option value="all">All Specializations ({availableSpecializations.length})</option>
-                  {availableSpecializations.map((spec) => (
-                    <option key={spec} value={spec}>
-                      {spec}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            {/* Contextual Second Row Filters */}
+            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-[1.2fr_1.2fr_auto] items-center pt-2 border-t border-gray-100">
+              {/* Medical Specific Contextual Dropdowns */}
+              {selectedStream === 'Medical' ? (
+                <>
+                  {selectedMedicalCategory === 'Paramedical / Allied Health Sciences' ? (
+                    <div>
+                      <label htmlFor="college-dept" className="sr-only">Filter by paramedical department</label>
+                      <select
+                        id="college-dept"
+                        value={selectedDepartment}
+                        onChange={(e) => handleDepartmentChange(e.target.value)}
+                        className={field}
+                      >
+                        {PARAMEDICAL_DEPARTMENTS.map((dept) => (
+                          <option key={dept.id} value={dept.id}>
+                            {dept.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : null}
 
-              <div>
-                <label htmlFor="college-course" className="sr-only">Filter by course or degree</label>
-                <select
-                  id="college-course"
-                  value={selectedCourse}
-                  onChange={(e) => setSelectedCourse(e.target.value)}
-                  className={field}
-                >
-                  <option value="all">All Degrees / Courses Offered ({availableCourses.length})</option>
-                  {availableCourses.map((crs) => (
-                    <option key={crs} value={crs}>
-                      {crs}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  <div className={selectedMedicalCategory === 'Paramedical / Allied Health Sciences' ? '' : 'sm:col-span-2'}>
+                    <label htmlFor="college-course" className="sr-only">Filter by course or degree</label>
+                    <select
+                      id="college-course"
+                      value={selectedCourse}
+                      onChange={(e) => setSelectedCourse(e.target.value)}
+                      className={field}
+                    >
+                      {selectedMedicalCategory === 'MBBS / BDS' ? (
+                        <>
+                          <option value="all">All MBBS / BDS Degrees ({MBBS_BDS_COURSES.length})</option>
+                          {MBBS_BDS_COURSES.map((crs) => (
+                            <option key={crs.id} value={crs.id}>
+                              {crs.label}
+                            </option>
+                          ))}
+                        </>
+                      ) : selectedMedicalCategory === 'AYUSH' ? (
+                        <>
+                          <option value="all">All AYUSH Programs ({AYUSH_COURSES.length})</option>
+                          {AYUSH_COURSES.map((crs) => (
+                            <option key={crs.id} value={crs.id}>
+                              {crs.label}
+                            </option>
+                          ))}
+                        </>
+                      ) : (
+                        <>
+                          <option value="all">
+                            {selectedDepartment !== 'all' ? `All ${selectedDepartment} Degrees` : 'All Paramedical & Medical Degrees'} ({availableCourses.length})
+                          </option>
+                          {availableCourses.map((crs) => (
+                            <option key={crs} value={crs}>
+                              {crs}
+                            </option>
+                          ))}
+                        </>
+                      )}
+                    </select>
+                  </div>
+                </>
+              ) : (
+                /* Non-Medical Stream Filters */
+                <>
+                  <div>
+                    <label htmlFor="college-specialization" className="sr-only">Filter by specialization</label>
+                    <select
+                      id="college-specialization"
+                      value={selectedSpecialization}
+                      onChange={(e) => setSelectedSpecialization(e.target.value)}
+                      className={field}
+                    >
+                      <option value="all">All Specializations ({availableSpecializations.length})</option>
+                      {availableSpecializations.map((spec) => (
+                        <option key={spec} value={spec}>
+                          {spec}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div className="flex items-center gap-4 px-2">
-                <label className="flex cursor-pointer items-center gap-2 text-xs font-semibold text-gray-700 whitespace-nowrap">
-                  <input
-                    type="checkbox"
-                    checked={onlyTnea}
-                    onChange={(e) => setOnlyTnea(e.target.checked)}
-                    className="h-4 w-4 accent-forest"
-                  />
-                  Verified TNEA Code
-                </label>
-              </div>
+                  <div>
+                    <label htmlFor="college-course" className="sr-only">Filter by course or degree</label>
+                    <select
+                      id="college-course"
+                      value={selectedCourse}
+                      onChange={(e) => setSelectedCourse(e.target.value)}
+                      className={field}
+                    >
+                      <option value="all">All Degrees / Courses Offered ({availableCourses.length})</option>
+                      {availableCourses.map((crs) => (
+                        <option key={crs} value={crs}>
+                          {crs}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-4 px-2">
+                    <label className="flex cursor-pointer items-center gap-2 text-xs font-semibold text-gray-700 whitespace-nowrap">
+                      <input
+                        type="checkbox"
+                        checked={onlyTnea}
+                        onChange={(e) => setOnlyTnea(e.target.checked)}
+                        className="h-4 w-4 accent-forest"
+                      />
+                      Verified TNEA Code
+                    </label>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -1640,9 +1967,14 @@ export default function Colleges({ collegesData }) {
                       <p className="mt-1 flex items-center gap-1.5 text-sm text-gray-600"><FaMapMarkerAlt className="shrink-0 text-xs text-crimson" aria-hidden="true" />{c.location}</p>
                     </div>
                   </div>
-                  <div className="mt-3 flex flex-wrap gap-1.5">
+                  <div className="mt-3 flex flex-wrap items-center gap-1.5">
                     <span className="rounded-full bg-emerald-50 border border-emerald-200/60 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">{c.type || 'Engineering'}</span>
-                    {c.specialization && (
+                    {c.type === 'Medical' && c.medicalCategory && (
+                      <span className="rounded-full bg-rose-50 border border-rose-200/70 px-2.5 py-0.5 text-xs font-semibold text-rose-800">
+                        {c.medicalCategory}
+                      </span>
+                    )}
+                    {c.specialization && c.specialization !== c.medicalCategory && (
                       <span className="rounded-full bg-blue-50 border border-blue-200/60 px-2.5 py-0.5 text-xs font-semibold text-blue-800">
                         {c.specialization}
                       </span>
@@ -1653,6 +1985,15 @@ export default function Colleges({ collegesData }) {
                       </span>
                     )}
                     <span className="rounded-full bg-forest/10 px-2.5 py-0.5 text-xs font-semibold text-forest">{c.zone}</span>
+
+                    {/* Academic Levels Badges */}
+                    {Array.isArray(c.academicLevels) && c.academicLevels.map((lvl) => (
+                      <span key={lvl} className="rounded-full bg-indigo-50 border border-indigo-200/60 px-2 py-0.5 text-[11px] font-semibold text-indigo-700">
+                        {lvl}
+                      </span>
+                    ))}
+
+                    {/* Regulatory Authority Code (NMC, DCI, NCH, NCISM, PCI, INC, TNEA, etc.) */}
                     {c.codeValue && c.codeStatus === 'VERIFIED' ? (
                       <span
                         className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${getCodeBadgeStyle(c.codeType)}`}
@@ -1660,14 +2001,14 @@ export default function Colleges({ collegesData }) {
                       >
                         <FaCode aria-hidden="true" /> {c.codeType ? `${c.codeType} ` : ''}{c.codeValue}
                       </span>
-                    ) : c.tneaStatus === 'verified' && c.tneaCode ? (
+                    ) : (c.type !== 'Medical' && c.tneaStatus === 'verified' && c.tneaCode) ? (
                       <span
                         className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-900"
                         title={`Verified TNEA Code: ${c.tneaCode}${c.tneaSourceYear ? ` (${c.tneaSourceYear})` : ''}`}
                       >
                         <FaCode aria-hidden="true" /> TNEA {c.tneaCode}
                       </span>
-                    ) : c.tneaStatus === 'pending_verification' ? (
+                    ) : (c.type !== 'Medical' && c.tneaStatus === 'pending_verification') ? (
                       <span
                         className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800"
                         title="TNEA counselling code pending verification"
@@ -1677,6 +2018,25 @@ export default function Colleges({ collegesData }) {
                     ) : null}
                     {c.note && <span className="rounded-full bg-crimson/10 px-2.5 py-0.5 text-xs font-semibold text-crimson">{c.note}</span>}
                   </div>
+
+                  {/* Prominent Courses Offered Preview */}
+                  {Array.isArray(c.courses) && c.courses.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1">
+                      {c.courses
+                        .filter(cr => academicLevel === 'all' || cr.level === academicLevel)
+                        .slice(0, 3)
+                        .map((cr) => (
+                          <span
+                            key={cr._id || cr.name}
+                            className="inline-flex items-center gap-1 rounded-md bg-gray-50 border border-gray-200/60 px-2 py-0.5 text-[11px] font-medium text-gray-700"
+                          >
+                            <FaGraduationCap className="text-forest text-[10px]" />
+                            {cr.name}{cr.duration ? ` (${cr.duration})` : ''}
+                          </span>
+                        ))}
+                    </div>
+                  )}
+
                   <div className="mt-auto flex flex-wrap items-center gap-3 pt-4">
                     {c.departments && c.departments.length > 0 && (
                       <button type="button" onClick={() => setSelectedCollege(c)} className="inline-flex items-center gap-2 rounded-full border border-forest px-4 py-2 text-xs font-semibold text-forest hover:bg-forest hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2">
